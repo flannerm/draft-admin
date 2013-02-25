@@ -1,0 +1,170 @@
+﻿<UserControl x:Class="DraftAdmin.Views.PlayerTabView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+             xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions" 
+             xmlns:prompt="clr-namespace:UserPrompt"
+             xmlns:global="clr-namespace:DraftAdmin.Global"
+             mc:Ignorable="d" Width="1000"
+             d:DesignHeight="500" d:DesignWidth="1000">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="35"/>
+            <RowDefinition/>
+            <RowDefinition/>
+            <RowDefinition/>
+            <RowDefinition Height="40"/>
+        </Grid.RowDefinitions>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="Auto"/>
+        </Grid.ColumnDefinitions>
+
+        <Grid Name="filters" Grid.Row="0" Grid.Column="0" Margin="15,0,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="30"/>
+                <ColumnDefinition Width="85"/>
+                <ColumnDefinition Width="100"/>
+                <ColumnDefinition Width="40"/>
+                <ColumnDefinition Width="134"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <TextBlock Grid.Column="0" VerticalAlignment="Center" Text="Filter:"/>
+            <TextBox Grid.Column="1" Height="25" Width="80" Text="{Binding FirstNameFilter, UpdateSourceTrigger=PropertyChanged}"/>
+            <TextBox Grid.Column="2" Height="25" Width="95" Text="{Binding LastNameFilter, UpdateSourceTrigger=PropertyChanged}"/>
+            <TextBox Grid.Column="3" Height="25" Width="35" Text="{Binding PositionFilter, UpdateSourceTrigger=PropertyChanged}"/>
+            <TextBox Grid.Column="4" Height="25" Width="129" Text="{Binding SchoolFilter, UpdateSourceTrigger=PropertyChanged}"/>
+            
+            <Button Grid.Column="5" Name="clearFilterButton" Content="X" Background="Black" Foreground="White" Command="{Binding ClearFilterCommand}" Height="25" Width="25" Margin="10,0,0,0"/>
+        </Grid>
+
+        <Border Grid.Row="1" Grid.RowSpan="3" Grid.Column="0" Background="White" BorderThickness="0" BorderBrush="#FF000000" 
+                CornerRadius="8,8,8,8" Margin="10,0,0,0">
+            <!--Length,Source={x:Static local:MyClass.Instance}}/>-->
+            <ListView x:Name="listPlayers" ItemsSource="{Binding FilteredPlayers}"               
+                    		ScrollViewer.CanContentScroll="True"
+                    		ScrollViewer.VerticalScrollBarVisibility="Auto"
+                    		ScrollViewer.HorizontalScrollBarVisibility="Hidden"
+                    		HorizontalAlignment="Left" 
+                    		SelectedItem="{Binding SelectedPlayer}"
+                            BorderThickness="0"
+                            Width="505">
+                <ListView.Background>
+                    <SolidColorBrush Color="Gray" Opacity="0.2"/>
+
+                </ListView.Background>
+
+                <ListView.View>
+                    <GridView>
+                        <GridViewColumn Header="Rank" Width="30">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding KiperRank, Converter={StaticResource rankToString}}" Width="30"/>
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+                        
+                        <GridViewColumn Header="First Name" Width="85">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding FirstName}" Width="85"/>
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+                        
+                        <GridViewColumn Header="Last Name" Width="100">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding LastName}" Width="100"/>
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+                        
+                        <GridViewColumn Header="" Width="40">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Position}" Width="40"/>
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+                        
+                        <GridViewColumn Header="" Width="134">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal">
+                                        <Border BorderThickness="0" Height="27" Width="40" CornerRadius="5" VerticalAlignment="Center">
+                                            <Border.Background>
+                                                <ImageBrush ImageSource="{Binding School.LogoPng, Converter={StaticResource nullToImage}}" Stretch="UniformToFill"/>
+                                                <!--<ImageBrush ImageSource="{Binding School.LogoBitmap}" Stretch="UniformToFill"/>-->
+                                            </Border.Background>                                        
+                                        </Border>
+                                        <TextBlock Text="{Binding School.Name}" Width="90" VerticalAlignment="Center" Margin="5,0,0,0"/>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+                        
+                        <GridViewColumn Header="Pick" Width="40">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Pick.OverallPick}" Width="40"/>
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+                        
+                        <GridViewColumn Header="Team" Width="60">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Border BorderThickness="0" Height="27" Width="40" CornerRadius="5" VerticalAlignment="Center">
+                                        <Border.Background>
+                                            <ImageBrush ImageSource="{Binding Pick.Team.LogoPng, Converter={StaticResource nullToImage}}" Stretch="UniformToFill"/>                                            
+                                        </Border.Background>                                        
+                                    </Border>                                    
+                                    <!--<Image Source="{Binding Pick.Team.LogoPng, Converter={StaticResource nullToImage}}" Height="30"/>-->
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+                    </GridView>
+                </ListView.View>
+            </ListView>
+        </Border>
+
+        <StackPanel Orientation="Horizontal" Grid.Row="4" Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center">
+
+            <Button x:Name="addButton" Height="30" Width="100" Margin="5" Background="Black"
+                                Command="{Binding AddPlayerCommand}" Content="Add Player"/>
+
+            <Button x:Name="deleteButton" Height="30" Width="100" Margin="5" Background="Black"
+                                Command="{Binding DeletePlayerCommand}" Content="Delete Player"/>
+
+            <Button x:Name="refreshButton" Height="30" Width="120" Margin="25,0,0,0" Background="Black"
+                                Command="{Binding RefreshPlayersCommand}" Content="Refresh Players"/>
+        </StackPanel>
+
+        <Border Grid.Column="1" Grid.Row="1" Grid.RowSpan="3" Background="White" BorderThickness="0" BorderBrush="#ff000000" 
+                CornerRadius="8,8,8,8" Margin="10,0,10,0">
+            <ContentControl x:Name="contentControl" Content="{Binding SelectedPlayerEditVM}" Background="#eaeedb" Width="460">
+                <!--<i:Interaction.Behaviors>
+                    <ei:FluidMoveBehavior Duration="0:0:2" AppliesTo="Children"/>
+                </i:Interaction.Behaviors>-->
+            </ContentControl>
+        </Border>
+
+        <prompt:MessageBox Trigger="{Binding AskSaveOnDirty}"
+                               Type="YesNo" YesAction="{Binding SaveChanges}"
+                               NoAction="{Binding DiscardChanges}"
+                               Message="{Binding PromptMessage}"
+                               Caption="Unsaved player info"/>
+
+        <prompt:MessageBox Trigger="{Binding AskDeletePlayer}"
+                               Type="YesNo" YesAction="{Binding DeletePlayer}"
+                               NoAction="{Binding CancelDeletePlayer}"
+                               Message="{Binding PromptMessage}"
+                               Caption="Delete Player"/>
+
+    </Grid>
+</UserControl>

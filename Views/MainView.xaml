@@ -1,0 +1,382 @@
+﻿<Window
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:prompt="clr-namespace:UserPrompt"
+        xmlns:behaviors="clr-namespace:DraftAdmin.Behaviors"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+	    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+        xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity" 
+        xmlns:Custom="http://www.julmar.com/wpfhelpers" 
+        xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions" 
+        mc:Ignorable="d" x:Class="DraftAdmin.Views.MainView"
+        xmlns:wf="clr-namespace:System.Windows.Forms;assembly=System.Windows.Forms"  
+        xmlns:clk="clr-namespace:AxClockControl;assembly=AxInterop.ClockControl"
+        xmlns:global="clr-namespace:DraftAdmin.Global"
+        Icon="/DraftAdmin;component/DraftAdminIcon.ico"
+        Title="NFL Draft Compression Admin" Height="768" Width="1024">
+    
+    <Grid>
+        <Grid.Background>
+            <ImageBrush ImageSource="/DraftAdmin;component/Images/background.png"/>
+        </Grid.Background>
+        
+        <Grid.RowDefinitions>
+        	<RowDefinition Height="Auto"/>
+        	<RowDefinition/>
+        	<RowDefinition Height="30"/>
+        	<RowDefinition Height="30"/>
+        </Grid.RowDefinitions>
+
+        <Grid>
+            <Grid.Background>
+                <SolidColorBrush Color="White" Opacity="0.4"/>
+            </Grid.Background>
+            
+            <Grid.ColumnDefinitions>
+            	<ColumnDefinition Width="Auto"/>
+            	<ColumnDefinition Width="Auto"/>
+            	<ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            	<ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            
+            <StackPanel Orientation="Horizontal" Grid.Column="0">
+                <Button Grid.Column="0" x:Name="initializeButton" Height="30" Width="110" Margin="10" HorizontalAlignment="Left" VerticalAlignment="Center"
+                    Command="{Binding InitializePlayoutCommand}" Content="Initialize Playout" Background="Black" IsEnabled="{Binding PlayoutEnabled}"/>
+
+                <Button x:Name="connectPlayoutButton" Height="30" Width="120" Margin="10" 
+                    Command="{Binding ConnectToPlayoutCommand}" Content="Connect To Playout" Background="Black"/>
+            </StackPanel>
+            
+            <StackPanel Grid.Column="1" Orientation="Horizontal" Margin="40,0,0,0">
+                
+                <TextBlock Text="Lower 3rd:" VerticalAlignment="Center"/>
+                
+                <Button x:Name="togglePlaylistTimerButton" Height="30" Width="100" Margin="5,10,10,10" HorizontalAlignment="Left" VerticalAlignment="Center"
+                    Command="{Binding TogglePlaylistTimerCommand}" Content="{Binding PlaylistTimerRunning, Converter={StaticResource boolToString}}" Background="Black" IsEnabled="{Binding PlayoutEnabled}"/>
+                
+                <Button x:Name="resetCyleButton" Height="30" Width="100" Margin="10,10,10,10" 
+                    Command="{Binding ResetCycleCommand}" Content="Reset Cycle" Background="Black" IsEnabled="{Binding PlayoutEnabled}"/>
+                
+            </StackPanel>
+
+            <StackPanel Grid.Column="4" Orientation="Horizontal" HorizontalAlignment="Center">
+                <Button x:Name="nextOTCButton" Grid.Column="3" VerticalAlignment="Top" HorizontalAlignment="Right" Height="30" Width="130" Margin="10,10,10,10" 
+                        Command="{Binding NextOnTheClockCommand}" Content="Next On The Clock" Background="Black"/>
+
+                <TextBlock Text="On The Clock:" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                
+                <Border BorderThickness="2" Height="44" Width="64" CornerRadius="10" Margin="0,0,5,0">
+                    
+                    <Border.Background>
+                        <ImageBrush ImageSource="{Binding OnTheClock.Team.LogoPng, Source={x:Static global:GlobalCollections.Instance}}"/>
+                    </Border.Background>
+
+                    <Rectangle x:Name="GelShine" Margin="2,2,2,0" VerticalAlignment="Top" RadiusX="6" RadiusY="6" Opacity="1" Stroke="Transparent" Height="15px">
+                        <Rectangle.Fill>
+                            <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                <GradientStop Color="#ccffffff" Offset="0"/>
+                                <GradientStop Color="Transparent" Offset="1"/>
+                            </LinearGradientBrush>
+                        </Rectangle.Fill>
+                    </Rectangle>
+                    
+                </Border>
+         
+                <TextBlock Text="Round " VerticalAlignment="Center"/>
+                <TextBlock Text="{Binding OnTheClock.Round, Source={x:Static global:GlobalCollections.Instance}}" VerticalAlignment="Center"/>
+                <TextBlock Text=" #" VerticalAlignment="Center"/>
+                <TextBlock Text="{Binding OnTheClock.OverallPick, Source={x:Static global:GlobalCollections.Instance}}" VerticalAlignment="Center"/>
+            </StackPanel>
+
+        </Grid>
+
+        <TabControl Grid.Row="1" Margin="8">
+            
+            <TabControl.Background>
+                <SolidColorBrush Color="White" Opacity="0.4"/>
+            </TabControl.Background>
+            
+            <TabItem Header="Players">
+                <ContentControl Content="{Binding PlayerTabVM}"/>                
+            </TabItem>
+
+            <TabItem Header="Current Selection">
+                <ContentControl Content="{Binding CurrentSelectionTabVM}"/>
+            </TabItem>
+
+            <TabItem Header="Draft Order">
+                <ContentControl Content="{Binding DraftOrderTabVM}"/>
+            </TabItem>
+
+            <TabItem Header="Teams">
+                <ContentControl Content="{Binding TeamTabVM}"/>
+            </TabItem>
+
+            <TabItem Header="Schools">
+                <ContentControl Content="{Binding SchoolTabVM}"/>
+            </TabItem>
+
+            <TabItem Header="Categories">
+                <ContentControl Content="{Binding CategoryTabVM}"/>
+            </TabItem>
+            
+            <TabItem Header="Interruptions">
+                <ContentControl Content="{Binding InterruptionTabVM}"/>
+            </TabItem>
+            
+            <TabItem Header="Playlists">
+                <ContentControl Content="{Binding PlaylistTabVM}"/>
+            </TabItem>
+            
+            <TabItem Header="Poll">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+                    
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="1*"/>
+                    </Grid.RowDefinitions>
+
+                    <Border Grid.Column="0" Grid.Row="0" Grid.RowSpan="2" CornerRadius="10" Margin="10" Height="500" Width="400" VerticalAlignment="Top">
+                        <Border.Background>
+                            <SolidColorBrush Color="Gray" Opacity="0.3"/>
+                        </Border.Background>
+
+                        <TextBlock Height="480" Width="380" Margin="10" 
+                               VerticalAlignment="Top" Text="{Binding PollText}" FontWeight="Bold" FontFamily="Courier New"/>
+
+                    </Border>
+                        
+                    <StackPanel Orientation="Horizontal" Grid.Column="1" Grid.Row="0" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10">
+                        <TextBlock Text="Answers:" FontSize="16" VerticalAlignment="Center"/>
+                        <ComboBox Height="50" Width="60" Margin="5,0,0,0" SelectedValue="{Binding PollAnswers}"
+                                   FontSize="20">
+                            <ComboBoxItem Content="2" VerticalAlignment="Center"/>
+                            <ComboBoxItem Content="3" VerticalAlignment="Center"/>
+                            <ComboBoxItem Content="4" VerticalAlignment="Center"/>
+                            <ComboBoxItem Content="5" VerticalAlignment="Center"/>
+                        </ComboBox>
+
+                        <CheckBox Content="Auto-Refresh Poll" IsChecked="{Binding RefreshPoll}" Margin="40,18,0,0"/>
+                    </StackPanel>
+                    
+                    <Grid Grid.Row="1" Grid.Column="1">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <StackPanel Grid.Row="0" Orientation="Horizontal" VerticalAlignment="Top">
+                            <Button x:Name="showPollQuestionButton" Content="Show Poll (Vote Now)" Width="150" Height="30" Background="Black"
+                                Command="{Binding ShowPollQuestionCommand}"/>
+                            <Button x:Name="showPollResults" Content="Show Poll Results" Width="150" Height="30" Background="Black" Margin="20"
+                                Command="{Binding ShowPollResultsCommand}"/>
+                        </StackPanel>
+
+                        <StackPanel Grid.Row="1" Orientation="Horizontal" VerticalAlignment="Top">
+                            <TextBlock Text="Poll Chip:" VerticalAlignment="Center"></TextBlock>
+                            <ComboBox  Height="30" Width="300" SelectedItem="{Binding SelectedPollChip}" Margin="10"
+                                       ItemsSource="{Binding PollChips}"/>
+                            <!--<TextBox Text="{Binding PollChip}" Height="30" Width="300" Margin="10,0,0,0"></TextBox>-->
+                        </StackPanel>
+
+                        <Button Grid.Row="2" x:Name="refreshPollChipsButton" Height="30" Width="120" Margin="0,15,30,0"
+                                    Command="{Binding RefreshPollChipsCommand}" Content="Refresh List" Background="Black" IsEnabled="{Binding PlayoutEnabled}"/>
+                    </Grid>
+                    
+                    
+                    
+                </Grid>
+                
+            </TabItem>
+            
+            <TabItem Header="Clock">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+
+
+
+                    <Border Grid.Column="0" Grid.Row="0" CornerRadius="10" Margin="10" Width="180" Height="150" HorizontalAlignment="Left" VerticalAlignment="Top">
+                        <Border.Background>
+                            <SolidColorBrush Color="Green" Opacity="0.3"/>
+                        </Border.Background>
+
+
+
+                        <StackPanel Orientation="Vertical">
+                            
+                            <!--<WindowsFormsHost Name="clockHost" Width="120" Height="65" Margin="10" HorizontalAlignment="Center" VerticalAlignment="Top">                                
+                                <clk:AxClockCtl x:Name="clock" Visible="True" ClockChange="clock_ClockChange" />
+                            </WindowsFormsHost>-->
+
+
+                            <Button x:Name="showClock" Height="30" Width="120" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0"
+                                Command="{Binding ShowClockCommand}" Content="Show Clock" Background="Black" IsEnabled="{Binding PlayoutEnabled}"/>
+                            
+                            <CheckBox x:Name="chkTurnClockRed" Content="Turn Clock Red Under 1:00" Margin="10" Height="20"
+                                      IsChecked="{Binding ClockRedUnderMin}"/>
+
+                        </StackPanel>
+                    </Border>
+
+                    <Border Grid.Column="0" Grid.Row="1" CornerRadius="10" Margin="10" Width="180" Height="150" HorizontalAlignment="Left" VerticalAlignment="Top">
+                        <Border.Background>
+                            <SolidColorBrush Color="Green" Opacity="0.3"/>
+                        </Border.Background>
+
+                        <StackPanel Orientation="Vertical">
+                            <TextBlock Text="Countdown To:" Margin="10" FontSize="14" HorizontalAlignment="Center"/>
+                            <TextBox x:Name="countdownTime" Width="100" Height="30" Text="{Binding CountdownTarget}"/>
+                            <CheckBox Content="Use Countdown Clock" IsChecked="{Binding UseCountdownClock}" 
+                                      Margin="0,10,0,0" HorizontalAlignment="Center"></CheckBox>
+                        </StackPanel>
+                    </Border>
+
+
+                    <Border Grid.Column="1" Grid.Row="0" CornerRadius="10" Margin="10" Width="320" Height="150" HorizontalAlignment="Left" VerticalAlignment="Top">
+                        <Border.Background>
+                            <SolidColorBrush Color="Red" Opacity="0.3"/>
+                        </Border.Background>
+
+                        <StackPanel Grid.Column="1" Grid.Row="0" VerticalAlignment="Center" Orientation="Vertical">
+                            
+                            <ComboBox  Height="30" Width="300" SelectedItem="{Binding SelectedClockOverlay}" Margin="10"
+                                       ItemsSource="{Binding ClockOverlays}">
+                                <!--<ComboBoxItem Content="On The Clock"/>
+                                <ComboBoxItem Content="Draft Starts In"/>
+                                <ComboBoxItem Content="Draft Resumes In"/>
+                                <ComboBoxItem Content="Draft Over"/>-->
+                            </ComboBox>
+
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+
+                                <Button x:Name="refreshOverlaysButton" Height="30" Width="120" Margin="0,0,30,0"
+                                    Command="{Binding RefreshOverlaysCommand}" Content="Refresh List" Background="Black" IsEnabled="{Binding PlayoutEnabled}"/>
+
+                                <Button x:Name="showClockOverlayButton" Height="30" Width="120" Margin="0"
+                                    Command="{Binding ShowClockOverlayCommand}" Content="Show Clock Overlay" Background="Black" IsEnabled="{Binding PlayoutEnabled}"/>
+                                
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+
+                </Grid>
+                
+            </TabItem>
+            
+            <TabItem Header="Data">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    
+                    <Button x:Name="importPlayersButton" Grid.Column="0" Grid.Row="0" VerticalAlignment="Top" Height="30" Width="180" Margin="10,10,10,10" 
+                        Command="{Binding ImportPlayersCommand}" Content="Import Players From Excel" Background="Black"/>
+
+                    <Button x:Name="importTeamsButton" Grid.Column="0" Grid.Row="1" VerticalAlignment="Top" Height="30" Width="180" Margin="10,10,10,10" 
+                        Command="{Binding ImportTeamsCommand}" Content="Import Team Info From Excel" Background="Black"/>
+
+                    <Button x:Name="getSchoolsFromSDRButton" Grid.Column="2" Grid.Row="0" VerticalAlignment="Top" Height="30" Width="170" Margin="10,10,10,10"
+                        Command="{Binding GetSchoolsFromSDRCommand}" Content="Import Schools From SDR" Background="Black"/>
+
+                    <Button x:Name="getTeamsFromSDRButton" Grid.Column="2" Grid.Row="1" VerticalAlignment="Top" Height="30" Width="170" Margin="10,10,10,10"
+                        Command="{Binding GetTeamsFromSDRCommand}" Content="Import NFL Teams From SDR" Background="Black"/>
+
+                    <Button x:Name="deleteLastPickButton" Grid.Column="3" Grid.Row="0" VerticalAlignment="Top" Height="30" Width="170" Margin="10,10,10,10"
+                        Command="{Binding DeleteLastPickCommand}" Content="Delete Last Pick" Background="Black"/>
+
+                    <Button x:Name="deleteAllPicksButton" Grid.Column="3" Grid.Row="1" VerticalAlignment="Top" Height="30" Width="170" Margin="10,10,10,10"
+                        Command="{Binding DeleteAllPicksCommand}" Content="Delete ALL Picks" Background="Red" Foreground="Black" FontWeight="Bold"/>
+
+                    <ContentControl Height="300" Width="300" Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="4" Content="{Binding TeamsAndPlayersVM}" 
+                                    Margin="10,20,0,0" HorizontalAlignment="Left"/>
+                </Grid>
+            </TabItem>
+            
+        </TabControl>
+
+        <TextBlock Grid.Row="2" Text="{Binding StatusMessageText}" Foreground="{Binding StatusMessageColor}" VerticalAlignment="Center" FontWeight="Bold" Height="30" Padding="10">
+            <TextBlock.Background>
+                <SolidColorBrush Color="White" Opacity="0.4"/>
+            </TextBlock.Background>
+        </TextBlock>
+
+        <TextBlock Grid.Row="3" Text="{Binding PlayoutMessageText}" Foreground="{Binding PlayoutMessageColor}" VerticalAlignment="Center" FontWeight="Bold" Height="30" Padding="10">
+            <TextBlock.Background>
+                <SolidColorBrush Color="White" Opacity="0.4"/>
+            </TextBlock.Background>
+        </TextBlock>        
+
+        <prompt:MessageBox Trigger="{Binding AskImportPlayers}"
+                               Type="YesNo" YesAction="{Binding ImportPlayers}"
+                               NoAction="{Binding CancelImportPlayers}"
+                               Message="{Binding PromptMessage}"
+                               Caption="Import Players"/>
+
+        <prompt:MessageBox Trigger="{Binding AskImportTeams}"
+                               Type="YesNo" YesAction="{Binding ImportTeams}"
+                               NoAction="{Binding CancelImportTeams}"
+                               Message="{Binding PromptMessage}"
+                               Caption="Import Team Info"/>
+
+        <prompt:MessageBox Trigger="{Binding AskResetCycle}"
+                               Type="YesNo" YesAction="{Binding ResetCycle}"
+                               NoAction="{Binding CancelResetCycle}"
+                               Message="{Binding PromptMessage}"
+                               Caption="Reset Cycle"/>
+
+        <prompt:MessageBox Trigger="{Binding AskInitializePlayout}"
+                               Type="YesNo" YesAction="{Binding InitializePlayout}"
+                               NoAction="{Binding CancelInitializePlayout}"
+                               Message="{Binding PromptMessage}"
+                               Caption="Initialize Playout"/>
+
+        <prompt:MessageBox Trigger="{Binding AskGetSchoolsFromSDR}"
+                               Type="YesNo" YesAction="{Binding GetSchoolsFromSDR}"
+                               NoAction="{Binding CancelGetSchoolsFromSDR}"
+                               Message="{Binding PromptMessage}"
+                               Caption="Get Schools From SDR"/>
+
+        <prompt:MessageBox Trigger="{Binding AskGetTeamsFromSDR}"
+                               Type="YesNo" YesAction="{Binding GetTeamsFromSDR}"
+                               NoAction="{Binding CancelGetTeamsFromSDR}"
+                               Message="{Binding PromptMessage}"
+                               Caption="Get NFL Teams From SDR"/>
+
+        <prompt:MessageBox Trigger="{Binding AskDeleteLastPick}"
+                               Type="YesNo" YesAction="{Binding DeleteLastPick}"
+                               NoAction="{Binding CancelDeleteLastPick}"
+                               Message="{Binding PromptMessage}"
+                               Caption="Delete Last Pick"/>
+
+        <prompt:MessageBox Trigger="{Binding AskDeleteAllPicks}"
+                               Type="YesNo" YesAction="{Binding DeleteAllPicks}"
+                               NoAction="{Binding CancelDeleteAllPicks}"
+                               Message="{Binding PromptMessage}"
+                               Caption="Delete ALL Picks"/>
+    </Grid>
+</Window>

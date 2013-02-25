@@ -1,0 +1,174 @@
+﻿<UserControl x:Class="DraftAdmin.Views.TeamEditView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d">
+    
+    <Grid Background="Transparent">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
+        </Grid.RowDefinitions>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"></ColumnDefinition>
+            <ColumnDefinition></ColumnDefinition>
+            <ColumnDefinition Width="35"></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+
+        <TextBlock Text="Name:" Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="5"/>
+        
+        <TextBlock Text="Tricode:" Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="5"/>
+
+        <TextBlock Text="Overall Record:" Grid.Row="6" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="5"/>
+
+        <TextBlock Text="Lottery Pct Rank:" Grid.Row="7" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="5"/>
+
+        <TextBlock Text="Tidbits:" Grid.Row="8" Grid.Column="0" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="5"/>
+
+        <StackPanel Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" Orientation="Horizontal">
+            <TextBox Name="fullName" HorizontalAlignment="Stretch" VerticalAlignment="Center"
+                 Height="30" Margin="5,5,10,5" Width="150"
+                 Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" VerticalContentAlignment="Center"></TextBox>
+
+            <TextBlock Text="City:" Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="5"/>
+            
+            <TextBox Name="city" HorizontalAlignment="Stretch" VerticalAlignment="Center"
+                 Height="30" Margin="5,5,10,5" Width="150"
+                 Text="{Binding City, UpdateSourceTrigger=PropertyChanged}" VerticalContentAlignment="Center"></TextBox>
+        </StackPanel>
+
+
+        <TextBox Name="tricode" Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" HorizontalAlignment="Left" VerticalAlignment="Center"
+                     Height="30" Margin="5,5,10,5" Width="150"
+                     Text="{Binding Tricode, UpdateSourceTrigger=PropertyChanged}"></TextBox>
+
+        <StackPanel Grid.Row="6" Grid.Column="1" Grid.ColumnSpan="2" Orientation="Horizontal" HorizontalAlignment="Left">
+
+            <TextBox Name="overallRecord" HorizontalAlignment="Left" VerticalAlignment="Center"
+                     Height="30" Margin="5,5,10,5" Width="80"
+                     Text="{Binding OverallRecord, UpdateSourceTrigger=PropertyChanged}"></TextBox>
+
+            <TextBlock Text="Conf. Record:"  VerticalAlignment="Center" HorizontalAlignment="Right" Margin="5"/>
+
+            <TextBox Name="confRecord" HorizontalAlignment="Right" VerticalAlignment="Center"
+                     Height="30" Margin="5,5,10,5" Width="80"
+                     Text="{Binding ConferenceRecord, UpdateSourceTrigger=PropertyChanged}"></TextBox>
+
+        </StackPanel>
+
+        <StackPanel Grid.Row="7" Grid.Column="1" Grid.ColumnSpan="2" Orientation="Horizontal" HorizontalAlignment="Left">
+
+            <TextBox Name="lotteryPctRank" HorizontalAlignment="Left" VerticalAlignment="Center"
+                     Height="30" Margin="5,5,10,5" Width="80"
+                     Text="{Binding LotteryPctRank, UpdateSourceTrigger=PropertyChanged}"></TextBox>
+
+            <TextBlock Text="Lottery Order:"  VerticalAlignment="Center" HorizontalAlignment="Right" Margin="5"/>
+
+            <TextBox Name="lotteryOrder" HorizontalAlignment="Right" VerticalAlignment="Center"
+                     Height="30" Margin="5,5,10,5" Width="80"
+                     Text="{Binding LotteryOrder, UpdateSourceTrigger=PropertyChanged}"></TextBox>
+
+        </StackPanel>
+
+        <ListView Grid.Row="8" Grid.Column="1" Grid.ColumnSpan="2" Name="tidbits" Height="225" Width="350"
+                  ItemsSource="{Binding TidbitVMs, UpdateSourceTrigger=PropertyChanged}"                  
+                  ScrollViewer.CanContentScroll="True"
+                  ScrollViewer.VerticalScrollBarVisibility="Auto"
+                  ScrollViewer.HorizontalScrollBarVisibility="Hidden"
+                  HorizontalAlignment="Left" 
+                  SelectedItem="{Binding SelectedTidbit}"
+                  Margin="5">
+            <ListView.View>
+                <GridView>
+                    <GridView.Columns>
+                        <GridViewColumn Header="Order" Width="40">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBox Text="{Binding TidbitOrder, UpdateSourceTrigger=PropertyChanged}"></TextBox>
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+                        <GridViewColumn Header="Enabled" Width="50">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <CheckBox IsChecked="{Binding Enabled}"/>
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+                        <GridViewColumn Header="Text" Width="250">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBox Text="{Binding TidbitText}" Width="240" Height="40" TextWrapping="Wrap" AcceptsReturn="True"></TextBox>
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+                    </GridView.Columns>
+                </GridView>
+            </ListView.View>
+        </ListView>
+
+        <StackPanel Grid.Row="9" Grid.Column="1" Grid.ColumnSpan="2" Orientation="Horizontal" VerticalAlignment="Center" Margin="5">
+            <Button Name="addTidbitButton" Content="Add Tidbit" Width="90" Command="{Binding AddTidbitCommand}" Background="Black"></Button>
+            <Button Name="deleteTidbitButton" Content="Delete Tidbit" Width="90" Height="25" Command="{Binding DeleteTidbitCommand}" Background="Black"></Button>
+        </StackPanel>
+
+        <StackPanel Grid.Row="10" Grid.ColumnSpan="3" HorizontalAlignment="Center" VerticalAlignment="Center" Orientation="Horizontal">
+            <Button Name="saveButton" Height="30" Width="100" Margin="5" 
+                        Command="{Binding SaveTeamCommand}" Content="Save" Background="Black">
+            </Button>
+        </StackPanel>
+
+        <!--<Border Grid.Row="11" Grid.ColumnSpan="3" CornerRadius="10" Margin="10">
+            <Border.Background>
+                <SolidColorBrush Color="Green" Opacity="0.3"/>
+            </Border.Background>
+
+            <StackPanel Orientation="Vertical" Background="Transparent">
+                <TextBlock Margin="5,0,0,0">
+                <TextBlock.Text>
+                    <![CDATA[Tidbit Order < 10:  general team tidbits]]>
+                </TextBlock.Text>
+                </TextBlock>
+
+                <TextBlock Margin="5,0,0,0">
+                <TextBlock.Text>
+                    <![CDATA[Tidbit Order 10-17:  Titled Off. Ranks/Def. Ranks]]>
+                </TextBlock.Text>
+                </TextBlock>
+
+                <TextBlock Margin="5,0,0,0">
+                <TextBlock.Text>
+                    <![CDATA[Tidbit Order 20-22:  RECORD/DIV. FINISH/PLAYOFFS]]>
+                </TextBlock.Text>
+                </TextBlock>
+
+                <TextBlock Margin="5,0,0,0">
+                <TextBlock.Text>
+                    <![CDATA[Tidbit Order 30-33:  OFF. RANK (PPG)/OFF. RANK (YPG)/DEF. RANK (PPG)/DEF. RANK (YPG)]]>
+                </TextBlock.Text>
+                </TextBlock>
+
+                <TextBlock Margin="5,0,0,0">
+                <TextBlock.Text>
+                    <![CDATA[Tidbit Order 40-43:  MEL'S TEAM NEEDS (4 POSITIONS)]]>
+                </TextBlock.Text>
+                </TextBlock>
+            </StackPanel>
+        </Border>-->
+
+        
+
+    </Grid>
+</UserControl>

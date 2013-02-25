@@ -1,0 +1,1672 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:tns="http://localhost/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tm="http://microsoft.com/wsdl/mime/textMatching/" xmlns:s="http://www.w3.org/2001/XMLSchema" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" targetNamespace="http://localhost/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:types>
+    <s:schema elementFormDefault="qualified" targetNamespace="http://localhost/">
+      <s:element name="HelloWorld">
+        <s:complexType />
+      </s:element>
+      <s:element name="HelloWorldResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="HelloWorldResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="CallFunctionByName">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="Name" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="Params" type="tns:ArrayOfAnyType" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="ArrayOfAnyType">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="anyType" nillable="true" />
+        </s:sequence>
+      </s:complexType>
+      <s:element name="CallFunctionByNameResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="CallFunctionByNameResult">
+              <s:complexType>
+                <s:sequence>
+                  <s:element ref="s:schema" />
+                  <s:any />
+                </s:sequence>
+              </s:complexType>
+            </s:element>
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetTeamsByLeague">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="pstrLeague" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetTeamsByLeagueResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetTeamsByLeagueResult">
+              <s:complexType>
+                <s:sequence>
+                  <s:element ref="s:schema" />
+                  <s:any />
+                </s:sequence>
+              </s:complexType>
+            </s:element>
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetPlayersByTeam">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="plngTeamId" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetPlayersByTeamResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetPlayersByTeamResult">
+              <s:complexType>
+                <s:sequence>
+                  <s:element ref="s:schema" />
+                  <s:any />
+                </s:sequence>
+              </s:complexType>
+            </s:element>
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetConferencesbyLeague">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="pstrLeague" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetConferencesbyLeagueResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetConferencesbyLeagueResult">
+              <s:complexType>
+                <s:sequence>
+                  <s:element ref="s:schema" />
+                  <s:any />
+                </s:sequence>
+              </s:complexType>
+            </s:element>
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetTeamsByConference">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="plngTeamId" type="s:long" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetTeamsByConferenceResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetTeamsByConferenceResult">
+              <s:complexType>
+                <s:sequence>
+                  <s:element ref="s:schema" />
+                  <s:any />
+                </s:sequence>
+              </s:complexType>
+            </s:element>
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetIMSImageByTeamID">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="pstrHiDef" type="s:string" />
+            <s:element minOccurs="1" maxOccurs="1" name="plngTeamID" type="s:long" />
+            <s:element minOccurs="1" maxOccurs="1" name="plngImageTypeId" type="s:long" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetIMSImageByTeamIDResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetIMSImageByTeamIDResult">
+              <s:complexType>
+                <s:sequence>
+                  <s:element ref="s:schema" />
+                  <s:any />
+                </s:sequence>
+              </s:complexType>
+            </s:element>
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetX2OGamesByLeagueOrDate">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="pstrDate" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="pstrMachinename" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="pstrleague" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetX2OGamesByLeagueOrDateResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetX2OGamesByLeagueOrDateResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetGamesByDateRange">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="pstrLeague" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="pstrStartDate" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="pstrEndDate" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetGamesByDateRangeResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetGamesByDateRangeResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetDotComHeadlines">
+        <s:complexType />
+      </s:element>
+      <s:element name="GetDotComHeadlinesResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetDotComHeadlinesResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetMultiPlayerCards">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="pstrPlayerIds" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="pstrLeagueId" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="pstrSeasonType" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetMultiPlayerCardsResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetMultiPlayerCardsResult">
+              <s:complexType>
+                <s:sequence>
+                  <s:element ref="s:schema" />
+                  <s:any />
+                </s:sequence>
+              </s:complexType>
+            </s:element>
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetMLPlayerCards">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="pstrPlayerIds" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="pstrSeasonId" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetMLPlayerCardsResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetMLPlayerCardsResult">
+              <s:complexType>
+                <s:sequence>
+                  <s:element ref="s:schema" />
+                  <s:any />
+                </s:sequence>
+              </s:complexType>
+            </s:element>
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetSeasonByLeague">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="pstrLeagueId" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetSeasonByLeagueResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetSeasonByLeagueResult">
+              <s:complexType>
+                <s:sequence>
+                  <s:element ref="s:schema" />
+                  <s:any />
+                </s:sequence>
+              </s:complexType>
+            </s:element>
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetNewsTeamsByLeague">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="pstrLeague" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetNewsTeamsByLeagueResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetNewsTeamsByLeagueResult">
+              <s:complexType>
+                <s:sequence>
+                  <s:element ref="s:schema" />
+                  <s:any />
+                </s:sequence>
+              </s:complexType>
+            </s:element>
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetPlayersByTeamWithIMS">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="plngPlayerId" type="s:long" />
+            <s:element minOccurs="0" maxOccurs="1" name="pstrSwatch" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetPlayersByTeamWithIMSResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetPlayersByTeamWithIMSResult">
+              <s:complexType>
+                <s:sequence>
+                  <s:element ref="s:schema" />
+                  <s:any />
+                </s:sequence>
+              </s:complexType>
+            </s:element>
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetMLBBoxScore">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="pstrGameNum" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="pstrCallType" type="s:string" />
+            <s:element minOccurs="1" maxOccurs="1" name="pblnLineUp" type="s:boolean" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetMLBBoxScoreResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetMLBBoxScoreResult">
+              <s:complexType>
+                <s:sequence>
+                  <s:element ref="s:schema" />
+                  <s:any />
+                </s:sequence>
+              </s:complexType>
+            </s:element>
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetTeamsAndPlayersImagePath">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="pstrIDs" type="s:string" />
+            <s:element minOccurs="1" maxOccurs="1" name="plngImageTypeId" type="s:long" />
+            <s:element minOccurs="0" maxOccurs="1" name="pstrHiDef" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="pstrSwatch" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetTeamsAndPlayersImagePathResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetTeamsAndPlayersImagePathResult">
+              <s:complexType>
+                <s:sequence>
+                  <s:element ref="s:schema" />
+                  <s:any />
+                </s:sequence>
+              </s:complexType>
+            </s:element>
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetAutoRaceStandings">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="pintCircuitSeriesId" type="s:int" />
+            <s:element minOccurs="0" maxOccurs="1" name="pstrStandingsType" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="pstrScoringSystem" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetAutoRaceStandingsResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetAutoRaceStandingsResult">
+              <s:complexType>
+                <s:sequence>
+                  <s:element ref="s:schema" />
+                  <s:any />
+                </s:sequence>
+              </s:complexType>
+            </s:element>
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetTop25GamesInfo">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="pstrLeague" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetTop25GamesInfoResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetTop25GamesInfoResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="string" nillable="true" type="s:string" />
+      <s:element name="DataSet" nillable="true">
+        <s:complexType>
+          <s:sequence>
+            <s:element ref="s:schema" />
+            <s:any />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+    </s:schema>
+  </wsdl:types>
+  <wsdl:message name="HelloWorldSoapIn">
+    <wsdl:part name="parameters" element="tns:HelloWorld" />
+  </wsdl:message>
+  <wsdl:message name="HelloWorldSoapOut">
+    <wsdl:part name="parameters" element="tns:HelloWorldResponse" />
+  </wsdl:message>
+  <wsdl:message name="CallFunctionByNameSoapIn">
+    <wsdl:part name="parameters" element="tns:CallFunctionByName" />
+  </wsdl:message>
+  <wsdl:message name="CallFunctionByNameSoapOut">
+    <wsdl:part name="parameters" element="tns:CallFunctionByNameResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetTeamsByLeagueSoapIn">
+    <wsdl:part name="parameters" element="tns:GetTeamsByLeague" />
+  </wsdl:message>
+  <wsdl:message name="GetTeamsByLeagueSoapOut">
+    <wsdl:part name="parameters" element="tns:GetTeamsByLeagueResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetPlayersByTeamSoapIn">
+    <wsdl:part name="parameters" element="tns:GetPlayersByTeam" />
+  </wsdl:message>
+  <wsdl:message name="GetPlayersByTeamSoapOut">
+    <wsdl:part name="parameters" element="tns:GetPlayersByTeamResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetConferencesbyLeagueSoapIn">
+    <wsdl:part name="parameters" element="tns:GetConferencesbyLeague" />
+  </wsdl:message>
+  <wsdl:message name="GetConferencesbyLeagueSoapOut">
+    <wsdl:part name="parameters" element="tns:GetConferencesbyLeagueResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetTeamsByConferenceSoapIn">
+    <wsdl:part name="parameters" element="tns:GetTeamsByConference" />
+  </wsdl:message>
+  <wsdl:message name="GetTeamsByConferenceSoapOut">
+    <wsdl:part name="parameters" element="tns:GetTeamsByConferenceResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetIMSImageByTeamIDSoapIn">
+    <wsdl:part name="parameters" element="tns:GetIMSImageByTeamID" />
+  </wsdl:message>
+  <wsdl:message name="GetIMSImageByTeamIDSoapOut">
+    <wsdl:part name="parameters" element="tns:GetIMSImageByTeamIDResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetX2OGamesByLeagueOrDateSoapIn">
+    <wsdl:part name="parameters" element="tns:GetX2OGamesByLeagueOrDate" />
+  </wsdl:message>
+  <wsdl:message name="GetX2OGamesByLeagueOrDateSoapOut">
+    <wsdl:part name="parameters" element="tns:GetX2OGamesByLeagueOrDateResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetGamesByDateRangeSoapIn">
+    <wsdl:part name="parameters" element="tns:GetGamesByDateRange" />
+  </wsdl:message>
+  <wsdl:message name="GetGamesByDateRangeSoapOut">
+    <wsdl:part name="parameters" element="tns:GetGamesByDateRangeResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetDotComHeadlinesSoapIn">
+    <wsdl:part name="parameters" element="tns:GetDotComHeadlines" />
+  </wsdl:message>
+  <wsdl:message name="GetDotComHeadlinesSoapOut">
+    <wsdl:part name="parameters" element="tns:GetDotComHeadlinesResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetMultiPlayerCardsSoapIn">
+    <wsdl:part name="parameters" element="tns:GetMultiPlayerCards" />
+  </wsdl:message>
+  <wsdl:message name="GetMultiPlayerCardsSoapOut">
+    <wsdl:part name="parameters" element="tns:GetMultiPlayerCardsResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetMLPlayerCardsSoapIn">
+    <wsdl:part name="parameters" element="tns:GetMLPlayerCards" />
+  </wsdl:message>
+  <wsdl:message name="GetMLPlayerCardsSoapOut">
+    <wsdl:part name="parameters" element="tns:GetMLPlayerCardsResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetSeasonByLeagueSoapIn">
+    <wsdl:part name="parameters" element="tns:GetSeasonByLeague" />
+  </wsdl:message>
+  <wsdl:message name="GetSeasonByLeagueSoapOut">
+    <wsdl:part name="parameters" element="tns:GetSeasonByLeagueResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetNewsTeamsByLeagueSoapIn">
+    <wsdl:part name="parameters" element="tns:GetNewsTeamsByLeague" />
+  </wsdl:message>
+  <wsdl:message name="GetNewsTeamsByLeagueSoapOut">
+    <wsdl:part name="parameters" element="tns:GetNewsTeamsByLeagueResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetPlayersByTeamWithIMSSoapIn">
+    <wsdl:part name="parameters" element="tns:GetPlayersByTeamWithIMS" />
+  </wsdl:message>
+  <wsdl:message name="GetPlayersByTeamWithIMSSoapOut">
+    <wsdl:part name="parameters" element="tns:GetPlayersByTeamWithIMSResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetMLBBoxScoreSoapIn">
+    <wsdl:part name="parameters" element="tns:GetMLBBoxScore" />
+  </wsdl:message>
+  <wsdl:message name="GetMLBBoxScoreSoapOut">
+    <wsdl:part name="parameters" element="tns:GetMLBBoxScoreResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetTeamsAndPlayersImagePathSoapIn">
+    <wsdl:part name="parameters" element="tns:GetTeamsAndPlayersImagePath" />
+  </wsdl:message>
+  <wsdl:message name="GetTeamsAndPlayersImagePathSoapOut">
+    <wsdl:part name="parameters" element="tns:GetTeamsAndPlayersImagePathResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetAutoRaceStandingsSoapIn">
+    <wsdl:part name="parameters" element="tns:GetAutoRaceStandings" />
+  </wsdl:message>
+  <wsdl:message name="GetAutoRaceStandingsSoapOut">
+    <wsdl:part name="parameters" element="tns:GetAutoRaceStandingsResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetTop25GamesInfoSoapIn">
+    <wsdl:part name="parameters" element="tns:GetTop25GamesInfo" />
+  </wsdl:message>
+  <wsdl:message name="GetTop25GamesInfoSoapOut">
+    <wsdl:part name="parameters" element="tns:GetTop25GamesInfoResponse" />
+  </wsdl:message>
+  <wsdl:message name="HelloWorldHttpGetIn" />
+  <wsdl:message name="HelloWorldHttpGetOut">
+    <wsdl:part name="Body" element="tns:string" />
+  </wsdl:message>
+  <wsdl:message name="GetTeamsByLeagueHttpGetIn">
+    <wsdl:part name="pstrLeague" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="GetTeamsByLeagueHttpGetOut">
+    <wsdl:part name="Body" element="tns:DataSet" />
+  </wsdl:message>
+  <wsdl:message name="GetPlayersByTeamHttpGetIn">
+    <wsdl:part name="plngTeamId" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="GetPlayersByTeamHttpGetOut">
+    <wsdl:part name="Body" element="tns:DataSet" />
+  </wsdl:message>
+  <wsdl:message name="GetConferencesbyLeagueHttpGetIn">
+    <wsdl:part name="pstrLeague" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="GetConferencesbyLeagueHttpGetOut">
+    <wsdl:part name="Body" element="tns:DataSet" />
+  </wsdl:message>
+  <wsdl:message name="GetTeamsByConferenceHttpGetIn">
+    <wsdl:part name="plngTeamId" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="GetTeamsByConferenceHttpGetOut">
+    <wsdl:part name="Body" element="tns:DataSet" />
+  </wsdl:message>
+  <wsdl:message name="GetIMSImageByTeamIDHttpGetIn">
+    <wsdl:part name="pstrHiDef" type="s:string" />
+    <wsdl:part name="plngTeamID" type="s:string" />
+    <wsdl:part name="plngImageTypeId" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="GetIMSImageByTeamIDHttpGetOut">
+    <wsdl:part name="Body" element="tns:DataSet" />
+  </wsdl:message>
+  <wsdl:message name="GetX2OGamesByLeagueOrDateHttpGetIn">
+    <wsdl:part name="pstrDate" type="s:string" />
+    <wsdl:part name="pstrMachinename" type="s:string" />
+    <wsdl:part name="pstrleague" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="GetX2OGamesByLeagueOrDateHttpGetOut">
+    <wsdl:part name="Body" element="tns:string" />
+  </wsdl:message>
+  <wsdl:message name="GetGamesByDateRangeHttpGetIn">
+    <wsdl:part name="pstrLeague" type="s:string" />
+    <wsdl:part name="pstrStartDate" type="s:string" />
+    <wsdl:part name="pstrEndDate" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="GetGamesByDateRangeHttpGetOut">
+    <wsdl:part name="Body" element="tns:string" />
+  </wsdl:message>
+  <wsdl:message name="GetDotComHeadlinesHttpGetIn" />
+  <wsdl:message name="GetDotComHeadlinesHttpGetOut">
+    <wsdl:part name="Body" element="tns:string" />
+  </wsdl:message>
+  <wsdl:message name="GetMultiPlayerCardsHttpGetIn">
+    <wsdl:part name="pstrPlayerIds" type="s:string" />
+    <wsdl:part name="pstrLeagueId" type="s:string" />
+    <wsdl:part name="pstrSeasonType" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="GetMultiPlayerCardsHttpGetOut">
+    <wsdl:part name="Body" element="tns:DataSet" />
+  </wsdl:message>
+  <wsdl:message name="GetMLPlayerCardsHttpGetIn">
+    <wsdl:part name="pstrPlayerIds" type="s:string" />
+    <wsdl:part name="pstrSeasonId" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="GetMLPlayerCardsHttpGetOut">
+    <wsdl:part name="Body" element="tns:DataSet" />
+  </wsdl:message>
+  <wsdl:message name="GetSeasonByLeagueHttpGetIn">
+    <wsdl:part name="pstrLeagueId" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="GetSeasonByLeagueHttpGetOut">
+    <wsdl:part name="Body" element="tns:DataSet" />
+  </wsdl:message>
+  <wsdl:message name="GetNewsTeamsByLeagueHttpGetIn">
+    <wsdl:part name="pstrLeague" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="GetNewsTeamsByLeagueHttpGetOut">
+    <wsdl:part name="Body" element="tns:DataSet" />
+  </wsdl:message>
+  <wsdl:message name="GetPlayersByTeamWithIMSHttpGetIn">
+    <wsdl:part name="plngPlayerId" type="s:string" />
+    <wsdl:part name="pstrSwatch" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="GetPlayersByTeamWithIMSHttpGetOut">
+    <wsdl:part name="Body" element="tns:DataSet" />
+  </wsdl:message>
+  <wsdl:message name="GetMLBBoxScoreHttpGetIn">
+    <wsdl:part name="pstrGameNum" type="s:string" />
+    <wsdl:part name="pstrCallType" type="s:string" />
+    <wsdl:part name="pblnLineUp" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="GetMLBBoxScoreHttpGetOut">
+    <wsdl:part name="Body" element="tns:DataSet" />
+  </wsdl:message>
+  <wsdl:message name="GetTeamsAndPlayersImagePathHttpGetIn">
+    <wsdl:part name="pstrIDs" type="s:string" />
+    <wsdl:part name="plngImageTypeId" type="s:string" />
+    <wsdl:part name="pstrHiDef" type="s:string" />
+    <wsdl:part name="pstrSwatch" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="GetTeamsAndPlayersImagePathHttpGetOut">
+    <wsdl:part name="Body" element="tns:DataSet" />
+  </wsdl:message>
+  <wsdl:message name="GetAutoRaceStandingsHttpGetIn">
+    <wsdl:part name="pintCircuitSeriesId" type="s:string" />
+    <wsdl:part name="pstrStandingsType" type="s:string" />
+    <wsdl:part name="pstrScoringSystem" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="GetAutoRaceStandingsHttpGetOut">
+    <wsdl:part name="Body" element="tns:DataSet" />
+  </wsdl:message>
+  <wsdl:message name="GetTop25GamesInfoHttpGetIn">
+    <wsdl:part name="pstrLeague" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="GetTop25GamesInfoHttpGetOut">
+    <wsdl:part name="Body" element="tns:string" />
+  </wsdl:message>
+  <wsdl:message name="HelloWorldHttpPostIn" />
+  <wsdl:message name="HelloWorldHttpPostOut">
+    <wsdl:part name="Body" element="tns:string" />
+  </wsdl:message>
+  <wsdl:message name="GetTeamsByLeagueHttpPostIn">
+    <wsdl:part name="pstrLeague" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="GetTeamsByLeagueHttpPostOut">
+    <wsdl:part name="Body" element="tns:DataSet" />
+  </wsdl:message>
+  <wsdl:message name="GetPlayersByTeamHttpPostIn">
+    <wsdl:part name="plngTeamId" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="GetPlayersByTeamHttpPostOut">
+    <wsdl:part name="Body" element="tns:DataSet" />
+  </wsdl:message>
+  <wsdl:message name="GetConferencesbyLeagueHttpPostIn">
+    <wsdl:part name="pstrLeague" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="GetConferencesbyLeagueHttpPostOut">
+    <wsdl:part name="Body" element="tns:DataSet" />
+  </wsdl:message>
+  <wsdl:message name="GetTeamsByConferenceHttpPostIn">
+    <wsdl:part name="plngTeamId" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="GetTeamsByConferenceHttpPostOut">
+    <wsdl:part name="Body" element="tns:DataSet" />
+  </wsdl:message>
+  <wsdl:message name="GetIMSImageByTeamIDHttpPostIn">
+    <wsdl:part name="pstrHiDef" type="s:string" />
+    <wsdl:part name="plngTeamID" type="s:string" />
+    <wsdl:part name="plngImageTypeId" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="GetIMSImageByTeamIDHttpPostOut">
+    <wsdl:part name="Body" element="tns:DataSet" />
+  </wsdl:message>
+  <wsdl:message name="GetX2OGamesByLeagueOrDateHttpPostIn">
+    <wsdl:part name="pstrDate" type="s:string" />
+    <wsdl:part name="pstrMachinename" type="s:string" />
+    <wsdl:part name="pstrleague" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="GetX2OGamesByLeagueOrDateHttpPostOut">
+    <wsdl:part name="Body" element="tns:string" />
+  </wsdl:message>
+  <wsdl:message name="GetGamesByDateRangeHttpPostIn">
+    <wsdl:part name="pstrLeague" type="s:string" />
+    <wsdl:part name="pstrStartDate" type="s:string" />
+    <wsdl:part name="pstrEndDate" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="GetGamesByDateRangeHttpPostOut">
+    <wsdl:part name="Body" element="tns:string" />
+  </wsdl:message>
+  <wsdl:message name="GetDotComHeadlinesHttpPostIn" />
+  <wsdl:message name="GetDotComHeadlinesHttpPostOut">
+    <wsdl:part name="Body" element="tns:string" />
+  </wsdl:message>
+  <wsdl:message name="GetMultiPlayerCardsHttpPostIn">
+    <wsdl:part name="pstrPlayerIds" type="s:string" />
+    <wsdl:part name="pstrLeagueId" type="s:string" />
+    <wsdl:part name="pstrSeasonType" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="GetMultiPlayerCardsHttpPostOut">
+    <wsdl:part name="Body" element="tns:DataSet" />
+  </wsdl:message>
+  <wsdl:message name="GetMLPlayerCardsHttpPostIn">
+    <wsdl:part name="pstrPlayerIds" type="s:string" />
+    <wsdl:part name="pstrSeasonId" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="GetMLPlayerCardsHttpPostOut">
+    <wsdl:part name="Body" element="tns:DataSet" />
+  </wsdl:message>
+  <wsdl:message name="GetSeasonByLeagueHttpPostIn">
+    <wsdl:part name="pstrLeagueId" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="GetSeasonByLeagueHttpPostOut">
+    <wsdl:part name="Body" element="tns:DataSet" />
+  </wsdl:message>
+  <wsdl:message name="GetNewsTeamsByLeagueHttpPostIn">
+    <wsdl:part name="pstrLeague" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="GetNewsTeamsByLeagueHttpPostOut">
+    <wsdl:part name="Body" element="tns:DataSet" />
+  </wsdl:message>
+  <wsdl:message name="GetPlayersByTeamWithIMSHttpPostIn">
+    <wsdl:part name="plngPlayerId" type="s:string" />
+    <wsdl:part name="pstrSwatch" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="GetPlayersByTeamWithIMSHttpPostOut">
+    <wsdl:part name="Body" element="tns:DataSet" />
+  </wsdl:message>
+  <wsdl:message name="GetMLBBoxScoreHttpPostIn">
+    <wsdl:part name="pstrGameNum" type="s:string" />
+    <wsdl:part name="pstrCallType" type="s:string" />
+    <wsdl:part name="pblnLineUp" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="GetMLBBoxScoreHttpPostOut">
+    <wsdl:part name="Body" element="tns:DataSet" />
+  </wsdl:message>
+  <wsdl:message name="GetTeamsAndPlayersImagePathHttpPostIn">
+    <wsdl:part name="pstrIDs" type="s:string" />
+    <wsdl:part name="plngImageTypeId" type="s:string" />
+    <wsdl:part name="pstrHiDef" type="s:string" />
+    <wsdl:part name="pstrSwatch" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="GetTeamsAndPlayersImagePathHttpPostOut">
+    <wsdl:part name="Body" element="tns:DataSet" />
+  </wsdl:message>
+  <wsdl:message name="GetAutoRaceStandingsHttpPostIn">
+    <wsdl:part name="pintCircuitSeriesId" type="s:string" />
+    <wsdl:part name="pstrStandingsType" type="s:string" />
+    <wsdl:part name="pstrScoringSystem" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="GetAutoRaceStandingsHttpPostOut">
+    <wsdl:part name="Body" element="tns:DataSet" />
+  </wsdl:message>
+  <wsdl:message name="GetTop25GamesInfoHttpPostIn">
+    <wsdl:part name="pstrLeague" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="GetTop25GamesInfoHttpPostOut">
+    <wsdl:part name="Body" element="tns:string" />
+  </wsdl:message>
+  <wsdl:portType name="ServiceSoap">
+    <wsdl:operation name="HelloWorld">
+      <wsdl:input message="tns:HelloWorldSoapIn" />
+      <wsdl:output message="tns:HelloWorldSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="CallFunctionByName">
+      <wsdl:input message="tns:CallFunctionByNameSoapIn" />
+      <wsdl:output message="tns:CallFunctionByNameSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetTeamsByLeague">
+      <wsdl:input message="tns:GetTeamsByLeagueSoapIn" />
+      <wsdl:output message="tns:GetTeamsByLeagueSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetPlayersByTeam">
+      <wsdl:input message="tns:GetPlayersByTeamSoapIn" />
+      <wsdl:output message="tns:GetPlayersByTeamSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetConferencesbyLeague">
+      <wsdl:input message="tns:GetConferencesbyLeagueSoapIn" />
+      <wsdl:output message="tns:GetConferencesbyLeagueSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetTeamsByConference">
+      <wsdl:input message="tns:GetTeamsByConferenceSoapIn" />
+      <wsdl:output message="tns:GetTeamsByConferenceSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetIMSImageByTeamID">
+      <wsdl:input message="tns:GetIMSImageByTeamIDSoapIn" />
+      <wsdl:output message="tns:GetIMSImageByTeamIDSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetX2OGamesByLeagueOrDate">
+      <wsdl:input message="tns:GetX2OGamesByLeagueOrDateSoapIn" />
+      <wsdl:output message="tns:GetX2OGamesByLeagueOrDateSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetGamesByDateRange">
+      <wsdl:input message="tns:GetGamesByDateRangeSoapIn" />
+      <wsdl:output message="tns:GetGamesByDateRangeSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetDotComHeadlines">
+      <wsdl:input message="tns:GetDotComHeadlinesSoapIn" />
+      <wsdl:output message="tns:GetDotComHeadlinesSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetMultiPlayerCards">
+      <wsdl:input message="tns:GetMultiPlayerCardsSoapIn" />
+      <wsdl:output message="tns:GetMultiPlayerCardsSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetMLPlayerCards">
+      <wsdl:input message="tns:GetMLPlayerCardsSoapIn" />
+      <wsdl:output message="tns:GetMLPlayerCardsSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetSeasonByLeague">
+      <wsdl:input message="tns:GetSeasonByLeagueSoapIn" />
+      <wsdl:output message="tns:GetSeasonByLeagueSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetNewsTeamsByLeague">
+      <wsdl:input message="tns:GetNewsTeamsByLeagueSoapIn" />
+      <wsdl:output message="tns:GetNewsTeamsByLeagueSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetPlayersByTeamWithIMS">
+      <wsdl:input message="tns:GetPlayersByTeamWithIMSSoapIn" />
+      <wsdl:output message="tns:GetPlayersByTeamWithIMSSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetMLBBoxScore">
+      <wsdl:input message="tns:GetMLBBoxScoreSoapIn" />
+      <wsdl:output message="tns:GetMLBBoxScoreSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetTeamsAndPlayersImagePath">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">This method accecpts a ~ delimited string of Id's for players or a ~ delimited string for teams and returns the IMS logo or Headshot path respectively</wsdl:documentation>
+      <wsdl:input message="tns:GetTeamsAndPlayersImagePathSoapIn" />
+      <wsdl:output message="tns:GetTeamsAndPlayersImagePathSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetAutoRaceStandings">
+      <wsdl:input message="tns:GetAutoRaceStandingsSoapIn" />
+      <wsdl:output message="tns:GetAutoRaceStandingsSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetTop25GamesInfo">
+      <wsdl:input message="tns:GetTop25GamesInfoSoapIn" />
+      <wsdl:output message="tns:GetTop25GamesInfoSoapOut" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:portType name="ServiceHttpGet">
+    <wsdl:operation name="HelloWorld">
+      <wsdl:input message="tns:HelloWorldHttpGetIn" />
+      <wsdl:output message="tns:HelloWorldHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetTeamsByLeague">
+      <wsdl:input message="tns:GetTeamsByLeagueHttpGetIn" />
+      <wsdl:output message="tns:GetTeamsByLeagueHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetPlayersByTeam">
+      <wsdl:input message="tns:GetPlayersByTeamHttpGetIn" />
+      <wsdl:output message="tns:GetPlayersByTeamHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetConferencesbyLeague">
+      <wsdl:input message="tns:GetConferencesbyLeagueHttpGetIn" />
+      <wsdl:output message="tns:GetConferencesbyLeagueHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetTeamsByConference">
+      <wsdl:input message="tns:GetTeamsByConferenceHttpGetIn" />
+      <wsdl:output message="tns:GetTeamsByConferenceHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetIMSImageByTeamID">
+      <wsdl:input message="tns:GetIMSImageByTeamIDHttpGetIn" />
+      <wsdl:output message="tns:GetIMSImageByTeamIDHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetX2OGamesByLeagueOrDate">
+      <wsdl:input message="tns:GetX2OGamesByLeagueOrDateHttpGetIn" />
+      <wsdl:output message="tns:GetX2OGamesByLeagueOrDateHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetGamesByDateRange">
+      <wsdl:input message="tns:GetGamesByDateRangeHttpGetIn" />
+      <wsdl:output message="tns:GetGamesByDateRangeHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetDotComHeadlines">
+      <wsdl:input message="tns:GetDotComHeadlinesHttpGetIn" />
+      <wsdl:output message="tns:GetDotComHeadlinesHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetMultiPlayerCards">
+      <wsdl:input message="tns:GetMultiPlayerCardsHttpGetIn" />
+      <wsdl:output message="tns:GetMultiPlayerCardsHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetMLPlayerCards">
+      <wsdl:input message="tns:GetMLPlayerCardsHttpGetIn" />
+      <wsdl:output message="tns:GetMLPlayerCardsHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetSeasonByLeague">
+      <wsdl:input message="tns:GetSeasonByLeagueHttpGetIn" />
+      <wsdl:output message="tns:GetSeasonByLeagueHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetNewsTeamsByLeague">
+      <wsdl:input message="tns:GetNewsTeamsByLeagueHttpGetIn" />
+      <wsdl:output message="tns:GetNewsTeamsByLeagueHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetPlayersByTeamWithIMS">
+      <wsdl:input message="tns:GetPlayersByTeamWithIMSHttpGetIn" />
+      <wsdl:output message="tns:GetPlayersByTeamWithIMSHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetMLBBoxScore">
+      <wsdl:input message="tns:GetMLBBoxScoreHttpGetIn" />
+      <wsdl:output message="tns:GetMLBBoxScoreHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetTeamsAndPlayersImagePath">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">This method accecpts a ~ delimited string of Id's for players or a ~ delimited string for teams and returns the IMS logo or Headshot path respectively</wsdl:documentation>
+      <wsdl:input message="tns:GetTeamsAndPlayersImagePathHttpGetIn" />
+      <wsdl:output message="tns:GetTeamsAndPlayersImagePathHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetAutoRaceStandings">
+      <wsdl:input message="tns:GetAutoRaceStandingsHttpGetIn" />
+      <wsdl:output message="tns:GetAutoRaceStandingsHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetTop25GamesInfo">
+      <wsdl:input message="tns:GetTop25GamesInfoHttpGetIn" />
+      <wsdl:output message="tns:GetTop25GamesInfoHttpGetOut" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:portType name="ServiceHttpPost">
+    <wsdl:operation name="HelloWorld">
+      <wsdl:input message="tns:HelloWorldHttpPostIn" />
+      <wsdl:output message="tns:HelloWorldHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetTeamsByLeague">
+      <wsdl:input message="tns:GetTeamsByLeagueHttpPostIn" />
+      <wsdl:output message="tns:GetTeamsByLeagueHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetPlayersByTeam">
+      <wsdl:input message="tns:GetPlayersByTeamHttpPostIn" />
+      <wsdl:output message="tns:GetPlayersByTeamHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetConferencesbyLeague">
+      <wsdl:input message="tns:GetConferencesbyLeagueHttpPostIn" />
+      <wsdl:output message="tns:GetConferencesbyLeagueHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetTeamsByConference">
+      <wsdl:input message="tns:GetTeamsByConferenceHttpPostIn" />
+      <wsdl:output message="tns:GetTeamsByConferenceHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetIMSImageByTeamID">
+      <wsdl:input message="tns:GetIMSImageByTeamIDHttpPostIn" />
+      <wsdl:output message="tns:GetIMSImageByTeamIDHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetX2OGamesByLeagueOrDate">
+      <wsdl:input message="tns:GetX2OGamesByLeagueOrDateHttpPostIn" />
+      <wsdl:output message="tns:GetX2OGamesByLeagueOrDateHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetGamesByDateRange">
+      <wsdl:input message="tns:GetGamesByDateRangeHttpPostIn" />
+      <wsdl:output message="tns:GetGamesByDateRangeHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetDotComHeadlines">
+      <wsdl:input message="tns:GetDotComHeadlinesHttpPostIn" />
+      <wsdl:output message="tns:GetDotComHeadlinesHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetMultiPlayerCards">
+      <wsdl:input message="tns:GetMultiPlayerCardsHttpPostIn" />
+      <wsdl:output message="tns:GetMultiPlayerCardsHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetMLPlayerCards">
+      <wsdl:input message="tns:GetMLPlayerCardsHttpPostIn" />
+      <wsdl:output message="tns:GetMLPlayerCardsHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetSeasonByLeague">
+      <wsdl:input message="tns:GetSeasonByLeagueHttpPostIn" />
+      <wsdl:output message="tns:GetSeasonByLeagueHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetNewsTeamsByLeague">
+      <wsdl:input message="tns:GetNewsTeamsByLeagueHttpPostIn" />
+      <wsdl:output message="tns:GetNewsTeamsByLeagueHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetPlayersByTeamWithIMS">
+      <wsdl:input message="tns:GetPlayersByTeamWithIMSHttpPostIn" />
+      <wsdl:output message="tns:GetPlayersByTeamWithIMSHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetMLBBoxScore">
+      <wsdl:input message="tns:GetMLBBoxScoreHttpPostIn" />
+      <wsdl:output message="tns:GetMLBBoxScoreHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetTeamsAndPlayersImagePath">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">This method accecpts a ~ delimited string of Id's for players or a ~ delimited string for teams and returns the IMS logo or Headshot path respectively</wsdl:documentation>
+      <wsdl:input message="tns:GetTeamsAndPlayersImagePathHttpPostIn" />
+      <wsdl:output message="tns:GetTeamsAndPlayersImagePathHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetAutoRaceStandings">
+      <wsdl:input message="tns:GetAutoRaceStandingsHttpPostIn" />
+      <wsdl:output message="tns:GetAutoRaceStandingsHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetTop25GamesInfo">
+      <wsdl:input message="tns:GetTop25GamesInfoHttpPostIn" />
+      <wsdl:output message="tns:GetTop25GamesInfoHttpPostOut" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="ServiceSoap" type="tns:ServiceSoap">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="HelloWorld">
+      <soap:operation soapAction="http://localhost/HelloWorld" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="CallFunctionByName">
+      <soap:operation soapAction="http://localhost/CallFunctionByName" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetTeamsByLeague">
+      <soap:operation soapAction="http://localhost/GetTeamsByLeague" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetPlayersByTeam">
+      <soap:operation soapAction="http://localhost/GetPlayersByTeam" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetConferencesbyLeague">
+      <soap:operation soapAction="http://localhost/GetConferencesbyLeague" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetTeamsByConference">
+      <soap:operation soapAction="http://localhost/GetTeamsByConference" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetIMSImageByTeamID">
+      <soap:operation soapAction="http://localhost/GetIMSImageByTeamID" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetX2OGamesByLeagueOrDate">
+      <soap:operation soapAction="http://localhost/GetX2OGamesByLeagueOrDate" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetGamesByDateRange">
+      <soap:operation soapAction="http://localhost/GetGamesByDateRange" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetDotComHeadlines">
+      <soap:operation soapAction="http://localhost/GetDotComHeadlines" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetMultiPlayerCards">
+      <soap:operation soapAction="http://localhost/GetMultiPlayerCards" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetMLPlayerCards">
+      <soap:operation soapAction="http://localhost/GetMLPlayerCards" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetSeasonByLeague">
+      <soap:operation soapAction="http://localhost/GetSeasonByLeague" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetNewsTeamsByLeague">
+      <soap:operation soapAction="http://localhost/GetNewsTeamsByLeague" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetPlayersByTeamWithIMS">
+      <soap:operation soapAction="http://localhost/GetPlayersByTeamWithIMS" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetMLBBoxScore">
+      <soap:operation soapAction="http://localhost/GetMLBBoxScore" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetTeamsAndPlayersImagePath">
+      <soap:operation soapAction="http://localhost/GetTeamsAndPlayersImagePath" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetAutoRaceStandings">
+      <soap:operation soapAction="http://localhost/GetAutoRaceStandings" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetTop25GamesInfo">
+      <soap:operation soapAction="http://localhost/GetTop25GamesInfo" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="ServiceSoap12" type="tns:ServiceSoap">
+    <soap12:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="HelloWorld">
+      <soap12:operation soapAction="http://localhost/HelloWorld" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="CallFunctionByName">
+      <soap12:operation soapAction="http://localhost/CallFunctionByName" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetTeamsByLeague">
+      <soap12:operation soapAction="http://localhost/GetTeamsByLeague" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetPlayersByTeam">
+      <soap12:operation soapAction="http://localhost/GetPlayersByTeam" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetConferencesbyLeague">
+      <soap12:operation soapAction="http://localhost/GetConferencesbyLeague" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetTeamsByConference">
+      <soap12:operation soapAction="http://localhost/GetTeamsByConference" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetIMSImageByTeamID">
+      <soap12:operation soapAction="http://localhost/GetIMSImageByTeamID" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetX2OGamesByLeagueOrDate">
+      <soap12:operation soapAction="http://localhost/GetX2OGamesByLeagueOrDate" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetGamesByDateRange">
+      <soap12:operation soapAction="http://localhost/GetGamesByDateRange" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetDotComHeadlines">
+      <soap12:operation soapAction="http://localhost/GetDotComHeadlines" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetMultiPlayerCards">
+      <soap12:operation soapAction="http://localhost/GetMultiPlayerCards" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetMLPlayerCards">
+      <soap12:operation soapAction="http://localhost/GetMLPlayerCards" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetSeasonByLeague">
+      <soap12:operation soapAction="http://localhost/GetSeasonByLeague" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetNewsTeamsByLeague">
+      <soap12:operation soapAction="http://localhost/GetNewsTeamsByLeague" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetPlayersByTeamWithIMS">
+      <soap12:operation soapAction="http://localhost/GetPlayersByTeamWithIMS" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetMLBBoxScore">
+      <soap12:operation soapAction="http://localhost/GetMLBBoxScore" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetTeamsAndPlayersImagePath">
+      <soap12:operation soapAction="http://localhost/GetTeamsAndPlayersImagePath" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetAutoRaceStandings">
+      <soap12:operation soapAction="http://localhost/GetAutoRaceStandings" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetTop25GamesInfo">
+      <soap12:operation soapAction="http://localhost/GetTop25GamesInfo" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="ServiceHttpGet" type="tns:ServiceHttpGet">
+    <http:binding verb="GET" />
+    <wsdl:operation name="HelloWorld">
+      <http:operation location="/HelloWorld" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetTeamsByLeague">
+      <http:operation location="/GetTeamsByLeague" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetPlayersByTeam">
+      <http:operation location="/GetPlayersByTeam" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetConferencesbyLeague">
+      <http:operation location="/GetConferencesbyLeague" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetTeamsByConference">
+      <http:operation location="/GetTeamsByConference" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetIMSImageByTeamID">
+      <http:operation location="/GetIMSImageByTeamID" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetX2OGamesByLeagueOrDate">
+      <http:operation location="/GetX2OGamesByLeagueOrDate" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetGamesByDateRange">
+      <http:operation location="/GetGamesByDateRange" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetDotComHeadlines">
+      <http:operation location="/GetDotComHeadlines" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetMultiPlayerCards">
+      <http:operation location="/GetMultiPlayerCards" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetMLPlayerCards">
+      <http:operation location="/GetMLPlayerCards" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetSeasonByLeague">
+      <http:operation location="/GetSeasonByLeague" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetNewsTeamsByLeague">
+      <http:operation location="/GetNewsTeamsByLeague" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetPlayersByTeamWithIMS">
+      <http:operation location="/GetPlayersByTeamWithIMS" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetMLBBoxScore">
+      <http:operation location="/GetMLBBoxScore" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetTeamsAndPlayersImagePath">
+      <http:operation location="/GetTeamsAndPlayersImagePath" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetAutoRaceStandings">
+      <http:operation location="/GetAutoRaceStandings" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetTop25GamesInfo">
+      <http:operation location="/GetTop25GamesInfo" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="ServiceHttpPost" type="tns:ServiceHttpPost">
+    <http:binding verb="POST" />
+    <wsdl:operation name="HelloWorld">
+      <http:operation location="/HelloWorld" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetTeamsByLeague">
+      <http:operation location="/GetTeamsByLeague" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetPlayersByTeam">
+      <http:operation location="/GetPlayersByTeam" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetConferencesbyLeague">
+      <http:operation location="/GetConferencesbyLeague" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetTeamsByConference">
+      <http:operation location="/GetTeamsByConference" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetIMSImageByTeamID">
+      <http:operation location="/GetIMSImageByTeamID" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetX2OGamesByLeagueOrDate">
+      <http:operation location="/GetX2OGamesByLeagueOrDate" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetGamesByDateRange">
+      <http:operation location="/GetGamesByDateRange" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetDotComHeadlines">
+      <http:operation location="/GetDotComHeadlines" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetMultiPlayerCards">
+      <http:operation location="/GetMultiPlayerCards" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetMLPlayerCards">
+      <http:operation location="/GetMLPlayerCards" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetSeasonByLeague">
+      <http:operation location="/GetSeasonByLeague" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetNewsTeamsByLeague">
+      <http:operation location="/GetNewsTeamsByLeague" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetPlayersByTeamWithIMS">
+      <http:operation location="/GetPlayersByTeamWithIMS" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetMLBBoxScore">
+      <http:operation location="/GetMLBBoxScore" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetTeamsAndPlayersImagePath">
+      <http:operation location="/GetTeamsAndPlayersImagePath" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetAutoRaceStandings">
+      <http:operation location="/GetAutoRaceStandings" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetTop25GamesInfo">
+      <http:operation location="/GetTop25GamesInfo" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="Service">
+    <wsdl:port name="ServiceSoap" binding="tns:ServiceSoap">
+      <soap:address location="http://scliveweb/dataserver/service.asmx" />
+    </wsdl:port>
+    <wsdl:port name="ServiceSoap12" binding="tns:ServiceSoap12">
+      <soap12:address location="http://scliveweb/dataserver/service.asmx" />
+    </wsdl:port>
+    <wsdl:port name="ServiceHttpGet" binding="tns:ServiceHttpGet">
+      <http:address location="http://scliveweb/dataserver/service.asmx" />
+    </wsdl:port>
+    <wsdl:port name="ServiceHttpPost" binding="tns:ServiceHttpPost">
+      <http:address location="http://scliveweb/dataserver/service.asmx" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

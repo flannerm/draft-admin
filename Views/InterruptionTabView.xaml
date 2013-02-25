@@ -1,0 +1,71 @@
+﻿<UserControl x:Class="DraftAdmin.Views.InterruptionTabView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:prompt="clr-namespace:UserPrompt"
+             xmlns:global="clr-namespace:DraftAdmin.Global"
+             mc:Ignorable="d" 
+             d:DesignHeight="500" d:DesignWidth="1000">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="10"/>
+            <RowDefinition/>
+            <RowDefinition/>
+            <RowDefinition/>
+            <RowDefinition Height="40"/>
+        </Grid.RowDefinitions>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+
+        <Border Grid.Row="1" Grid.RowSpan="3" Grid.Column="0" Background="White" BorderBrush="#FF000000" 
+                            BorderThickness="1,1,1,1" CornerRadius="8,8,8,8" Width="485">
+            <ListView x:Name="listInterruptions" ItemsSource="{Binding Interruptions, Source={x:Static global:GlobalCollections.Instance}}" Background="Transparent"                 
+                                    ScrollViewer.CanContentScroll="True"
+                                    ScrollViewer.VerticalScrollBarVisibility="Auto"
+                                    ScrollViewer.HorizontalScrollBarVisibility="Hidden"
+                                    HorizontalAlignment="Left" 
+                                    SelectedItem="{Binding SelectedInterruption}"
+                                    Padding="5">
+                <ListView.View>
+                    <GridView>
+                        <GridViewColumn Header="" Width="60">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <!--<Image Source="{Binding LogoPng}" Height="30"/>-->
+                                    <Image Source="{Binding LogoBitmap}" Height="30"/>
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+                        <GridViewColumn Header="Name" Width="285">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding FullName}" Width="285"/>
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+                        <GridViewColumn Header="Tricode" Width="125">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Tricode}" Width="125"/>
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+                    </GridView>
+                </ListView.View>
+            </ListView>
+        </Border>
+
+        <Button Grid.Row="4" x:Name="refreshInterruptionsButton" Height="30" Width="130" Margin="5" Background="Black"
+                                Command="{Binding RefreshInterruptionsCommand}" Content="Refresh Interruptions"/>
+
+        <Border Grid.Column="1" Grid.Row="1" Grid.RowSpan="3" Background="White" BorderBrush="#FF000000" 
+                            BorderThickness="1,1,1,1" CornerRadius="8,8,8,8" Width="485">
+            <ContentControl x:Name="contentControlInterruptions" Content="{Binding SelectedInterruptionEditVM}" Background="#eaeedb"/>
+        </Border>
+
+    </Grid>
+</UserControl>

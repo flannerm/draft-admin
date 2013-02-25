@@ -1,0 +1,152 @@
+﻿<UserControl x:Class="DraftAdmin.Views.PlaylistTabView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:global="clr-namespace:DraftAdmin.Global"
+             mc:Ignorable="d" 
+             d:DesignHeight="500" d:DesignWidth="1000">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="Auto"/>
+        </Grid.ColumnDefinitions>
+        
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition/>
+            <RowDefinition/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+
+        <StackPanel Orientation="Vertical" Grid.Column="0" Grid.Row="0" HorizontalAlignment="Right" VerticalAlignment="Top">
+            <ComboBox Width="260" Margin="5" ItemsSource="{Binding Playlists}" DisplayMemberPath="PlaylistName" SelectedValuePath="PlaylistID"
+                      SelectedItem="{Binding PlaylistToLoad, UpdateSourceTrigger=PropertyChanged}">
+            </ComboBox>
+            
+            <Button Name="loadPlaylistButton" Height="30" Width="100" Margin="5" 
+                        Command="{Binding LoadPlaylistCommand}" Content="Load Playlist" Background="Black">
+            </Button>
+
+            <Button Name="removePlaylistButton" Height="30" Width="100" Margin="5" 
+                        Command="{Binding RemovePlaylistCommand}" Content="Remove Playlist" Background="Black">
+            </Button>
+
+        </StackPanel>
+
+        <ListView Grid.Column="1" Grid.Row="0" x:Name="listPlaylists" Width="700" Margin="5"
+                  ItemsSource="{Binding LoadedPlaylists}"               
+                  ScrollViewer.CanContentScroll="True"
+                  ScrollViewer.VerticalScrollBarVisibility="Auto"
+                  ScrollViewer.HorizontalScrollBarVisibility="Hidden"
+                  HorizontalAlignment="Left" 
+                  SelectedItem="{Binding SelectedPlaylist}">
+
+            <ListView.Background>
+                <SolidColorBrush Color="Gray" Opacity="0.2"/>
+            </ListView.Background>
+
+            <ListView.View>
+                <GridView>                   
+                    <GridViewColumn Header="Playlist Name" Width="680">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding PlaylistName}" Width="250"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>                    
+                </GridView>
+            </ListView.View>
+        </ListView>
+
+        <ListView Grid.Column="1" Grid.Row="1" Grid.RowSpan="3" x:Name="listPlaylistItems" Width="700" Margin="5"
+                  ItemsSource="{Binding SelectedPlaylist.PlaylistItems}"               
+                  ScrollViewer.CanContentScroll="True"
+                  ScrollViewer.VerticalScrollBarVisibility="Auto"
+                  ScrollViewer.HorizontalScrollBarVisibility="Hidden"
+                  HorizontalAlignment="Left" 
+                  SelectedItem="{Binding SelectedPlaylistItem}">
+            
+            <ListView.Background>
+                <SolidColorBrush Color="Gray" Opacity="0.2"/>
+            </ListView.Background>
+
+            <ListView.View>
+                <GridView>
+                    <!--<GridViewColumn Header="" Width="30">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <Image Source="/DraftAdmin;component/Images/arrow_lg.png" Visibility="{Binding OnAir, Converter={StaticResource boolToVis}}"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>-->
+                    <GridViewColumn Header="Order" Width="40">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding PlaylistOrder}"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <GridViewColumn Header="Enabled" Width="55">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <CheckBox IsChecked="{Binding Enabled}"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <GridViewColumn Header="Desc" Width="240">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Description}" Width="250"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <GridViewColumn Header="Template" Width="140">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Template}" Width="150"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>                    
+                    <GridViewColumn Header="Page Type" Width="100">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding PageType}" Width="120"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <GridViewColumn Header="Panel Type" Width="100">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding PanelType}" Width="120"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                </GridView>
+            </ListView.View>
+        </ListView>
+
+        <Button Grid.Column="0" Grid.Row="1" Name="jumpToItemButton" Height="30" Width="230" Margin="5"  VerticalAlignment="Center"
+                Command="{Binding JumpToItemCommand}" Content="Jump To Selected Item (stop cycle first!)" Background="Black"/>
+
+        <StackPanel  Grid.Column="0" Grid.Row="2" Orientation="Vertical">
+            <Button Grid.Column="0" Grid.Row="2" Name="disablePollButton" Height="30" Width="230" Margin="5" 
+                    Command="{Binding DisablePollCommand}" Content="Disable Poll Items" Background="Black"/>
+            
+            <Button Grid.Column="0" Grid.Row="2" Name="enablePollButton" Height="30" Width="230" Margin="5" 
+                    Command="{Binding EnablePollCommand}" Content="Enable Poll Items" Background="Black"/>
+        </StackPanel>
+        
+        <Border Grid.Column="0" Grid.Row="3" CornerRadius="10" Margin="10" Height="100" Width="200">
+            <Border.Background>
+                <SolidColorBrush Color="Black"/>
+            </Border.Background>
+
+            <TextBlock Grid.Column="0" Grid.Row="1" Height="80" Width="180" Margin="10"
+                   HorizontalAlignment="Center" VerticalAlignment="Top" Text="{Binding PlayoutFeedback}" 
+                   Foreground="Lime" Background="Transparent" FontFamily="Courier New" FontWeight="Bold"/>
+        </Border>
+        
+        
+    </Grid>
+</UserControl>
