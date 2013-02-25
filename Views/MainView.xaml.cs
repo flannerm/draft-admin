@@ -60,18 +60,14 @@ namespace DraftAdmin.Views
                 }
             }
 
-            //clock.ClockChange += new AxClockControl.__ClockCtl_ClockChangeEventHandler(clock_ClockChange);
-            
         }
-
-       
 
         private void MenuItem_Click(object sender, RoutedEventArgs e)
         {
             
         }
 
-        private void clock_ClockChange(object sender, AxClockControl.__ClockCtl_ClockChangeEvent e)
+        private void axClockCtl_ClockChange(object sender, AxClockControl.__ClockCtl_ClockChangeEvent e)
         {
             string clockStr = e.sClock.ToString();
 
@@ -83,10 +79,6 @@ namespace DraftAdmin.Views
 
             mainVM.Clock = clockStr;
         }
-
-
-
-
 
     }
 }

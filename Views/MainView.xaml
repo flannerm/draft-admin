@@ -7,13 +7,14 @@
 	    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
         xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity" 
         xmlns:Custom="http://www.julmar.com/wpfhelpers" 
-        xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions" 
-        mc:Ignorable="d" x:Class="DraftAdmin.Views.MainView"
-        xmlns:wf="clr-namespace:System.Windows.Forms;assembly=System.Windows.Forms"  
+        xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions"
+        
         xmlns:clk="clr-namespace:AxClockControl;assembly=AxInterop.ClockControl"
         xmlns:global="clr-namespace:DraftAdmin.Global"
+        mc:Ignorable="d" x:Class="DraftAdmin.Views.MainView"
         Icon="/DraftAdmin;component/DraftAdminIcon.ico"
-        Title="NFL Draft Compression Admin" Height="768" Width="1024">
+        Title="NFL Draft Compression Admin"
+        Loaded="WindowLoaded" Height="768" Width="1024">
     
     <Grid>
         <Grid.Background>
@@ -208,21 +209,24 @@
                         <RowDefinition/>
                     </Grid.RowDefinitions>
 
-
-
                     <Border Grid.Column="0" Grid.Row="0" CornerRadius="10" Margin="10" Width="180" Height="150" HorizontalAlignment="Left" VerticalAlignment="Top">
                         <Border.Background>
                             <SolidColorBrush Color="Green" Opacity="0.3"/>
                         </Border.Background>
 
-
-
                         <StackPanel Orientation="Vertical">
+
+                            <WindowsFormsHost Name="wfh" Width="120" Height="65" Margin="10">
+                                <clk:AxClockCtl x:Name="axClockCtl" ClockChange="axClockCtl_ClockChange" ></clk:AxClockCtl>
+                            </WindowsFormsHost>
+                            
+                            <!--<WindowsFormsHost Name="wfh" Width="120" Height="65" >
+                                <clk:AxClockCtl x:Name="axClockCtl" ClockChange="axClockCtl_ClockChange" />
+                            </WindowsFormsHost>-->
                             
                             <!--<WindowsFormsHost Name="clockHost" Width="120" Height="65" Margin="10" HorizontalAlignment="Center" VerticalAlignment="Top">                                
-                                <clk:AxClockCtl x:Name="clock" Visible="True" ClockChange="clock_ClockChange" />
+                                <clk:AxClockCtl x:Name="clockCtl" Visible="True" ClockChange="clock_ClockChange" />
                             </WindowsFormsHost>-->
-
 
                             <Button x:Name="showClock" Height="30" Width="120" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0"
                                 Command="{Binding ShowClockCommand}" Content="Show Clock" Background="Black" IsEnabled="{Binding PlayoutEnabled}"/>
