@@ -1380,33 +1380,185 @@ namespace DraftAdmin.DataAccess
 
                 Int32 teamId = 0;
 
-                FileInfo queryFile = new FileInfo(ConfigurationManager.AppSettings["QueryDirectory"].ToString() + "\\" + playlistItem.Query);
+                FileInfo queryFile = null;
+                
+                if (playlistItem.Query != null && playlistItem.Query.ToString().Trim() != "")
+                {
+                    queryFile = new FileInfo(ConfigurationManager.AppSettings["QueryDirectory"].ToString() + "\\" + playlistItem.Query);
+                }
 
                 string query = "";
 
-                if (queryFile.Exists)
+                if (queryFile != null)
                 {
-                    query = File.ReadAllText(queryFile.FullName);
-                }
-                else
-                {
-                    query = playlistItem.Query;
-                }
+                    if (queryFile.Exists)
+                    {
+                        query = File.ReadAllText(queryFile.FullName);
+                    }
+                    else
+                    {
+                        query = playlistItem.Query;
+                    }
 
-                Object[] parms = null;
+                    Object[] parms = null;
 
-                switch (playlistItem.Datasource.ToUpper())
-                {
-                    case "SDR":
-                        cnO = createConnectionSDR();
+                    switch (playlistItem.Datasource.ToUpper())
+                    {
+                        case "SDR":
+                            cnO = createConnectionSDR();
 
-                        cmdO = new OracleCommand();
-                        cmdO.BindByName = true;
+                            cmdO = new OracleCommand();
+                            cmdO.BindByName = true;
 
-                        //add the parms to the query/stored proc if there are any
-                        if (playlistItem.QueryParameters.ToString() != "")
-                        {
+                            //add the parms to the query/stored proc if there are any
+                            if (playlistItem.QueryParameters.ToString() != "")
+                            {
+                                parms = playlistItem.QueryParameters.Split('|');
+
+                                for (int i = 0; i < parms.Length; i++)
+                                {
+                                    string[] parmval = parms[i].ToString().Split('=');
+
+                                    string parm = parmval[0].ToString();
+                                    string val = parmval[1].ToString();
+
+                                    if (val.Substring(0, 1) == "'" && val.Substring(val.Length - 1, 1) == "'")
+                                    {
+                                        string parmStr = val.Substring(1, val.Length - 2);
+
+                                        if (parmStr.Length > 0 && parmStr.Substring(0, 1) == "#")
+                                        {
+                                            if (ConfigurationManager.AppSettings[parmStr.Substring(1)] != null) //pull the value from the app.config file
+                                            {
+                                                parmStr = ConfigurationManager.AppSettings[parmStr.Substring(1)].ToString();
+                                            }
+                                        }
+
+                                        if (parmStr.IndexOf(",") > -1 || (parm.IndexOf('(') > -1 && parm.IndexOf(')') > -1)) //this is an array
+                                        {
+                                            cmdO.Parameters.Add(new OracleParameter(parm, OracleDbType.Varchar2));
+
+                                            string[] arrVals = parmStr.Split(',');
+
+                                            Int32[] arrSize = new Int32[arrVals.Length - 1];
+
+                                            for (int p = 0; p < arrVals.Length - 1; p++)
+                                            {
+                                                arrSize[p] = arrVals[p].Length;
+                                            }
+
+                                            cmdO.Parameters[parm].CollectionType = OracleCollectionType.PLSQLAssociativeArray;
+                                            cmdO.Parameters[parm].Value = arrVals;
+                                            cmdO.Parameters[parm].Size = arrVals.Length;
+                                            cmdO.Parameters[parm].ArrayBindSize = arrSize;
+
+                                            OracleParameterStatus[] arrStatus = new OracleParameterStatus[1];
+                                            arrStatus[0] = 0;
+
+                                            cmdO.Parameters[parm].ArrayBindStatus = arrStatus;
+                                            cmdO.Parameters[parm].Direction = ParameterDirection.Input;
+                                        }
+                                        else
+                                        {
+                                            cmdO.Parameters.Add(new OracleParameter(parm, OracleDbType.Varchar2, parmStr, ParameterDirection.Input));
+                                        }
+
+                                    }
+                                    else if (val.ToUpper() == "NULL")
+                                    {
+                                        cmdO.Parameters.Add(new OracleParameter(parm, OracleDbType.NVarchar2, DBNull.Value, ParameterDirection.Input));
+                                    }
+                                    else
+                                    {
+                                        if (val.ToString().ToUpper() != "OTC")
+                                        {
+                                            if (val.Substring(0, 1) == "#")
+                                            {
+                                                if (ConfigurationManager.AppSettings[val.Substring(1)] != null)
+                                                {
+                                                    val = ConfigurationManager.AppSettings[val.Substring(1)];
+                                                }
+                                            }
+
+                                            cmdO.Parameters.Add(new OracleParameter(parm, OracleDbType.Int32, val, ParameterDirection.Input));
+                                        }
+                                    }
+
+                                    if (parm.ToUpper() == "INTEAMID")
+                                    {
+                                        //adding a special case for the On The Clock (connected) items, to add the team swatch to the dataset
+                                        if (val.ToString().ToUpper() == "OTC")
+                                        {
+                                            teamId = GlobalCollections.Instance.OnTheClock.Team.ID;
+                                            cmdO.Parameters.Add(new OracleParameter(parm, OracleDbType.Int32, teamId, ParameterDirection.Input));
+                                        }
+                                        else
+                                        {
+                                            if (val.Substring(0, 1) == "#")
+                                            {
+                                                if (ConfigurationManager.AppSettings[val.Substring(1)] != null)
+                                                {
+                                                    val = ConfigurationManager.AppSettings[val.Substring(1)];
+                                                }
+                                            }
+
+                                            Int32.TryParse(val, out teamId);
+                                        }
+
+                                        teamIds.Add(teamId);
+                                    }
+
+                                }
+                            }
+
+                            if (playlistItem.QueryType.ToUpper() == "SP")
+                            {
+                                cmdO.Connection = cnO;
+                                cmdO.CommandText = playlistItem.Query;
+                                cmdO.CommandType = System.Data.CommandType.StoredProcedure;
+                                cmdO.BindByName = true;
+
+                                cmdO.Parameters.Add(new OracleParameter(playlistItem.OutputParameter, OracleDbType.RefCursor, ParameterDirection.Output));
+
+                                adpO = new OracleDataAdapter(cmdO);
+
+                                ds = new DataSet();
+
+                                adpO.Fill(ds);
+
+                                tbl = ds.Tables[0];
+                            }
+                            else
+                            {
+                                if (query != "")
+                                {
+                                    cmdO.CommandText = query.ToString();
+                                    cmdO.Connection = cnO;
+                                    rdrO = cmdO.ExecuteReader();
+                                    tbl.Load(rdrO);
+                                    rdrO.Close();
+                                    rdrO.Dispose();
+                                }
+
+                            }
+
+                            break;
+                        case "MYSQL":
+                            if (query != "")
+                            {
+                                cnM = createConnectionMySql();
+                                cmdM = new MySqlCommand(query.ToString(), cnM);
+                                rdrM = cmdM.ExecuteReader();
+                                tbl.Load(rdrM);
+                                rdrM.Close();
+                                rdrM.Dispose();
+                            }
+
+                            break;
+                        case "WS":
                             parms = playlistItem.QueryParameters.Split('|');
+
+                            Object[] wsParms = new Object[parms.Length];
 
                             for (int i = 0; i < parms.Length; i++)
                             {
@@ -1415,184 +1567,41 @@ namespace DraftAdmin.DataAccess
                                 string parm = parmval[0].ToString();
                                 string val = parmval[1].ToString();
 
-                                if (val.Substring(0, 1) == "'" && val.Substring(val.Length - 1, 1) == "'")
+                                val = val.Replace("'", "");
+
+                                if (val.Length > 0 && val.Substring(0, 1) == "#")
                                 {
-                                    string parmStr = val.Substring(1, val.Length - 2);
-                                                                            
-                                    if (parmStr.Length > 0 && parmStr.Substring(0, 1) == "#")
+                                    if (ConfigurationManager.AppSettings[val.Substring(1)] != null)
                                     {
-                                        if (ConfigurationManager.AppSettings[parmStr.Substring(1)] != null) //pull the value from the app.config file
-                                        {
-                                            parmStr = ConfigurationManager.AppSettings[parmStr.Substring(1)].ToString();
-                                        }                                   
-                                    }                                    
-
-                                    if (parmStr.IndexOf(",") > -1 || (parm.IndexOf('(') > -1 && parm.IndexOf(')') > -1)) //this is an array
-                                    {
-                                        cmdO.Parameters.Add(new OracleParameter(parm, OracleDbType.Varchar2));
-
-                                        string[] arrVals = parmStr.Split(',');
-
-                                        Int32[] arrSize = new Int32[arrVals.Length - 1];
-
-                                        for (int p = 0; p < arrVals.Length - 1; p++)
-                                        {
-                                            arrSize[p] = arrVals[p].Length;
-                                        }
-                                        
-                                        cmdO.Parameters[parm].CollectionType = OracleCollectionType.PLSQLAssociativeArray;
-                                        cmdO.Parameters[parm].Value = arrVals;
-                                        cmdO.Parameters[parm].Size = arrVals.Length;
-                                        cmdO.Parameters[parm].ArrayBindSize = arrSize;
-
-                                        OracleParameterStatus[] arrStatus = new OracleParameterStatus[1];
-                                        arrStatus[0] = 0;
-
-                                        cmdO.Parameters[parm].ArrayBindStatus = arrStatus;
-                                        cmdO.Parameters[parm].Direction = ParameterDirection.Input; 
-                                    }
-                                    else
-                                    {
-                                        cmdO.Parameters.Add(new OracleParameter(parm, OracleDbType.Varchar2, parmStr, ParameterDirection.Input));
-                                    }
-                                    
-                                }
-                                else if (val.ToUpper() == "NULL")
-                                {
-                                    cmdO.Parameters.Add(new OracleParameter(parm, OracleDbType.NVarchar2, DBNull.Value, ParameterDirection.Input));
-                                }
-                                else
-                                {
-                                    if (val.ToString().ToUpper() != "OTC")
-                                    {
-                                        if (val.Substring(0, 1) == "#")
-                                        {
-                                            if (ConfigurationManager.AppSettings[val.Substring(1)] != null)
-                                            {
-                                                val = ConfigurationManager.AppSettings[val.Substring(1)];
-                                            }
-                                        }
-
-                                        cmdO.Parameters.Add(new OracleParameter(parm, OracleDbType.Int32, val, ParameterDirection.Input));
+                                        val = ConfigurationManager.AppSettings[val.Substring(1)];
                                     }
                                 }
-                                
-                                if (parm.ToUpper() == "INTEAMID")
-                                {
-                                    //adding a special case for the On The Clock (connected) items, to add the team swatch to the dataset
-                                    if (val.ToString().ToUpper() == "OTC")
-                                    {
-                                        teamId = GlobalCollections.Instance.OnTheClock.Team.ID;
-                                        cmdO.Parameters.Add(new OracleParameter(parm, OracleDbType.Int32, teamId, ParameterDirection.Input));
-                                    }
-                                    else
-                                    {
-                                        if (val.Substring(0, 1) == "#")
-                                        {
-                                            if (ConfigurationManager.AppSettings[val.Substring(1)] != null)
-                                            {
-                                                val = ConfigurationManager.AppSettings[val.Substring(1)];
-                                            }
-                                        }
 
-                                        Int32.TryParse(val, out teamId);
-                                    }
-
-                                    teamIds.Add(teamId);
-                                }
-
+                                wsParms[i] = val;
                             }
-                        }
 
-                        if (playlistItem.QueryType.ToUpper() == "SP")
-                        {
-                            cmdO.Connection = cnO;
-                            cmdO.CommandText = playlistItem.Query;
-                            cmdO.CommandType = System.Data.CommandType.StoredProcedure;
-                            cmdO.BindByName = true;
+                            DataSet dsTemp = null;
 
-                            cmdO.Parameters.Add(new OracleParameter(playlistItem.OutputParameter, OracleDbType.RefCursor, ParameterDirection.Output));
-
-                            adpO = new OracleDataAdapter(cmdO);
-
-                            ds = new DataSet();
-
-                            adpO.Fill(ds);
-
-                            tbl = ds.Tables[0];
-                        }
-                        else
-                        {
-                            if (query != "")
+                            try
                             {
-                                cmdO.CommandText = query.ToString();
-                                cmdO.Connection = cnO;
-                                rdrO = cmdO.ExecuteReader();
-                                tbl.Load(rdrO);
-                                rdrO.Close();
-                                rdrO.Dispose();
+                                dsTemp = WebService.CallFunctionByName(playlistItem.Query, wsParms);
                             }
-
-                        }
-
-                        break;
-                    case "MYSQL":
-                        if (query != "")
-                        {
-                            cnM = createConnectionMySql();
-                            cmdM = new MySqlCommand(query.ToString(), cnM);
-                            rdrM = cmdM.ExecuteReader();
-                            tbl.Load(rdrM);
-                            rdrM.Close();
-                            rdrM.Dispose();
-                        }
-
-                        break;
-                    case "WS":
-                        parms = playlistItem.QueryParameters.Split('|');
-
-                        Object[] wsParms = new Object[parms.Length];
-
-                        for (int i = 0; i < parms.Length; i++)
-                        {
-                            string[] parmval = parms[i].ToString().Split('=');
-
-                            string parm = parmval[0].ToString();
-                            string val = parmval[1].ToString();
-
-                            val = val.Replace("'", "");
-
-                            if (val.Length > 0 && val.Substring(0, 1) == "#")
+                            catch
                             {
-                                if (ConfigurationManager.AppSettings[val.Substring(1)] != null)
-                                {
-                                    val = ConfigurationManager.AppSettings[val.Substring(1)];
-                                }
+                                Debug.Print("Web Service call failed");
+                                dsTemp = null;
                             }
 
-                            wsParms[i] = val;
-                        }
+                            if (dsTemp != null)
+                            {
+                                tbl = dsTemp.Tables[0];
+                            }
 
-                        DataSet dsTemp = null;
-
-                        try
-                        {
-                            dsTemp = WebService.CallFunctionByName(playlistItem.Query, wsParms);
-                        }
-                        catch
-                        {
-                            Debug.Print("Web Service call failed");
-                            dsTemp = null;
-                        }
-
-                        if (dsTemp != null)
-                        {
-                            tbl = dsTemp.Tables[0];
-                        }
-
-                        break;                    
+                            break;
+                    }
+                
                 }
-                                
+         
                 if (playlistItem.AdditionalDataFields != null)
                 {
                     foreach (KeyValuePair<string, string> pair in playlistItem.AdditionalDataFields)
@@ -1616,50 +1625,54 @@ namespace DraftAdmin.DataAccess
                     }
                 }
 
-                if (tbl.Rows.Count == 0)
+                if (tbl.Rows.Count == 0 && playlistItem.Query != null)
                 {
                     Debug.Print("No data returned by " + playlistItem.Query);
                 }
 
                 XmlDataRow xmlDataRow;
 
-                if (playlistItem.MaxRows == 1)
+                switch (playlistItem.MaxRows)
                 {
-
-                    foreach (DataRow row in tbl.Rows)
-                    {
-                    //DataRow row = tbl.Rows[playlistItem.RowIndex];
-
+                    case 0:
+                        //just add a blank data row
                         xmlDataRow = new XmlDataRow();
-
-                        foreach (DataColumn col in tbl.Columns)
+                        xmlDataRows.Add(xmlDataRow);
+                        break;
+                    case 1:
+                        foreach (DataRow row in tbl.Rows)
                         {
-                            xmlDataRow.Add(col.ColumnName, row[col.ColumnName].ToString());
-                        }
+                            //DataRow row = tbl.Rows[playlistItem.RowIndex];
 
-                        if (playlistItem.Description.ToUpper() != "PROMPTER")
-                        {
-                            xmlDataRow.Add("PANEL_TYPE", playlistItem.PanelType);
-                            xmlDataRow.Add("PAGE_TYPE", playlistItem.PageType);
-                        }
+                            xmlDataRow = new XmlDataRow();
 
-                        if (playlistItem.AdditionalDataFields != null)
-                        {
-                            foreach (KeyValuePair<string, string> pair in playlistItem.AdditionalDataFields)
+                            foreach (DataColumn col in tbl.Columns)
                             {
-                                if (pair.Key.ToString().ToUpper().IndexOf("INTEAMID") == -1)
+                                xmlDataRow.Add(col.ColumnName, row[col.ColumnName].ToString());
+                            }
+
+                            if (playlistItem.Description.ToUpper() != "PROMPTER")
+                            {
+                                xmlDataRow.Add("PANEL_TYPE", playlistItem.PanelType);
+                                xmlDataRow.Add("PAGE_TYPE", playlistItem.PageType);
+                            }
+
+                            if (playlistItem.AdditionalDataFields != null)
+                            {
+                                foreach (KeyValuePair<string, string> pair in playlistItem.AdditionalDataFields)
                                 {
-                                    xmlDataRow.Add(pair.Key, pair.Value);
+                                    if (pair.Key.ToString().ToUpper().IndexOf("INTEAMID") == -1)
+                                    {
+                                        xmlDataRow.Add(pair.Key, pair.Value);
+                                    }
                                 }
                             }
-                        }
 
-                        xmlDataRows.Add(xmlDataRow);
-                    }                    
-                }
-                else
-                {
-                    xmlDataRow = new XmlDataRow();
+                            xmlDataRows.Add(xmlDataRow);
+                        }            
+                        break;
+                    default:
+                        xmlDataRow = new XmlDataRow();
                     int count = 1;
 
                     if (tbl.Rows.Count > 0)
@@ -1706,6 +1719,7 @@ namespace DraftAdmin.DataAccess
 
                         xmlDataRows.Add(xmlDataRow);  //adds in the last row
                     }
+                        break;
                 }
 
                 //add all the team data to each xmlDataRow (so the team info is included with each data row)
@@ -2875,19 +2889,26 @@ namespace DraftAdmin.DataAccess
                             {
                                 row = tbl.Rows[0];
                             }
-                            
+
                             row["firstname"] = xmlRow["firstname"].ToString();
                             row["lastname"] = xmlRow["lastname"].ToString();
 
                             Int16 age;
 
-                            if (Int16.TryParse(xmlRow["age"].ToString(), out age))
+                            if (dsPlayers.Tables["players"].Columns["age"] != null)
                             {
-                                row["age"] = age;
-                            }                                                  
-                            
+                                if (Int16.TryParse(xmlRow["age"].ToString(), out age))
+                                {
+                                    row["age"] = age;
+                                }
+                            }
+
                             row["position"] = xmlRow["position"].ToString();
-                            row["positionfull"] = xmlRow["positionfull"].ToString();
+
+                            if (dsPlayers.Tables["players"].Columns["positionfull"] != null)
+                            {
+                                row["positionfull"] = xmlRow["positionfull"].ToString();
+                            }
 
                             if (xmlRow["school"].ToString() != "")
                             {

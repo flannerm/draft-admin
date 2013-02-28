@@ -222,9 +222,12 @@ namespace DraftAdmin.ViewModels
                         }
                         else
                         {
-                            playlistItem.CurrentRow = 0;
-                            playlist.CurrentPlaylistItem += 1;
-                            nextPlaylistItem(playlist);
+                            if (playlist.PlaylistItems.Count > 1)
+                            {
+                                playlistItem.CurrentRow = 0;
+                                playlist.CurrentPlaylistItem += 1;
+                                nextPlaylistItem(playlist);
+                            }
                         }
 
                     } //playlistItem.XmlDataRows != null

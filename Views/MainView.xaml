@@ -8,13 +8,12 @@
         xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity" 
         xmlns:Custom="http://www.julmar.com/wpfhelpers" 
         xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions"
-        
         xmlns:clk="clr-namespace:AxClockControl;assembly=AxInterop.ClockControl"
         xmlns:global="clr-namespace:DraftAdmin.Global"
         mc:Ignorable="d" x:Class="DraftAdmin.Views.MainView"
         Icon="/DraftAdmin;component/DraftAdminIcon.ico"
         Title="NFL Draft Compression Admin"
-        Loaded="WindowLoaded" Height="768" Width="1024">
+        Height="768" Width="1024">
     
     <Grid>
         <Grid.Background>

@@ -956,14 +956,18 @@ namespace DraftAdmin.ViewModels
             {
                 if (_playlistTabVM.SelectedPlaylist != null)
                 {
-                    if (_playlistTabVM.SelectedPlaylist.PlaylistName.ToUpper() == "PROMPTER")
+                    switch (_playlistTabVM.SelectedPlaylist.PlaylistName.ToUpper())
                     {
-                        commandToSend.Parameters.Add(new CommandParameter("TemplateName", "Prompter"));
-                    }
-                    else
-                    {
-                        commandToSend.Parameters.Add(new CommandParameter("TemplateName", "Clock"));
-                        xmlRow.Add("TURN_CLOCK_RED", _clockRedUnderMin.ToString().ToUpper());
+                        case "PROMPTER":
+                            commandToSend.Parameters.Add(new CommandParameter("TemplateName", "Prompter"));
+                            break;
+                        case "BREAK CLOCK":
+                            commandToSend.Parameters.Add(new CommandParameter("TemplateName", "BreakClock"));
+                            break;
+                        default:
+                            commandToSend.Parameters.Add(new CommandParameter("TemplateName", "Clock"));
+                            xmlRow.Add("TURN_CLOCK_RED", _clockRedUnderMin.ToString().ToUpper());
+                            break;
                     }
                 }
                 else
@@ -1142,18 +1146,23 @@ namespace DraftAdmin.ViewModels
         
         private void sendCommandToPlayout(PlayerCommand commandToSend, Playlist playlist = null)
         {
-            if (playlist == null)
+            try
             {
-                _playlistCommands.Add(commandToSend.CommandID, 0);
-            }
-            else
-            {
-                _playlistCommands.Add(commandToSend.CommandID, playlist.PlaylistID);
-            }
+                if (playlist == null)
+                {
+                    _playlistCommands.Add(commandToSend.CommandID, 0);
+                }
+                else
+                {
+                    _playlistCommands.Add(commandToSend.CommandID, playlist.PlaylistID);
+                }
 
-            _lastCommandID = commandToSend.CommandID;
+                _lastCommandID = commandToSend.CommandID;
 
-            _compTalker.Talk(commandToSend);
+                _compTalker.Talk(commandToSend);
+            }
+            catch (Exception ex)
+            { }
         }
         
         private void setStatusBarMsg(string msgText, string msgColor)
@@ -1418,6 +1427,7 @@ namespace DraftAdmin.ViewModels
                 }
 
                 commandToSend.TemplateData = xmlRow.GetXMLString();
+                commandToSend.CommandID = Guid.NewGuid().ToString();
 
                 sendCommandToPlayout(commandToSend);
             }
@@ -1548,6 +1558,7 @@ namespace DraftAdmin.ViewModels
             xmlRow.Add("CLOCK", "");
 
             commandToSend.TemplateData = xmlRow.GetXMLString();
+            commandToSend.CommandID = Guid.NewGuid().ToString();
 
             updateTotem(true);
 
