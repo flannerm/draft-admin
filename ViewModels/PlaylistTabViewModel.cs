@@ -259,6 +259,29 @@ namespace DraftAdmin.ViewModels
             Playlists = DbConnection.GetPlaylists();
         }
 
+        public void ResetPlaylists()
+        {
+            if (_loadedPlaylists != null)
+            {
+                foreach (Playlist playlist in _loadedPlaylists)
+                {
+                    playlist.CurrentPlaylistItem = 0;
+                    nextPlaylistItem(playlist);
+                }
+
+                //if (_currentL3PlaylistItem < GlobalCollections.Instance.PlaylistItems.Count)
+                //{
+                //    GlobalCollections.Instance.PlaylistItems[_currentL3PlaylistItem].CurrentRow = 0; //reset the current playlist item
+                //}
+
+                //_currentL3PlaylistItem = 0;
+
+                //nextL3Item(false);
+
+                //setStatusBarMsg("Cycle reset at " + DateTime.Now.ToLongTimeString(), "Green");
+            }        
+        }
+
         #endregion
 
         #region Commands

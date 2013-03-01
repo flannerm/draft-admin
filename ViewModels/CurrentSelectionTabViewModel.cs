@@ -99,6 +99,7 @@ namespace DraftAdmin.ViewModels
             PlayerCommand commandToSend = new PlayerCommand();
 
             commandToSend.Command = (DraftAdmin.PlayoutCommands.CommandType)Enum.Parse(typeof(DraftAdmin.PlayoutCommands.CommandType), "ShowPage");
+            commandToSend.CommandID = Guid.NewGuid().ToString();
             commandToSend.Parameters = new List<CommandParameter>();
             commandToSend.Parameters.Add(new CommandParameter("TemplateName", "CurrentSelection"));
 
@@ -137,6 +138,7 @@ namespace DraftAdmin.ViewModels
             PlayerCommand commandToSend = new PlayerCommand();
 
             commandToSend.Command = (DraftAdmin.PlayoutCommands.CommandType)Enum.Parse(typeof(DraftAdmin.PlayoutCommands.CommandType), "ShowPage");
+            commandToSend.CommandID = Guid.NewGuid().ToString();
             commandToSend.Parameters = new List<CommandParameter>();
             commandToSend.Parameters.Add(new CommandParameter("TemplateName", "Clock"));
 
@@ -157,6 +159,7 @@ namespace DraftAdmin.ViewModels
                 PlayerCommand commandToSend = new PlayerCommand();
 
                 commandToSend.Command = (DraftAdmin.PlayoutCommands.CommandType)Enum.Parse(typeof(DraftAdmin.PlayoutCommands.CommandType), "ShowPage");
+                commandToSend.CommandID = Guid.NewGuid().ToString();
                 commandToSend.Parameters = new List<CommandParameter>();
                 commandToSend.Parameters.Add(new CommandParameter("TemplateName", "CurrentSelection"));
 
@@ -206,6 +209,7 @@ namespace DraftAdmin.ViewModels
                     PlayerCommand commandToSend = new PlayerCommand();
 
                     commandToSend.Command = (DraftAdmin.PlayoutCommands.CommandType)Enum.Parse(typeof(DraftAdmin.PlayoutCommands.CommandType), "ShowPage");
+                    commandToSend.CommandID = Guid.NewGuid().ToString();
                     commandToSend.Parameters = new List<CommandParameter>();
                     commandToSend.Parameters.Add(new CommandParameter("TemplateName", "CurrentSelection"));
 
@@ -252,6 +256,7 @@ namespace DraftAdmin.ViewModels
             commandToSend = new PlayerCommand();
 
             commandToSend.Command = (DraftAdmin.PlayoutCommands.CommandType)Enum.Parse(typeof(DraftAdmin.PlayoutCommands.CommandType), "ShowPage");
+            commandToSend.CommandID = Guid.NewGuid().ToString();
             commandToSend.Parameters = new List<CommandParameter>();
             commandToSend.Parameters.Add(new CommandParameter("TemplateName", "Clock"));
 
@@ -288,6 +293,7 @@ namespace DraftAdmin.ViewModels
                 commandToSend = new PlayerCommand();
 
                 commandToSend.Command = (DraftAdmin.PlayoutCommands.CommandType)Enum.Parse(typeof(DraftAdmin.PlayoutCommands.CommandType), "HidePage");
+                commandToSend.CommandID = Guid.NewGuid().ToString();
                 commandToSend.Parameters = new List<CommandParameter>();
                 commandToSend.Parameters.Add(new CommandParameter("TemplateName", "Lower3rd_Connected"));
                 commandToSend.Parameters.Add(new CommandParameter("QueueCommand", "true"));
@@ -297,6 +303,7 @@ namespace DraftAdmin.ViewModels
                 commandToSend = new PlayerCommand();
 
                 commandToSend.Command = (DraftAdmin.PlayoutCommands.CommandType)Enum.Parse(typeof(DraftAdmin.PlayoutCommands.CommandType), "HidePage");
+                commandToSend.CommandID = Guid.NewGuid().ToString();
                 commandToSend.Parameters = new List<CommandParameter>();
                 commandToSend.Parameters.Add(new CommandParameter("TemplateName", "Lower3rd_Separated"));
 
@@ -305,6 +312,7 @@ namespace DraftAdmin.ViewModels
                 commandToSend = new PlayerCommand();
 
                 commandToSend.Command = (DraftAdmin.PlayoutCommands.CommandType)Enum.Parse(typeof(DraftAdmin.PlayoutCommands.CommandType), "ShowPage");
+                commandToSend.CommandID = Guid.NewGuid().ToString();
                 commandToSend.Parameters = new List<CommandParameter>();
                 commandToSend.Parameters.Add(new CommandParameter("TemplateName", "EndOfDraft"));
             }
@@ -314,6 +322,7 @@ namespace DraftAdmin.ViewModels
                 commandToSend = new PlayerCommand();
 
                 commandToSend.Command = (DraftAdmin.PlayoutCommands.CommandType)Enum.Parse(typeof(DraftAdmin.PlayoutCommands.CommandType), "HidePage");
+                commandToSend.CommandID = Guid.NewGuid().ToString();
                 commandToSend.Parameters = new List<CommandParameter>();
                 commandToSend.Parameters.Add(new CommandParameter("TemplateName", "CurrentSelection"));
             }
@@ -326,6 +335,7 @@ namespace DraftAdmin.ViewModels
             PlayerCommand commandToSend = new PlayerCommand();
 
             commandToSend.Command = (DraftAdmin.PlayoutCommands.CommandType)Enum.Parse(typeof(DraftAdmin.PlayoutCommands.CommandType), "ShowPage");
+            commandToSend.CommandID = Guid.NewGuid().ToString();
             commandToSend.Parameters = new List<CommandParameter>();
             commandToSend.Parameters.Add(new CommandParameter("TemplateName", "Clock"));
 
@@ -343,6 +353,7 @@ namespace DraftAdmin.ViewModels
             PlayerCommand commandToSend = new PlayerCommand();
 
             commandToSend.Command = (DraftAdmin.PlayoutCommands.CommandType)Enum.Parse(typeof(DraftAdmin.PlayoutCommands.CommandType), "HidePage");
+            commandToSend.CommandID = Guid.NewGuid().ToString();
             commandToSend.Parameters = new List<CommandParameter>();
             commandToSend.Parameters.Add(new CommandParameter("TemplateName", "EndOfDraft"));
 
@@ -354,6 +365,7 @@ namespace DraftAdmin.ViewModels
             PlayerCommand commandToSend = new PlayerCommand();
 
             commandToSend.Command = (DraftAdmin.PlayoutCommands.CommandType)Enum.Parse(typeof(DraftAdmin.PlayoutCommands.CommandType), "ShowPage");
+            commandToSend.CommandID = Guid.NewGuid().ToString();
             commandToSend.Parameters = new List<CommandParameter>();
             commandToSend.Parameters.Add(new CommandParameter("TemplateName", "Next"));
 

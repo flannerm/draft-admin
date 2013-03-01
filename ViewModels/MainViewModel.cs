@@ -298,10 +298,13 @@ namespace DraftAdmin.ViewModels
                 {
                     _playlistCommands.Clear();
 
-                    foreach (Playlist playlist in PlaylistTabVM.LoadedPlaylists)
+                    if (PlaylistTabVM.LoadedPlaylists != null)
                     {
-                        playlist.TimerRunning = false;
-                        playlist.Timer.Stop();
+                        foreach (Playlist playlist in PlaylistTabVM.LoadedPlaylists)
+                        {
+                            playlist.TimerRunning = false;
+                            playlist.Timer.Stop();
+                        }
                     }
                 }
 
@@ -766,8 +769,14 @@ namespace DraftAdmin.ViewModels
 
                                 if (_playlistTimerRunning)
                                 {
-                                    System.Timers.Timer timer = PlaylistTabVM.LoadedPlaylists.SingleOrDefault(p => p.PlaylistID == playlistID).Timer;
+                                    Playlist loadedPlaylist = PlaylistTabVM.LoadedPlaylists.SingleOrDefault(p => p.PlaylistID == playlistID);
+                                    System.Timers.Timer timer = null;
 
+                                    if (loadedPlaylist != null)
+                                    {
+                                        timer = loadedPlaylist.Timer;
+                                    }
+                                    
                                     //System.Timers.Timer timer = GlobalCollections.Instance.PlaylistTimers.FirstOrDefault(p => p.Key.PlaylistID == playlistID).Value;
 
                                     if (timer != null) { timer.Start(); }
@@ -1240,7 +1249,7 @@ namespace DraftAdmin.ViewModels
 
         private void resetCycleNoPrompt()
         {
-
+            _playlistTabVM.ResetPlaylists();
         }
 
         private void importPlayersAction(object parameter)
@@ -1269,7 +1278,9 @@ namespace DraftAdmin.ViewModels
 
         private void resetCycleAction(object parameter)
         {
-           
+            PlaylistTimerRunning = false;
+            _playlistTabVM.ResetPlaylists();
+            AskResetCycle = false;
         }
 
         private void cancelResetCycleAction(object parameter)
@@ -1540,6 +1551,7 @@ namespace DraftAdmin.ViewModels
             commandToSend = new PlayerCommand();
 
             commandToSend.Command = (DraftAdmin.PlayoutCommands.CommandType)Enum.Parse(typeof(DraftAdmin.PlayoutCommands.CommandType), "ShowPage");
+            commandToSend.CommandID = Guid.NewGuid().ToString();
             commandToSend.Parameters = new List<CommandParameter>();
             commandToSend.Parameters.Add(new CommandParameter("TemplateName", "Clock"));
 
@@ -1580,6 +1592,7 @@ namespace DraftAdmin.ViewModels
             PlayerCommand commandToSend = new PlayerCommand();
 
             commandToSend.Command = (DraftAdmin.PlayoutCommands.CommandType)Enum.Parse(typeof(DraftAdmin.PlayoutCommands.CommandType), "ShowPage");
+            commandToSend.CommandID = Guid.NewGuid().ToString();
             commandToSend.Parameters = new List<CommandParameter>();
             commandToSend.Parameters.Add(new CommandParameter("TemplateName", "Next"));
 
@@ -1693,6 +1706,7 @@ namespace DraftAdmin.ViewModels
                     commandToSend = new PlayerCommand();
 
                     commandToSend.Command = (DraftAdmin.PlayoutCommands.CommandType)Enum.Parse(typeof(DraftAdmin.PlayoutCommands.CommandType), "ShowPage");
+                    commandToSend.CommandID = Guid.NewGuid().ToString();
                     commandToSend.Parameters = new List<CommandParameter>();
                     commandToSend.Parameters.Add(new CommandParameter("TemplateName", "Poll"));
 
@@ -1728,6 +1742,7 @@ namespace DraftAdmin.ViewModels
                     commandToSend = new PlayerCommand();
 
                     commandToSend.Command = (DraftAdmin.PlayoutCommands.CommandType)Enum.Parse(typeof(DraftAdmin.PlayoutCommands.CommandType), "ShowPage");
+                    commandToSend.CommandID = Guid.NewGuid().ToString();
                     commandToSend.Parameters = new List<CommandParameter>();
                     commandToSend.Parameters.Add(new CommandParameter("TemplateName", "Poll"));
 

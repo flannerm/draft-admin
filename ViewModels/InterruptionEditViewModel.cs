@@ -91,6 +91,7 @@ namespace DraftAdmin.ViewModels
                 PlayerCommand commandToSend = new PlayerCommand();
 
                 commandToSend.Command = (DraftAdmin.PlayoutCommands.CommandType)Enum.Parse(typeof(DraftAdmin.PlayoutCommands.CommandType), "ShowPage");
+                commandToSend.CommandID = Guid.NewGuid().ToString();
                 commandToSend.Parameters = new List<CommandParameter>();
                 commandToSend.Parameters.Add(new CommandParameter("TemplateName", ConfigurationManager.AppSettings["InterruptionTemplate"].ToString()));
 
