@@ -3051,7 +3051,7 @@ namespace DraftAdmin.DataAccess
             
             worker.RunWorkerCompleted += delegate(object s, RunWorkerCompletedEventArgs args)
             { 
-                SetStatusBarMsg(playersImported.ToString() + " of " + playersToImport.ToString() + " players successfully imported at " + DateTime.Now.ToLongTimeString() + ".  Players not found by name:  " + playersNotFound.ToString() + ".  Errors importing " + importErrors.ToString() + ".", "Green");
+                SetStatusBarMsg(playersImported.ToString() + " of " + playersToImport.ToString() + " players successfully imported at " + DateTime.Now.ToLongTimeString() + ".  Players not found by ID:  " + playersNotFound.ToString() + ".  Errors importing " + importErrors.ToString() + ".", "Green");
                 GlobalCollections.Instance.LoadPlayers();
             };
 

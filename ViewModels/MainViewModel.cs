@@ -65,6 +65,7 @@ namespace DraftAdmin.ViewModels
         private DelegateCommand _deleteAllPicksCommand;
         private DelegateCommand _refreshOverlaysCommand;
         private DelegateCommand _refreshPollChipsCommand;
+        private DelegateCommand _refreshRightLogosCommand;
 
         private DelegateCommand _showPollQuestionCommand;
         private DelegateCommand _showPollResultsCommand;
@@ -74,6 +75,8 @@ namespace DraftAdmin.ViewModels
 
         private DelegateCommand _showClockOverlayCommand;
         private DelegateCommand _showClockCommand;
+
+        private DelegateCommand _showRightLogoCommand;
 
         private DelegateCommand _nextOnTheClockCommand;
 
@@ -119,8 +122,11 @@ namespace DraftAdmin.ViewModels
 
         private string _selectedClockOverlay;
         private string _selectedPollChip;
+        private string _selectedRightLogo;
+
         private ObservableCollection<string> _clockOverlays;
         private ObservableCollection<string> _pollChips;
+        private ObservableCollection<string> _rightLogos;
 
         private Talker _compTalker;
         private Talker _clockTalker;
@@ -369,6 +375,18 @@ namespace DraftAdmin.ViewModels
         {
             get { return _clockOverlays; }
             set { _clockOverlays = value; OnPropertyChanged("ClockOverlays"); }
+        }
+
+        public string SelectedRightLogo
+        {
+            get { return _selectedRightLogo; }
+            set { _selectedRightLogo = value; OnPropertyChanged("SelectedRightLogo"); }
+        }
+
+        public ObservableCollection<string> RightLogos
+        {
+            get { return _rightLogos; }
+            set { _rightLogos = value; OnPropertyChanged("RightLogos"); }
         }
 
         public ObservableCollection<string> PollChips
@@ -672,6 +690,8 @@ namespace DraftAdmin.ViewModels
             loadClockOverlays();
 
             loadPollChips();
+
+            loadRightLogos();
 
             getPollData();
 
@@ -1415,6 +1435,28 @@ namespace DraftAdmin.ViewModels
             }
         }
 
+        private void loadRightLogos()
+        {
+            if (RightLogos == null)
+            {
+                RightLogos = new ObservableCollection<string>();
+            }
+            else
+            {
+                RightLogos.Clear();
+            }
+
+            RightLogos.Add("<NONE>");
+
+            DirectoryInfo dir = new DirectoryInfo(ConfigurationManager.AppSettings["RightLogoDirectory"].ToString());
+
+            foreach (FileInfo file in dir.GetFiles())
+            {
+                RightLogos.Add(file.Name);
+            }
+        }
+        
+
         private void showClockOverlay()
         {
             if (_selectedClockOverlay != null)
@@ -1435,6 +1477,36 @@ namespace DraftAdmin.ViewModels
                 {
                     xmlRow.Add("CLOCK_OVERLAY", "OVERLAY");
                     xmlRow.Add("CHIP_1", ConfigurationManager.AppSettings["ClockOverlayDirectory"].ToString() + "\\" + _selectedClockOverlay);
+                }
+
+                commandToSend.TemplateData = xmlRow.GetXMLString();
+                commandToSend.CommandID = Guid.NewGuid().ToString();
+
+                sendCommandToPlayout(commandToSend);
+            }
+        }
+
+        private void showRightLogo()
+        {
+            if (_selectedRightLogo != null)
+            {
+                PlayerCommand commandToSend = new PlayerCommand();
+
+                commandToSend.Command = (DraftAdmin.PlayoutCommands.CommandType)Enum.Parse(typeof(DraftAdmin.PlayoutCommands.CommandType), "ShowPage");
+                commandToSend.Parameters = new List<CommandParameter>();
+                commandToSend.Parameters.Add(new CommandParameter("TemplateName", "RightLogo"));
+
+                XmlDataRow xmlRow = new XmlDataRow();
+
+                if (_selectedRightLogo == "<NONE>")
+                {
+                    xmlRow.Add("CHIP_1", "");
+                    xmlRow.Add("VISIBLE", "0");
+                }
+                else
+                {
+                    xmlRow.Add("CHIP_1", ConfigurationManager.AppSettings["RightLogoDirectory"].ToString() + "\\" + _selectedRightLogo);
+                    xmlRow.Add("VISIBLE", "1");
                 }
 
                 commandToSend.TemplateData = xmlRow.GetXMLString();
@@ -1877,6 +1949,18 @@ namespace DraftAdmin.ViewModels
             }
         }
 
+        public ICommand ShowRightLogoCommand
+        {
+            get
+            {
+                if (_showRightLogoCommand == null)
+                {
+                    _showRightLogoCommand = new DelegateCommand(showRightLogo);
+                }
+                return _showRightLogoCommand;
+            }
+        }
+
         public ICommand ShowClockCommand
         {
             get
@@ -1946,6 +2030,18 @@ namespace DraftAdmin.ViewModels
                     _refreshOverlaysCommand = new DelegateCommand(loadClockOverlays);
                 }
                 return _refreshOverlaysCommand;
+            }
+        }
+
+        public ICommand RefreshRightLogosCommand
+        {
+            get
+            {
+                if (_refreshRightLogosCommand == null)
+                {
+                    _refreshRightLogosCommand = new DelegateCommand(loadRightLogos);
+                }
+                return _refreshRightLogosCommand;
             }
         }
 

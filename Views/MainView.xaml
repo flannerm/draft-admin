@@ -217,21 +217,13 @@
 
                             <WindowsFormsHost Name="wfh" Width="120" Height="65" Margin="10">
                                 <clk:AxClockCtl x:Name="axClockCtl" ClockChange="axClockCtl_ClockChange" ></clk:AxClockCtl>
-                            </WindowsFormsHost>
-                            
-                            <!--<WindowsFormsHost Name="wfh" Width="120" Height="65" >
-                                <clk:AxClockCtl x:Name="axClockCtl" ClockChange="axClockCtl_ClockChange" />
-                            </WindowsFormsHost>-->
-                            
-                            <!--<WindowsFormsHost Name="clockHost" Width="120" Height="65" Margin="10" HorizontalAlignment="Center" VerticalAlignment="Top">                                
-                                <clk:AxClockCtl x:Name="clockCtl" Visible="True" ClockChange="clock_ClockChange" />
-                            </WindowsFormsHost>-->
+                            </WindowsFormsHost>                         
 
                             <Button x:Name="showClock" Height="30" Width="120" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0"
                                 Command="{Binding ShowClockCommand}" Content="Show Clock" Background="Black" IsEnabled="{Binding PlayoutEnabled}"/>
                             
                             <CheckBox x:Name="chkTurnClockRed" Content="Turn Clock Red Under 1:00" Margin="10" Height="20"
-                                      IsChecked="{Binding ClockRedUnderMin}"/>
+                                      IsChecked="{Binding ClockRedUnderMin}" FontWeight="Normal"/>
 
                         </StackPanel>
                     </Border>
@@ -242,7 +234,7 @@
                         </Border.Background>
 
                         <StackPanel Orientation="Vertical">
-                            <TextBlock Text="Countdown To:" Margin="10" FontSize="14" HorizontalAlignment="Center"/>
+                            <TextBlock Text="Countdown To:" Margin="10" FontSize="14" HorizontalAlignment="Center" FontWeight="Bold"/>
                             <TextBox x:Name="countdownTime" Width="100" Height="30" Text="{Binding CountdownTarget}"/>
                             <CheckBox Content="Use Countdown Clock" IsChecked="{Binding UseCountdownClock}" 
                                       Margin="0,10,0,0" HorizontalAlignment="Center"></CheckBox>
@@ -256,13 +248,11 @@
                         </Border.Background>
 
                         <StackPanel Grid.Column="1" Grid.Row="0" VerticalAlignment="Center" Orientation="Vertical">
-                            
+
+                            <TextBlock Text="Available Overlays" Margin="10,0,0,0" FontWeight="Bold"/>
+
                             <ComboBox  Height="30" Width="300" SelectedItem="{Binding SelectedClockOverlay}" Margin="10"
                                        ItemsSource="{Binding ClockOverlays}">
-                                <!--<ComboBoxItem Content="On The Clock"/>
-                                <ComboBoxItem Content="Draft Starts In"/>
-                                <ComboBoxItem Content="Draft Resumes In"/>
-                                <ComboBoxItem Content="Draft Over"/>-->
                             </ComboBox>
 
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
@@ -279,6 +269,35 @@
 
                 </Grid>
                 
+            </TabItem>
+            
+            <TabItem Header="Branding Logo">
+                <Grid>
+                    <Border Grid.Column="0" Grid.Row="0" CornerRadius="10" Margin="10" Width="320" Height="150" HorizontalAlignment="Left" VerticalAlignment="Top">
+                        <Border.Background>
+                            <SolidColorBrush Color="Red" Opacity="0.3"/>
+                        </Border.Background>
+
+                        <StackPanel Grid.Column="1" Grid.Row="0" VerticalAlignment="Center" Orientation="Vertical">
+
+                            <TextBlock Text="Available Branding Logos" Margin="10,0,0,0" FontWeight="Bold"/>
+                            
+                            <ComboBox  Height="30" Width="300" SelectedItem="{Binding SelectedRightLogo}" Margin="10"
+                                       ItemsSource="{Binding RightLogos}">
+                            </ComboBox>
+
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+
+                                <Button x:Name="refreshRightLogosButton" Height="30" Width="120" Margin="0,0,30,0"
+                                    Command="{Binding RefreshRightLogosCommand}" Content="Refresh List" Background="Black" IsEnabled="{Binding PlayoutEnabled}"/>
+
+                                <Button x:Name="showRightLogoButton" Height="30" Width="120" Margin="0"
+                                    Command="{Binding ShowRightLogoCommand}" Content="Show Right Logo" Background="Black" IsEnabled="{Binding PlayoutEnabled}"/>
+
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+                </Grid>
             </TabItem>
             
             <TabItem Header="Data">
@@ -315,7 +334,7 @@
                     <Button x:Name="deleteAllPicksButton" Grid.Column="3" Grid.Row="1" VerticalAlignment="Top" Height="30" Width="170" Margin="10,10,10,10"
                         Command="{Binding DeleteAllPicksCommand}" Content="Delete ALL Picks" Background="Red" Foreground="Black" FontWeight="Bold"/>
 
-                    <ContentControl Height="300" Width="300" Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="4" Content="{Binding TeamsAndPlayersVM}" 
+                    <ContentControl Height="Auto" Width="Auto" Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="4" Content="{Binding TeamsAndPlayersVM}" 
                                     Margin="10,20,0,0" HorizontalAlignment="Left"/>
                 </Grid>
             </TabItem>
