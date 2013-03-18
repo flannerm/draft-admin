@@ -22,7 +22,8 @@
         
         <Grid.RowDefinitions>
         	<RowDefinition Height="Auto"/>
-        	<RowDefinition/>
+        	<RowDefinition Height="Auto"/>
+            <RowDefinition/>
         	<RowDefinition Height="30"/>
         	<RowDefinition Height="30"/>
         </Grid.RowDefinitions>
@@ -91,7 +92,42 @@
 
         </Grid>
 
-        <TabControl Grid.Row="1" Margin="8">
+        <Grid Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="5">
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+
+            <TextBlock Grid.Row="0" Grid.Column="0" Text="Outgoing Command" Margin="10,0,0,0"/>
+            <TextBlock Grid.Row="0" Grid.Column="1" Text="Command Result" Margin="10,0,0,0"/>
+            
+            <Border Grid.Row="1" Grid.Column="0" CornerRadius="10" Margin="10,0,0,0" Height="40" Width="670" HorizontalAlignment="Left">
+                <Border.Background>
+                    <SolidColorBrush Color="Black"/>
+                </Border.Background>
+
+                <TextBlock Height="30" Width="660" Margin="5"
+                   HorizontalAlignment="Center" VerticalAlignment="Top" Text="{Binding PlayoutOutgoingCommand}" 
+                   Foreground="Lime" Background="Transparent" FontFamily="Courier New" FontWeight="Bold"/>
+            </Border>
+
+            <Border Grid.Row="1" Grid.Column="1" CornerRadius="10" Margin="10,0,0,0" Height="40" Width="300" HorizontalAlignment="Left">
+                <Border.Background>
+                    <SolidColorBrush Color="Black"/>
+                </Border.Background>
+
+                <TextBlock Height="30" Width="290" Margin="5"
+                   HorizontalAlignment="Center" VerticalAlignment="Top" Text="{Binding PlayoutFeedback}" 
+                   Foreground="Lime" Background="Transparent" FontFamily="Courier New" FontWeight="Bold"/>
+            </Border>
+        </Grid>
+        
+        <TabControl Grid.Row="2" Margin="8" Height="550" VerticalAlignment="Bottom">
             
             <TabControl.Background>
                 <SolidColorBrush Color="White" Opacity="0.4"/>
@@ -341,13 +377,13 @@
             
         </TabControl>
 
-        <TextBlock Grid.Row="2" Text="{Binding StatusMessageText}" Foreground="{Binding StatusMessageColor}" VerticalAlignment="Center" FontWeight="Bold" Height="30" Padding="10">
+        <TextBlock Grid.Row="3" Text="{Binding StatusMessageText}" Foreground="{Binding StatusMessageColor}" VerticalAlignment="Center" FontWeight="Bold" Height="30" Padding="10">
             <TextBlock.Background>
                 <SolidColorBrush Color="White" Opacity="0.4"/>
             </TextBlock.Background>
         </TextBlock>
 
-        <TextBlock Grid.Row="3" Text="{Binding PlayoutMessageText}" Foreground="{Binding PlayoutMessageColor}" VerticalAlignment="Center" FontWeight="Bold" Height="30" Padding="10">
+        <TextBlock Grid.Row="4" Text="{Binding PlayoutMessageText}" Foreground="{Binding PlayoutMessageColor}" VerticalAlignment="Center" FontWeight="Bold" Height="30" Padding="10">
             <TextBlock.Background>
                 <SolidColorBrush Color="White" Opacity="0.4"/>
             </TextBlock.Background>

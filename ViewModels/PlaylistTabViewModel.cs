@@ -30,7 +30,7 @@ namespace DraftAdmin.ViewModels
         private DelegateCommand _disablePollCommand;
         private DelegateCommand _enablePollCommand;
 
-        private string _playoutFeedack;
+        //private string _playoutFeedack;
 
         public delegate void JumpToItemEventHandler(int playlistItemOrder);
         public event JumpToItemEventHandler JumpToItemEvent;
@@ -69,11 +69,11 @@ namespace DraftAdmin.ViewModels
             set { _selectedPlaylistItem = value; OnPropertyChanged("SelectedPlaylistItem"); }
         }
 
-        public string PlayoutFeedback
-        {
-            get { return _playoutFeedack; }
-            set { _playoutFeedack = value; OnPropertyChanged("PlayoutFeedback"); }
-        }
+        //public string PlayoutFeedback
+        //{
+        //    get { return _playoutFeedack; }
+        //    set { _playoutFeedack = value; OnPropertyChanged("PlayoutFeedback"); }
+        //}
 
         #endregion
 
@@ -202,7 +202,7 @@ namespace DraftAdmin.ViewModels
 
                                     OnSendCommandNoTransitions(commandToSend);
 
-                                    Debug.Print("Clock sent to PageEngine: " + DateTime.Now);
+                                    //Debug.Print("Clock sent to PageEngine: " + DateTime.Now);
 
                                     if (playlist.TimerRunning)
                                     {

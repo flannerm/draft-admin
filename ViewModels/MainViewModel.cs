@@ -3,26 +3,26 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
-using DraftAdmin.DataAccess;
-using DraftAdmin.Models;
 using System.Timers;
 using System.Windows.Threading;
-using DraftAdmin.Commands;
 using System.Windows.Input;
-using DraftAdmin.Sockets;
-using DraftAdmin.PlayoutCommands;
 using System.Configuration;
 using System.Xml.Serialization;
 using System.IO;
-using DraftAdmin.Output;
 using System.Xml;
 using System.Data;
-//using System.Threading;
 using System.ComponentModel;
-using DraftAdmin.Global;
 using System.Net;
 using System.Windows.Forms;
 using System.Threading;
+
+using DraftAdmin.Global;
+using DraftAdmin.Output;
+using DraftAdmin.Sockets;
+using DraftAdmin.PlayoutCommands;
+using DraftAdmin.Commands;
+using DraftAdmin.DataAccess;
+using DraftAdmin.Models;
 
 namespace DraftAdmin.ViewModels
 {
@@ -51,6 +51,7 @@ namespace DraftAdmin.ViewModels
 
         private DispatcherTimer _reconnectPlayoutTimer;
         private DispatcherTimer _checkPlayoutConnectionTimer;
+
         private bool _playoutConnectionAlive = false;
         private bool _playoutInitialized = false;
                         
@@ -156,6 +157,9 @@ namespace DraftAdmin.ViewModels
         private bool _pickIsIn = false;
 
         private Dictionary<string, int> _playlistCommands;
+
+        private string _playoutFeedack;
+        private string _playoutOutgoingCommand;
 
         #endregion
 
@@ -495,6 +499,18 @@ namespace DraftAdmin.ViewModels
             set { _takeClock = value; OnPropertyChanged("TakeClock"); }
         }
 
+        public string PlayoutFeedback
+        {
+            get { return _playoutFeedack; }
+            set { _playoutFeedack = value; OnPropertyChanged("PlayoutFeedback"); }
+        }
+
+        public string PlayoutOutgoingCommand
+        {
+            get { return _playoutOutgoingCommand; }
+            set { _playoutOutgoingCommand = value; OnPropertyChanged("PlayoutOutgoingCommand"); }
+        }
+              
         #endregion
 
         #region Constructor
@@ -674,6 +690,7 @@ namespace DraftAdmin.ViewModels
             PlaylistTabVM.JumpToItemEvent += new PlaylistTabViewModel.JumpToItemEventHandler(jumpToPlaylistItem);
             PlaylistTabVM.SendCommandEvent += new PlaylistTabViewModel.SendCommandEventHandler(sendCommandToPlayout);
             PlaylistTabVM.SendCommandNoTransitionsEvent += new PlaylistTabViewModel.SendCommandNoTransitionsEventHandler(sendCommandNoTransitions);
+            //PlaylistTabVM.SetPlayoutOutgoingCommand += new SetPlayoutOutgoingCommandHandler(setPlayoutOutgoingCommand);
             PlaylistTabVM.LoadPlaylists();
 
             CurrentSelectionTabVM = new CurrentSelectionTabViewModel();
@@ -906,11 +923,17 @@ namespace DraftAdmin.ViewModels
 
         private void setPlayoutFeedback(string feedback)
         {
-            if (_playlistTabVM != null)
-            {
-                _playlistTabVM.PlayoutFeedback = feedback;
-            }            
+            //if (_playlistTabVM != null)
+            //{
+                //_playlistTabVM.PlayoutFeedback = feedback;
+                PlayoutFeedback = feedback;
+            //}            
         }
+
+        //private void setPlayoutOutgoingCommand(string command)
+        //{
+            //PlayoutOutgoingCommand = command;
+        //}
 
         private void initializePlayout()
         {
@@ -1090,15 +1113,14 @@ namespace DraftAdmin.ViewModels
                                 
                     commandToSend.Parameters = new List<CommandParameter>();
 
-                
-                        if (_playlistTabVM.SelectedPlaylist.PlaylistName.ToUpper() == "PROMPTER")
-                        {
-                            commandToSend.Parameters.Add(new CommandParameter("TemplateName", "Prompter"));
-                        }
-                        else
-                        {
-                            commandToSend.Parameters.Add(new CommandParameter("TemplateName", "Clock"));
-                        }
+                    if (_playlistTabVM.SelectedPlaylist.PlaylistName.ToUpper() == "PROMPTER")
+                    {
+                        commandToSend.Parameters.Add(new CommandParameter("TemplateName", "Prompter"));
+                    }
+                    else
+                    {
+                        commandToSend.Parameters.Add(new CommandParameter("TemplateName", "Clock"));
+                    }
                 
 
                     commandToSend.Parameters.Add(new CommandParameter("MergeDataWithoutTransitions", "true")); 
@@ -1177,6 +1199,8 @@ namespace DraftAdmin.ViewModels
         {
             try
             {
+                PlayoutOutgoingCommand = commandToSend.TemplateData;
+
                 if (playlist == null)
                 {
                     _playlistCommands.Add(commandToSend.CommandID, 0);
@@ -1313,7 +1337,7 @@ namespace DraftAdmin.ViewModels
             AskInitializePlayout = false;
 
             PlayerCommand commandToSend = new PlayerCommand();
-
+            
             //uncomment this if we want the admin to initialize the playout when the app starts...
             commandToSend.Command = (DraftAdmin.PlayoutCommands.CommandType)Enum.Parse(typeof(DraftAdmin.PlayoutCommands.CommandType), "Initialize");
             commandToSend.CommandID = "INIT";
@@ -1322,7 +1346,7 @@ namespace DraftAdmin.ViewModels
             commandToSend.Parameters.Add(new CommandParameter("WorkingDirectory", ConfigurationManager.AppSettings["TemplateDirectory"].ToString()));
             commandToSend.Parameters.Add(new CommandParameter("OutputType", ConfigurationManager.AppSettings["OutputType"].ToString()));
 
-            _compTalker.Talk(commandToSend);
+            sendCommandToPlayout(commandToSend);
             //*************************************************************************************
 
             commandToSend.Command = (DraftAdmin.PlayoutCommands.CommandType)Enum.Parse(typeof(DraftAdmin.PlayoutCommands.CommandType), "ShowPage");
@@ -1332,30 +1356,37 @@ namespace DraftAdmin.ViewModels
             commandToSend.Parameters.Add(new CommandParameter("TemplateName", "Background"));
             commandToSend.Parameters.Add(new CommandParameter("QueueCommand", "true"));
 
-            _compTalker.Talk(commandToSend);
+            sendCommandToPlayout(commandToSend);
 
             commandToSend.Command = (DraftAdmin.PlayoutCommands.CommandType)Enum.Parse(typeof(DraftAdmin.PlayoutCommands.CommandType), "ShowPage");
             commandToSend.Parameters = new List<CommandParameter>();
             commandToSend.Parameters.Add(new CommandParameter("TemplateName", "Clock"));
             commandToSend.Parameters.Add(new CommandParameter("QueueCommand", "true"));
 
-            _compTalker.Talk(commandToSend);
+            sendCommandToPlayout(commandToSend);
 
             commandToSend.Command = (DraftAdmin.PlayoutCommands.CommandType)Enum.Parse(typeof(DraftAdmin.PlayoutCommands.CommandType), "ShowPage");
             commandToSend.Parameters = new List<CommandParameter>();
             commandToSend.Parameters.Add(new CommandParameter("TemplateName", "Next"));
             commandToSend.Parameters.Add(new CommandParameter("QueueCommand", "true"));
 
-            _compTalker.Talk(commandToSend);
+            sendCommandToPlayout(commandToSend);
 
             commandToSend.Command = (DraftAdmin.PlayoutCommands.CommandType)Enum.Parse(typeof(DraftAdmin.PlayoutCommands.CommandType), "ShowPage");
             commandToSend.Parameters = new List<CommandParameter>();
             commandToSend.Parameters.Add(new CommandParameter("TemplateName", "RightLogo"));
 
-            _compTalker.Talk(commandToSend);
+            sendCommandToPlayout(commandToSend);
 
             //nextL3Item();
             //nextRTItem();
+        }
+
+        private void sendCommandToPlayout(PlayerCommand commandToSend)
+        {
+            PlayoutOutgoingCommand = commandToSend.Command + "; " + commandToSend.TemplateData;
+
+            _compTalker.Talk(commandToSend);
         }
 
         private void cancelInitializePlayoutAction(object parameter)

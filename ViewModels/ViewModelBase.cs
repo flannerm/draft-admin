@@ -72,16 +72,6 @@ namespace DraftAdmin.ViewModels
             }
         }
 
-        //protected void OnSendCommand(PlayerCommand command)
-        //{
-        //    SendCommandEventHandler handler = SendCommandEvent;
-
-        //    if (handler != null)
-        //    {
-        //        handler(command);
-        //    }
-        //}
-
         protected void OnSendCommand(PlayerCommand command, Playlist playlist)
         {
             SendCommandEventHandler handler = SendCommandEvent;
