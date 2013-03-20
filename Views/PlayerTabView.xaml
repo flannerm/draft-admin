@@ -145,7 +145,7 @@
                                 Command="{Binding RefreshPlayersCommand}" Content="Refresh Players"/>
         </StackPanel>
 
-        <Border Grid.Column="1" Grid.Row="1" Grid.RowSpan="3" Background="White" BorderThickness="0" BorderBrush="#ff000000" 
+        <Border Grid.Column="1" Grid.Row="1" Grid.RowSpan="4" Background="White" BorderThickness="0" BorderBrush="#ff000000" 
                 CornerRadius="8,8,8,8" Margin="10,0,10,0">
             <ContentControl x:Name="contentControl" Content="{Binding SelectedPlayerEditVM}" Background="#eaeedb" Width="460">
                 <!--<i:Interaction.Behaviors>

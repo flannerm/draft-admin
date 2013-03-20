@@ -62,7 +62,7 @@
         <Button Grid.Row="4" x:Name="refreshInterruptionsButton" Height="30" Width="130" Margin="5" Background="Black"
                                 Command="{Binding RefreshInterruptionsCommand}" Content="Refresh Interruptions"/>
 
-        <Border Grid.Column="1" Grid.Row="1" Grid.RowSpan="3" Background="White" BorderBrush="#FF000000" 
+        <Border Grid.Column="1" Grid.Row="1" Grid.RowSpan="4" Background="White" BorderBrush="#FF000000" 
                             BorderThickness="1,1,1,1" CornerRadius="8,8,8,8" Width="485">
             <ContentControl x:Name="contentControlInterruptions" Content="{Binding SelectedInterruptionEditVM}" Background="#eaeedb"/>
         </Border>

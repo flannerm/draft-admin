@@ -97,7 +97,7 @@ namespace DraftAdmin.DataAccess
             return picks;
         }
 
-        public static ObservableCollection<Player> GetPlayers()
+        public static ObservableCollection<Player> GetPlayers(BackgroundWorker worker = null)
         {
             ObservableCollection<Player> players = new ObservableCollection<Player>();
 
@@ -105,6 +105,8 @@ namespace DraftAdmin.DataAccess
             OracleCommand cmd = null;
             OracleDataReader rdr = null;
             DataTable tbl = null;
+
+            int i = 0;
 
             try
             {
@@ -129,6 +131,15 @@ namespace DraftAdmin.DataAccess
                     {
                         Player player = createPlayerModel(row);
                         players.Add(player);
+
+                        i++;
+
+                        int percent = Convert.ToInt32(((double)i / tbl.Rows.Count) * 100);
+
+                        if (worker != null)
+                        {
+                            worker.ReportProgress(percent);
+                        }                        
                     }
                 }
                 else

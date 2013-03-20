@@ -8,6 +8,7 @@ using DraftAdmin.DataAccess;
 using System.Windows.Input;
 using System.Collections.ObjectModel;
 using System.Text.RegularExpressions;
+using System.ComponentModel;
 
 namespace DraftAdmin.ViewModels
 {
@@ -269,9 +270,28 @@ namespace DraftAdmin.ViewModels
 
         private void refreshPlayers()
         {
-            Global.GlobalCollections.Instance.LoadPlayers();
+            OnSetStatusBarMsg("Loading players...", "#f88803");
 
-            filterPlayers();
+            BackgroundWorker worker = new BackgroundWorker();
+            worker.WorkerReportsProgress = true;
+
+            worker.DoWork += delegate(object s, DoWorkEventArgs args)
+            {
+                Global.GlobalCollections.Instance.LoadPlayers(worker);
+            };
+
+            worker.ProgressChanged += delegate(object s, ProgressChangedEventArgs args)
+            {
+                OnSetStatusBarMsg("Loading players (" + args.ProgressPercentage.ToString() + "%)", "#f88803");
+            };
+
+            worker.RunWorkerCompleted += delegate(object s, RunWorkerCompletedEventArgs args)
+            {
+                OnSetStatusBarMsg("Players loaded at: " + DateTime.Now.ToString("h:mm:ss tt"), "Green");
+                filterPlayers();
+            };
+
+            worker.RunWorkerAsync();            
         }
 
         #endregion

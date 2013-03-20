@@ -175,20 +175,19 @@
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="1*"/>
                     </Grid.RowDefinitions>
 
-                    <Border Grid.Column="0" Grid.Row="0" Grid.RowSpan="2" CornerRadius="10" Margin="10" Height="500" Width="400" VerticalAlignment="Top">
+                    <Border Grid.Column="0" Grid.Row="1" Grid.RowSpan="2" CornerRadius="10" Margin="10" Width="460" VerticalAlignment="Top" HorizontalAlignment="Left">
                         <Border.Background>
                             <SolidColorBrush Color="Gray" Opacity="0.3"/>
                         </Border.Background>
 
-                        <TextBlock Height="480" Width="380" Margin="10" 
+                        <TextBlock Height="400" Width="440" Margin="10" 
                                VerticalAlignment="Top" Text="{Binding PollText}" FontWeight="Bold" FontFamily="Courier New"/>
 
                     </Border>
                         
-                    <StackPanel Orientation="Horizontal" Grid.Column="1" Grid.Row="0" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10">
+                    <StackPanel Orientation="Horizontal" Grid.Column="0" Grid.Row="0" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10">
                         <TextBlock Text="Answers:" FontSize="16" VerticalAlignment="Center"/>
                         <ComboBox Height="50" Width="60" Margin="5,0,0,0" SelectedValue="{Binding PollAnswers}"
                                    FontSize="20">
@@ -200,25 +199,41 @@
 
                         <CheckBox Content="Auto-Refresh Poll" IsChecked="{Binding RefreshPoll}" Margin="40,18,0,0"/>
                     </StackPanel>
-                    
-                    <Grid Grid.Row="1" Grid.Column="1">
+
+                    <Border Grid.Column="1" Grid.Row="0" Grid.RowSpan="3" CornerRadius="10" Margin="5">
+                        <Border.Background>
+                            <SolidColorBrush Color="Red" Opacity="0.3"/>
+                        </Border.Background>
+                        
+                        <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="Auto"/>
                         </Grid.RowDefinitions>
 
-                        <StackPanel Grid.Row="0" Orientation="Horizontal" VerticalAlignment="Top">
+                        <StackPanel Grid.Row="0" Orientation="Horizontal" VerticalAlignment="Top" Margin="5">
                             <Button x:Name="showPollQuestionButton" Content="Show Poll (Vote Now)" Width="150" Height="30" Background="Black"
                                 Command="{Binding ShowPollQuestionCommand}"/>
                             <Button x:Name="showPollResults" Content="Show Poll Results" Width="150" Height="30" Background="Black" Margin="20"
                                 Command="{Binding ShowPollResultsCommand}"/>
                         </StackPanel>
 
-                        <StackPanel Grid.Row="1" Orientation="Horizontal" VerticalAlignment="Top">
-                            <TextBlock Text="Poll Chip:" VerticalAlignment="Center"></TextBlock>
-                            <ComboBox  Height="30" Width="300" SelectedItem="{Binding SelectedPollChip}" Margin="10"
-                                       ItemsSource="{Binding PollChips}"/>
+                        <StackPanel Grid.Row="1" Orientation="Vertical" VerticalAlignment="Top" Margin="5,0,5,0">
+                            <TextBlock Text="Available Poll Chips"></TextBlock>
+
+                            <ComboBox Height="60" Width="460" SelectedItem="{Binding SelectedPollChip}" Margin="0,5,0,0" HorizontalAlignment="Left"
+                                      ItemsSource="{Binding PollChips}">
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Horizontal">
+                                            <Image Source="{Binding Image}" Height="60" Stretch="Uniform"/>
+                                            <TextBlock Text="{Binding FileName}"/>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
+                            </ComboBox>
+                            
                             <!--<TextBox Text="{Binding PollChip}" Height="30" Width="300" Margin="10,0,0,0"></TextBox>-->
                         </StackPanel>
 
@@ -226,7 +241,7 @@
                                     Command="{Binding RefreshPollChipsCommand}" Content="Refresh List" Background="Black" IsEnabled="{Binding PlayoutEnabled}"/>
                     </Grid>
                     
-                    
+                    </Border>
                     
                 </Grid>
                 
@@ -278,20 +293,28 @@
                     </Border>
 
 
-                    <Border Grid.Column="1" Grid.Row="0" CornerRadius="10" Margin="10" Width="320" Height="150" HorizontalAlignment="Left" VerticalAlignment="Top">
+                    <Border Grid.Column="1" Grid.Row="0" Grid.RowSpan="2" CornerRadius="10" Margin="10" Width="500" Height="320" HorizontalAlignment="Left" VerticalAlignment="Top">
                         <Border.Background>
                             <SolidColorBrush Color="Red" Opacity="0.3"/>
                         </Border.Background>
 
-                        <StackPanel Grid.Column="1" Grid.Row="0" VerticalAlignment="Center" Orientation="Vertical">
+                        <StackPanel Grid.Column="1" Grid.Row="0" VerticalAlignment="Top" Orientation="Vertical" Margin="10">
 
-                            <TextBlock Text="Available Overlays" Margin="10,0,0,0" FontWeight="Bold"/>
+                            <TextBlock Text="Available Overlays" Margin="10,0,0,0" FontWeight="Bold" VerticalAlignment="Top"/>
 
-                            <ComboBox  Height="30" Width="300" SelectedItem="{Binding SelectedClockOverlay}" Margin="10"
-                                       ItemsSource="{Binding ClockOverlays}">
+                            <ComboBox Height="60" Width="460" SelectedItem="{Binding SelectedClockOverlay}" Margin="0,10,0,0"
+                                      ItemsSource="{Binding ClockOverlays}">
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Horizontal">
+                                            <Image Source="{Binding Image}" Height="60" Stretch="Uniform"/>
+                                            <TextBlock Text="{Binding FileName}"/>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
                             </ComboBox>
 
-                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="10">
 
                                 <Button x:Name="refreshOverlaysButton" Height="30" Width="120" Margin="0,0,30,0"
                                     Command="{Binding RefreshOverlaysCommand}" Content="Refresh List" Background="Black" IsEnabled="{Binding PlayoutEnabled}"/>
@@ -309,17 +332,25 @@
             
             <TabItem Header="Branding Logo">
                 <Grid>
-                    <Border Grid.Column="0" Grid.Row="0" CornerRadius="10" Margin="10" Width="320" Height="150" HorizontalAlignment="Left" VerticalAlignment="Top">
+                    <Border Grid.Column="0" Grid.Row="0" CornerRadius="10" Margin="10" Width="500" Height="150" HorizontalAlignment="Left" VerticalAlignment="Top">
                         <Border.Background>
                             <SolidColorBrush Color="Red" Opacity="0.3"/>
                         </Border.Background>
 
                         <StackPanel Grid.Column="1" Grid.Row="0" VerticalAlignment="Center" Orientation="Vertical">
 
-                            <TextBlock Text="Available Branding Logos" Margin="10,0,0,0" FontWeight="Bold"/>
-                            
-                            <ComboBox  Height="30" Width="300" SelectedItem="{Binding SelectedRightLogo}" Margin="10"
-                                       ItemsSource="{Binding RightLogos}">
+                            <TextBlock Text="Available Branding Logos" Margin="20,0,0,0"/>
+
+                            <ComboBox Height="60" Width="460" SelectedItem="{Binding SelectedRightLogo}" Margin="0,5,0,10" HorizontalAlignment="Center"
+                                      ItemsSource="{Binding RightLogos}">
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Horizontal">
+                                            <Image Source="{Binding Image}" Height="60" Stretch="Uniform"/>
+                                            <TextBlock Text="{Binding FileName}"/>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
                             </ComboBox>
 
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
@@ -353,16 +384,10 @@
                     </Grid.RowDefinitions>
                     
                     <Button x:Name="importPlayersButton" Grid.Column="0" Grid.Row="0" VerticalAlignment="Top" Height="30" Width="180" Margin="10,10,10,10" 
-                        Command="{Binding ImportPlayersCommand}" Content="Import Players From Excel" Background="Black"/>
+                        Command="{Binding ImportPlayersCommand}" Content="Import Players" Background="Black"/>
 
                     <Button x:Name="importTeamsButton" Grid.Column="0" Grid.Row="1" VerticalAlignment="Top" Height="30" Width="180" Margin="10,10,10,10" 
-                        Command="{Binding ImportTeamsCommand}" Content="Import Team Info From Excel" Background="Black"/>
-
-                    <Button x:Name="getSchoolsFromSDRButton" Grid.Column="2" Grid.Row="0" VerticalAlignment="Top" Height="30" Width="170" Margin="10,10,10,10"
-                        Command="{Binding GetSchoolsFromSDRCommand}" Content="Import Schools From SDR" Background="Black"/>
-
-                    <Button x:Name="getTeamsFromSDRButton" Grid.Column="2" Grid.Row="1" VerticalAlignment="Top" Height="30" Width="170" Margin="10,10,10,10"
-                        Command="{Binding GetTeamsFromSDRCommand}" Content="Import NFL Teams From SDR" Background="Black"/>
+                        Command="{Binding ImportTeamsCommand}" Content="Import Team Info" Background="Black"/>
 
                     <Button x:Name="deleteLastPickButton" Grid.Column="3" Grid.Row="0" VerticalAlignment="Top" Height="30" Width="170" Margin="10,10,10,10"
                         Command="{Binding DeleteLastPickCommand}" Content="Delete Last Pick" Background="Black"/>

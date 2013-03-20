@@ -116,9 +116,10 @@ namespace DraftAdmin.Global
             Teams = DbConnection.GetProTeams();
         }
 
-        public void LoadPlayers()
+        public void LoadPlayers(BackgroundWorker worker = null)
         {
-             Players = DbConnection.GetPlayers();
+            ObservableCollection<Player> players = DbConnection.GetPlayers(worker);
+            Players = players;
         }
 
         public void LoadDraftOrder()

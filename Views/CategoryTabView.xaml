@@ -63,7 +63,7 @@
         <Button Grid.Row="4" x:Name="refreshCategoriesButton" Height="30" Width="120" Margin="5" Background="Black"
                                 Command="{Binding RefreshCategoriesCommand}" Content="Refresh Categories"/>
 
-        <Border Grid.Column="1" Grid.Row="1" Grid.RowSpan="3" Background="White" BorderBrush="#FF000000" 
+        <Border Grid.Column="1" Grid.Row="1" Grid.RowSpan="4" Background="White" BorderBrush="#FF000000" 
                             BorderThickness="1,1,1,1" CornerRadius="8,8,8,8" Width="485">
             <ContentControl x:Name="contentControlCategories" Content="{Binding SelectedCategoryEditVM}" Background="#eaeedb"/>
         </Border>

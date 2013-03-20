@@ -250,6 +250,8 @@ namespace DraftAdmin.ViewModels
                 isLastPick = true;               
             }
 
+            CurrentPlayer = null;
+
             PlayerCommand commandToSend;
 
             //send a command to change the clock on-air

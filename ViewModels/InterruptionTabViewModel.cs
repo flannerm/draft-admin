@@ -120,12 +120,6 @@ namespace DraftAdmin.ViewModels
             }
         }
 
-        //private void showInterruption(PlayerCommand commandToSend)
-        //{
-        //    //L3TimerRunning = false;
-        //    //sendCommandToPlayout(commandToSend);
-        //}
-
         private void saveInterruption()
         {
             if (DbConnection.SaveCategory(_selectedInterruption) == true)

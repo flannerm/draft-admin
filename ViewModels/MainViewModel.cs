@@ -23,6 +23,9 @@ using DraftAdmin.PlayoutCommands;
 using DraftAdmin.Commands;
 using DraftAdmin.DataAccess;
 using DraftAdmin.Models;
+using System.Drawing;
+using DraftAdmin.Utilities;
+using System.Windows.Media.Imaging;
 
 namespace DraftAdmin.ViewModels
 {
@@ -121,13 +124,13 @@ namespace DraftAdmin.ViewModels
         private string _clock;
         private int _clockSeconds;
 
-        private string _selectedClockOverlay;
-        private string _selectedPollChip;
-        private string _selectedRightLogo;
+        private LogoChip _selectedClockOverlay;
+        private LogoChip _selectedPollChip;
+        private LogoChip _selectedRightLogo;
 
-        private ObservableCollection<string> _clockOverlays;
-        private ObservableCollection<string> _pollChips;
-        private ObservableCollection<string> _rightLogos;
+        private ObservableCollection<LogoChip> _clockOverlays;
+        private ObservableCollection<LogoChip> _pollChips;
+        private ObservableCollection<LogoChip> _rightLogos;
 
         private Talker _compTalker;
         private Talker _clockTalker;
@@ -347,7 +350,7 @@ namespace DraftAdmin.ViewModels
                 
                 if (_selectedClockOverlay != null)
                 {
-                    if (_selectedClockOverlay.ToUpper() != "<NONE>")
+                    if (_selectedClockOverlay.FileName.ToUpper() != "<NONE>")
                     {
                         _clock = "";
                     }
@@ -369,37 +372,37 @@ namespace DraftAdmin.ViewModels
             set { _clockRedUnderMin = value; OnPropertyChanged("ClockRedUnderMin"); }
         }
 
-        public string SelectedClockOverlay
+        public LogoChip SelectedClockOverlay
         {
             get { return _selectedClockOverlay; }
             set { _selectedClockOverlay = value; OnPropertyChanged("SelectedClockOverlay"); }
         }
 
-        public ObservableCollection<string> ClockOverlays
+        public ObservableCollection<LogoChip> ClockOverlays
         {
             get { return _clockOverlays; }
             set { _clockOverlays = value; OnPropertyChanged("ClockOverlays"); }
         }
 
-        public string SelectedRightLogo
+        public LogoChip SelectedRightLogo
         {
             get { return _selectedRightLogo; }
             set { _selectedRightLogo = value; OnPropertyChanged("SelectedRightLogo"); }
         }
 
-        public ObservableCollection<string> RightLogos
+        public ObservableCollection<LogoChip> RightLogos
         {
             get { return _rightLogos; }
             set { _rightLogos = value; OnPropertyChanged("RightLogos"); }
         }
 
-        public ObservableCollection<string> PollChips
+        public ObservableCollection<LogoChip> PollChips
         {
             get { return _pollChips; }
             set { _pollChips = value; OnPropertyChanged("PollChips"); }
         }
 
-        public string SelectedPollChip
+        public LogoChip SelectedPollChip
         {
             get { return _selectedPollChip; }
             set { _selectedPollChip = value; OnPropertyChanged("SelectedPollChip"); }
@@ -418,7 +421,6 @@ namespace DraftAdmin.ViewModels
             { 
                 _pollAnswers = value;
                 DbConnection.UpdateNumberOfPollAnswers(Convert.ToInt16(_pollAnswers.Content));
-                //OnPropertyChanged("PollAnswers"); 
             }
         }
 
@@ -457,7 +459,7 @@ namespace DraftAdmin.ViewModels
         {
             if (_selectedClockOverlay != null)
             {
-                if (_selectedClockOverlay.IndexOf("countdown") > -1)
+                if (_selectedClockOverlay.FileName.IndexOf("countdown") > -1)
                 {
                     getCountdownClock(_countdownTarget);
                     updateCountdownClock();
@@ -571,92 +573,14 @@ namespace DraftAdmin.ViewModels
                 _refreshPollTimer.Start();
             }
 
-            try
-            {
-                if (ConfigurationManager.AppSettings["LoadSchools"].ToString().ToUpper() != "FALSE")
-                {
-                    GlobalCollections.Instance.LoadSchools();
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Error in LoadSchools: " + ex.ToString());
-            }
+            loadSchools();
+            loadTeams();
+            loadOnTheClock();
+            loadDraftOrder();
+            loadPlayers();
 
-            try
-            {
-                if (ConfigurationManager.AppSettings["LoadTeams"].ToString().ToUpper() != "FALSE")
-                {
-                    GlobalCollections.Instance.LoadTeams();
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Error in LoadTeams: " + ex.ToString());
-            }
-
-            try
-            {
-                if (ConfigurationManager.AppSettings["LoadDraftOrder"].ToString().ToUpper() != "FALSE")
-                {
-                    GlobalCollections.Instance.LoadDraftOrder();
-                }                
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Error in LoadDraftOrder: " + ex.ToString());
-            }
-
-            try
-            {
-                if (ConfigurationManager.AppSettings["LoadPlayers"].ToString().ToUpper() != "FALSE")
-                {
-                    GlobalCollections.Instance.LoadPlayers();
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Error in LoadPlayers: " + ex.ToString());
-            }
-
-            try
-            {
-                if (ConfigurationManager.AppSettings["LoadOnTheClock"].ToString().ToUpper() != "FALSE")
-                {
-                    GlobalCollections.Instance.LoadOnTheClock();
-                }                
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Error in LoadOnTheClock: " + ex.ToString());
-            }
-
-            try
-            {
-                GlobalCollections.Instance.LoadCategories();
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Error in LoadCategories: " + ex.ToString());
-            }
-
-            try
-            {
-                GlobalCollections.Instance.LoadInterruptions();   
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Error in LoadInterruptions: " + ex.ToString());
-            }
-
-            try
-            {
-                //GlobalCollections.Instance.LoadPlaylists();
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Error in LoadPlaylists: " + ex.ToString());
-            }
+            loadCategories();
+            loadInterruptions();
 
             TeamsAndPlayersVM = new TeamsAndPlayersViewModel(DbConnection.WebService);
 
@@ -690,7 +614,6 @@ namespace DraftAdmin.ViewModels
             PlaylistTabVM.JumpToItemEvent += new PlaylistTabViewModel.JumpToItemEventHandler(jumpToPlaylistItem);
             PlaylistTabVM.SendCommandEvent += new PlaylistTabViewModel.SendCommandEventHandler(sendCommandToPlayout);
             PlaylistTabVM.SendCommandNoTransitionsEvent += new PlaylistTabViewModel.SendCommandNoTransitionsEventHandler(sendCommandNoTransitions);
-            //PlaylistTabVM.SetPlayoutOutgoingCommand += new SetPlayoutOutgoingCommandHandler(setPlayoutOutgoingCommand);
             PlaylistTabVM.LoadPlaylists();
 
             CurrentSelectionTabVM = new CurrentSelectionTabViewModel();
@@ -700,16 +623,9 @@ namespace DraftAdmin.ViewModels
             CurrentSelectionTabVM.ResetCycleEvent += new CurrentSelectionTabViewModel.ResetCycleEventHandler(resetCycleNoPrompt);
             CurrentSelectionTabVM.RefreshPlayersEvent += new CurrentSelectionTabViewModel.RefreshPlayersEventHandler(refreshPlayers);
 
-            //GlobalCollections.Instance.SendCommandEvent += new GlobalCollections.SendCommandEventHandler(sendCommandToPlayout);
-            //GlobalCollections.Instance.PlaylistAddedEvent += new GlobalCollections.PlaylistAddedEventHandler(playlistAdded);
-            //GlobalCollections.Instance.SendCommandNoTransitionsEvent += new GlobalCollections.SendCommandNoTransitionsEventHandler(sendCommandNoTransitions);
-
             loadClockOverlays();
-
             loadPollChips();
-
             loadRightLogos();
-
             getPollData();
 
             PollChip = "4GMC_logo_chip_ele.tga";
@@ -718,6 +634,219 @@ namespace DraftAdmin.ViewModels
         #endregion
 
         #region Private Methods
+
+        private void loadSchools()
+        {
+            try
+            {
+                if (ConfigurationManager.AppSettings["LoadSchools"].ToString().ToUpper() != "FALSE")
+                {
+                    setStatusBarMsg("Loading schools...", "Yellow");
+
+                    BackgroundWorker worker = new BackgroundWorker();
+                    worker.WorkerReportsProgress = false;
+
+                    worker.DoWork += delegate(object s, DoWorkEventArgs args)
+                    {
+                        GlobalCollections.Instance.LoadSchools();
+                    };
+
+                    worker.RunWorkerCompleted += delegate(object s, RunWorkerCompletedEventArgs args)
+                    {
+                        setStatusBarMsg("Schools loaded at: " + DateTime.Now.ToString("h:mm:ss tt"), "Green");
+                    };
+
+                    worker.RunWorkerAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error in LoadSchools: " + ex.ToString());
+            }
+        }
+
+        private void loadTeams()
+        {
+            try
+            {
+                if (ConfigurationManager.AppSettings["LoadTeams"].ToString().ToUpper() != "FALSE")
+                {
+                    //setStatusBarMsg("Loading teams...", "Yellow");
+
+                    //BackgroundWorker worker = new BackgroundWorker();
+                    //worker.WorkerReportsProgress = false;
+
+                    //worker.DoWork += delegate(object s, DoWorkEventArgs args)
+                    //{
+                        GlobalCollections.Instance.LoadTeams();
+                    //};
+
+                    //worker.RunWorkerCompleted += delegate(object s, RunWorkerCompletedEventArgs args)
+                    //{
+                    //    setStatusBarMsg("Teams loaded at: " + DateTime.Now.ToString("h:mm:ss tt"), "Green");
+
+                    //    loadDraftOrder();
+                    //};
+
+                    //worker.RunWorkerAsync();                    
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error in LoadTeams: " + ex.ToString());
+            }
+        }
+
+        private void loadDraftOrder()
+        {
+            try
+            {
+                if (ConfigurationManager.AppSettings["LoadDraftOrder"].ToString().ToUpper() != "FALSE")
+                {
+                    //setStatusBarMsg("Loading draft order...", "#f88803");
+
+                    //BackgroundWorker worker = new BackgroundWorker();
+                    //worker.WorkerReportsProgress = false;
+
+                    //worker.DoWork += delegate(object s, DoWorkEventArgs args)
+                    //{
+                        GlobalCollections.Instance.LoadDraftOrder();
+                    //};
+
+                    //worker.RunWorkerCompleted += delegate(object s, RunWorkerCompletedEventArgs args)
+                    //{
+                    //    setStatusBarMsg("Draft order loaded at: " + DateTime.Now.ToString("h:mm:ss tt"), "Green");
+                    //};
+
+                    //worker.RunWorkerAsync();                    
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error in LoadDraftOrder: " + ex.ToString());
+            }
+        }
+
+        private void loadPlayers()
+        {
+            try
+            {
+                if (ConfigurationManager.AppSettings["LoadPlayers"].ToString().ToUpper() != "FALSE")
+                {
+                    setStatusBarMsg("Loading players...", "#f88803");
+
+                    BackgroundWorker worker = new BackgroundWorker();
+                    worker.WorkerReportsProgress = true;
+
+                    worker.DoWork += delegate(object s, DoWorkEventArgs args)
+                    {
+                        GlobalCollections.Instance.LoadPlayers(worker);
+                    };
+
+                    worker.ProgressChanged += delegate(object s, ProgressChangedEventArgs args)
+                    {
+                        setStatusBarMsg("Loading players (" + args.ProgressPercentage.ToString() + "%)", "#f88803");
+                    };
+
+                    worker.RunWorkerCompleted += delegate(object s, RunWorkerCompletedEventArgs args)
+                    {
+                        setStatusBarMsg("Players loaded at: " + DateTime.Now.ToString("h:mm:ss tt"), "Green");
+                        nextOnTheClock();
+                        PlayerTabVM.FilteredPlayers = GlobalCollections.Instance.Players;
+                    };
+
+                    worker.RunWorkerAsync();                    
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error in LoadPlayers: " + ex.ToString());
+            }
+        }
+
+        private void loadOnTheClock()
+        {
+            try
+            {
+                if (ConfigurationManager.AppSettings["LoadOnTheClock"].ToString().ToUpper() != "FALSE")
+                {
+                    //setStatusBarMsg("Loading On The Clock...", "#f88803");
+
+                    //BackgroundWorker worker = new BackgroundWorker();
+                    //worker.WorkerReportsProgress = false;
+
+                    //worker.DoWork += delegate(object s, DoWorkEventArgs args)
+                    //{
+                        GlobalCollections.Instance.LoadOnTheClock();
+                    //};
+
+                    //worker.RunWorkerCompleted += delegate(object s, RunWorkerCompletedEventArgs args)
+                    //{
+                    //    setStatusBarMsg("On The Clock loaded at: " + DateTime.Now.ToString("h:mm:ss tt"), "Green");
+                    //};
+
+                    //worker.RunWorkerAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error in LoadOnTheClock: " + ex.ToString());
+            }
+        }
+
+        private void loadCategories()
+        {
+            try
+            {
+                //setStatusBarMsg("Loading Categories...", "#f88803");
+
+                //BackgroundWorker worker = new BackgroundWorker();
+                //worker.WorkerReportsProgress = false;
+
+                //worker.DoWork += delegate(object s, DoWorkEventArgs args)
+                //{
+                    GlobalCollections.Instance.LoadCategories();
+                //};
+
+                //worker.RunWorkerCompleted += delegate(object s, RunWorkerCompletedEventArgs args)
+                //{
+                //    setStatusBarMsg("Categories loaded at: " + DateTime.Now.ToString("h:mm:ss tt"), "Green");
+                //};
+
+                //worker.RunWorkerAsync();                
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error in LoadCategories: " + ex.ToString());
+            }
+        }
+
+        private void loadInterruptions()
+        {
+            try
+            {
+                //setStatusBarMsg("Loading Interruptions...", "#f88803");
+
+                //BackgroundWorker worker = new BackgroundWorker();
+                //worker.WorkerReportsProgress = false;
+
+                //worker.DoWork += delegate(object s, DoWorkEventArgs args)
+                //{
+                    GlobalCollections.Instance.LoadInterruptions();
+                //};
+
+                //worker.RunWorkerCompleted += delegate(object s, RunWorkerCompletedEventArgs args)
+                //{
+                //    setStatusBarMsg("Interruptions loaded at: " + DateTime.Now.ToString("h:mm:ss tt"), "Green");
+                //};
+
+                //worker.RunWorkerAsync();                
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error in LoadInterruptions: " + ex.ToString());
+            }
+        }
 
         private void connectToPlayout()
         {
@@ -814,8 +943,6 @@ namespace DraftAdmin.ViewModels
                                         timer = loadedPlaylist.Timer;
                                     }
                                     
-                                    //System.Timers.Timer timer = GlobalCollections.Instance.PlaylistTimers.FirstOrDefault(p => p.Key.PlaylistID == playlistID).Value;
-
                                     if (timer != null) { timer.Start(); }
                                 }
 
@@ -923,17 +1050,8 @@ namespace DraftAdmin.ViewModels
 
         private void setPlayoutFeedback(string feedback)
         {
-            //if (_playlistTabVM != null)
-            //{
-                //_playlistTabVM.PlayoutFeedback = feedback;
-                PlayoutFeedback = feedback;
-            //}            
+            PlayoutFeedback = feedback;           
         }
-
-        //private void setPlayoutOutgoingCommand(string command)
-        //{
-            //PlayoutOutgoingCommand = command;
-        //}
 
         private void initializePlayout()
         {
@@ -955,8 +1073,7 @@ namespace DraftAdmin.ViewModels
 
         private void l3TimerElapsed(object sender, EventArgs e)
         {
-            //_l3Timer.Stop(); 8/29/2012
-            //nextL3Item(); 8/29/2012
+            
         }
 
         private void refreshPollTimerElapsed(object sender, EventArgs e)
@@ -971,9 +1088,7 @@ namespace DraftAdmin.ViewModels
         
         private void jumpToPlaylistItem(int playlistItemOrder)
         {
-            //_currentL3PlaylistItem = (playlistItemOrder - 1);
-
-            //nextL3Item();
+            
         }
 
         private void playlistAdded(Playlist playlist, System.Timers.Timer timer)
@@ -1122,7 +1237,6 @@ namespace DraftAdmin.ViewModels
                         commandToSend.Parameters.Add(new CommandParameter("TemplateName", "Clock"));
                     }
                 
-
                     commandToSend.Parameters.Add(new CommandParameter("MergeDataWithoutTransitions", "true")); 
                 
                     xmlRow.Add("CLOCK", _countdownClock);
@@ -1232,7 +1346,6 @@ namespace DraftAdmin.ViewModels
 
         private void sendCommandNoTransitions(PlayerCommand commandToSend)
         {
-            //_compTalker.Talk(commandToSend);
             _clockTalker.Talk(commandToSend);
         }
         
@@ -1269,20 +1382,14 @@ namespace DraftAdmin.ViewModels
 
         private void importPlayers()
         {
-            PromptMessage = "Import players?";
+            PromptMessage = "Import players from " + ConfigurationManager.AppSettings["PlayersDataFile"].ToString() + "?";
             AskImportPlayers = true;
         }
 
         private void importTeams()
         {
-            PromptMessage = "Import teams info?";
+            PromptMessage = "Import teams from " + ConfigurationManager.AppSettings["TeamsDataFile"].ToString() + "?";
             AskImportTeams = true;
-        }
-
-        private void importSchools()
-        {
-            PromptMessage = "Import schools?";
-            AskImportSchools = true;
         }
 
         private void resetCycle()
@@ -1449,20 +1556,29 @@ namespace DraftAdmin.ViewModels
         {
             if (ClockOverlays == null)
             {
-                ClockOverlays = new ObservableCollection<string>();
+                ClockOverlays = new ObservableCollection<LogoChip>();
             }
             else
             {
                 ClockOverlays.Clear();
             }
 
-            ClockOverlays.Add("<NONE>");
+            ClockOverlays.Add(new LogoChip("<NONE>", null));
 
             DirectoryInfo dir = new DirectoryInfo(ConfigurationManager.AppSettings["ClockOverlayDirectory"].ToString());
 
             foreach (FileInfo file in dir.GetFiles())
             {
-                ClockOverlays.Add(file.Name);
+                Bitmap bmp = TargaImage.LoadTargaImage(file.FullName);
+                var strm = new System.IO.MemoryStream();
+                bmp.Save(strm, System.Drawing.Imaging.ImageFormat.Bmp);
+
+                BitmapImage logoBitmap = new BitmapImage();
+                logoBitmap.BeginInit();
+                logoBitmap.StreamSource = strm;
+                logoBitmap.EndInit();
+
+                ClockOverlays.Add(new LogoChip(file.Name, logoBitmap));
             }
         }
 
@@ -1470,23 +1586,59 @@ namespace DraftAdmin.ViewModels
         {
             if (RightLogos == null)
             {
-                RightLogos = new ObservableCollection<string>();
+                RightLogos = new ObservableCollection<LogoChip>();
             }
             else
             {
                 RightLogos.Clear();
             }
 
-            RightLogos.Add("<NONE>");
+            RightLogos.Add(new LogoChip("<NONE>", null));
 
             DirectoryInfo dir = new DirectoryInfo(ConfigurationManager.AppSettings["RightLogoDirectory"].ToString());
 
             foreach (FileInfo file in dir.GetFiles())
             {
-                RightLogos.Add(file.Name);
+                Bitmap bmp = TargaImage.LoadTargaImage(file.FullName);
+                var strm = new System.IO.MemoryStream();
+                bmp.Save(strm, System.Drawing.Imaging.ImageFormat.Bmp);
+
+                BitmapImage logoBitmap = new BitmapImage();
+                logoBitmap.BeginInit();
+                logoBitmap.StreamSource = strm;
+                logoBitmap.EndInit();
+
+                RightLogos.Add(new LogoChip(file.Name, logoBitmap));
             }
         }
-        
+
+        private void loadPollChips()
+        {
+            if (PollChips == null)
+            {
+                PollChips = new ObservableCollection<LogoChip>();
+            }
+            else
+            {
+                PollChips.Clear();
+            }
+
+            DirectoryInfo dir = new DirectoryInfo(ConfigurationManager.AppSettings["PollChipDirectory"].ToString());
+
+            foreach (FileInfo file in dir.GetFiles())
+            {
+                Bitmap bmp = TargaImage.LoadTargaImage(file.FullName);
+                var strm = new System.IO.MemoryStream();
+                bmp.Save(strm, System.Drawing.Imaging.ImageFormat.Bmp);
+
+                BitmapImage logoBitmap = new BitmapImage();
+                logoBitmap.BeginInit();
+                logoBitmap.StreamSource = strm;
+                logoBitmap.EndInit();
+
+                PollChips.Add(new LogoChip(file.Name, logoBitmap));
+            }
+        }
 
         private void showClockOverlay()
         {
@@ -1500,14 +1652,14 @@ namespace DraftAdmin.ViewModels
 
                 XmlDataRow xmlRow = new XmlDataRow();
 
-                if (_selectedClockOverlay == "<NONE>")
+                if (_selectedClockOverlay.FileName == "<NONE>")
                 {
                     xmlRow.Add("CLOCK_OVERLAY", "ON THE CLOCK");
                 }
                 else
                 {
                     xmlRow.Add("CLOCK_OVERLAY", "OVERLAY");
-                    xmlRow.Add("CHIP_1", ConfigurationManager.AppSettings["ClockOverlayDirectory"].ToString() + "\\" + _selectedClockOverlay);
+                    xmlRow.Add("CHIP_1", ConfigurationManager.AppSettings["ClockOverlayDirectory"].ToString() + "\\" + _selectedClockOverlay.FileName);
                 }
 
                 commandToSend.TemplateData = xmlRow.GetXMLString();
@@ -1529,14 +1681,14 @@ namespace DraftAdmin.ViewModels
 
                 XmlDataRow xmlRow = new XmlDataRow();
 
-                if (_selectedRightLogo == "<NONE>")
+                if (_selectedRightLogo.FileName == "<NONE>")
                 {
                     xmlRow.Add("CHIP_1", "");
                     xmlRow.Add("VISIBLE", "0");
                 }
                 else
                 {
-                    xmlRow.Add("CHIP_1", ConfigurationManager.AppSettings["RightLogoDirectory"].ToString() + "\\" + _selectedRightLogo);
+                    xmlRow.Add("CHIP_1", ConfigurationManager.AppSettings["RightLogoDirectory"].ToString() + "\\" + _selectedRightLogo.FileName);
                     xmlRow.Add("VISIBLE", "1");
                 }
 
@@ -1544,25 +1696,6 @@ namespace DraftAdmin.ViewModels
                 commandToSend.CommandID = Guid.NewGuid().ToString();
 
                 sendCommandToPlayout(commandToSend);
-            }
-        }
-
-        private void loadPollChips()
-        {
-            if (PollChips == null)
-            {
-                PollChips = new ObservableCollection<string>();
-            }
-            else
-            {
-                PollChips.Clear();
-            }
-
-            DirectoryInfo dir = new DirectoryInfo(ConfigurationManager.AppSettings["PollChipDirectory"].ToString());
-
-            foreach (FileInfo file in dir.GetFiles())
-            {
-                PollChips.Add(file.Name);
             }
         }
 
@@ -1766,7 +1899,9 @@ namespace DraftAdmin.ViewModels
 
             if (DbConnection.DeleteLastPick(GlobalCollections.Instance.OnTheClock.OverallPick - 1) == true)
             {
-                GlobalCollections.Instance.LoadPlayers();
+                //GlobalCollections.Instance.LoadPlayers();
+                loadPlayers();
+
                 Global.GlobalCollections.Instance.LoadOnTheClock();
             }
         }
@@ -1782,7 +1917,8 @@ namespace DraftAdmin.ViewModels
 
             if (DbConnection.DeleteAllPicks() == true)
             {
-                GlobalCollections.Instance.LoadPlayers();
+                //GlobalCollections.Instance.LoadPlayers();
+                loadPlayers();
                 Global.GlobalCollections.Instance.LoadOnTheClock();
             }
         }
@@ -1798,7 +1934,7 @@ namespace DraftAdmin.ViewModels
 
             if (poll != null)
             {
-                string pollChip = ConfigurationManager.AppSettings["PollChipDirectory"].ToString() + "\\" + _selectedPollChip;
+                string pollChip = ConfigurationManager.AppSettings["PollChipDirectory"].ToString() + "\\" + _selectedPollChip.FileName;
 
                 if (File.Exists(pollChip))
                 {
@@ -1834,7 +1970,7 @@ namespace DraftAdmin.ViewModels
 
             if (poll != null)
             {
-                string pollChip = ConfigurationManager.AppSettings["PollChipDirectory"].ToString() + "\\" + _selectedPollChip;
+                string pollChip = ConfigurationManager.AppSettings["PollChipDirectory"].ToString() + "\\" + _selectedPollChip.FileName;
 
                 if (File.Exists(pollChip))
                 {
@@ -1896,18 +2032,6 @@ namespace DraftAdmin.ViewModels
             }
         }
 
-        public ICommand ImportSchoolsCommand
-        {
-            get
-            {
-                if (_importSchoolsCommand == null)
-                {
-                    _importSchoolsCommand = new DelegateCommand(importSchools);
-                }
-                return _importSchoolsCommand;
-            }
-        }
-
         public ICommand ResetCycleCommand
         {
             get
@@ -1941,30 +2065,6 @@ namespace DraftAdmin.ViewModels
                     _initializePlayoutCommand = new DelegateCommand(initializePlayout);
                 }
                 return _initializePlayoutCommand;
-            }
-        }
-
-        public ICommand GetSchoolsFromSDRCommand
-        {
-            get
-            {
-                if (_getSchoolsFromSDRCommand == null)
-                {
-                    _getSchoolsFromSDRCommand = new DelegateCommand(getSchoolsFromSDR);
-                }
-                return _getSchoolsFromSDRCommand;
-            }
-        }
-
-        public ICommand GetTeamsFromSDRCommand
-        {
-            get
-            {
-                if (_getTeamsFromSDRCommand == null)
-                {
-                    _getTeamsFromSDRCommand = new DelegateCommand(getTeamsFromSDR);
-                }
-                return _getTeamsFromSDRCommand;
             }
         }
 

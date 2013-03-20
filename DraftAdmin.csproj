@@ -119,6 +119,7 @@
     <Compile Include="Converters\RankToString.cs" />
     <Compile Include="Global\GlobalCollections.cs" />
     <Compile Include="Models\Category.cs" />
+    <Compile Include="Models\LogoChip.cs" />
     <Compile Include="Models\Pick.cs" />
     <Compile Include="Models\Playlist.cs" />
     <Compile Include="PlayoutCommands\PlayerCommand.cs" />
