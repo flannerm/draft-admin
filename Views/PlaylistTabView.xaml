@@ -83,7 +83,9 @@
                     <GridViewColumn Header="Order" Width="40">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBlock Text="{Binding PlaylistOrder}"/>
+                                <Border Background="{Binding OnAir}">
+                                    <TextBlock Text="{Binding PlaylistOrder}"/>
+                                </Border>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
@@ -129,24 +131,17 @@
         <Button Grid.Column="0" Grid.Row="1" Name="jumpToItemButton" Height="30" Width="230" Margin="5"  VerticalAlignment="Center"
                 Command="{Binding JumpToItemCommand}" Content="Jump To Selected Item (stop cycle first!)" Background="Black"/>
 
-        <StackPanel  Grid.Column="0" Grid.Row="2" Orientation="Vertical">
-            <Button Grid.Column="0" Grid.Row="2" Name="disablePollButton" Height="30" Width="230" Margin="5" 
-                    Command="{Binding DisablePollCommand}" Content="Disable Poll Items" Background="Black"/>
+        <StackPanel  Grid.Column="0" Grid.Row="3" Orientation="Vertical" Height="90" VerticalAlignment="Bottom" Margin="5,0,0,5">
+            <StackPanel.Background>
+                <SolidColorBrush Color="Gray" Opacity="0.2"/>
+            </StackPanel.Background>
             
-            <Button Grid.Column="0" Grid.Row="2" Name="enablePollButton" Height="30" Width="230" Margin="5" 
-                    Command="{Binding EnablePollCommand}" Content="Enable Poll Items" Background="Black"/>
-        </StackPanel>
-        
-        <Border Grid.Column="0" Grid.Row="3" CornerRadius="10" Margin="10" Height="100" Width="200">
-            <Border.Background>
-                <SolidColorBrush Color="Black"/>
-            </Border.Background>
-
-            <TextBlock Grid.Column="0" Grid.Row="1" Height="80" Width="180" Margin="10"
-                   HorizontalAlignment="Center" VerticalAlignment="Top" Text="{Binding PlayoutFeedback}" 
-                   Foreground="Lime" Background="Transparent" FontFamily="Courier New" FontWeight="Bold"/>
-        </Border>
-        
+            <Button Grid.Column="0" Grid.Row="2" Name="disablePollButton" Height="30" Width="230" Margin="10" 
+                    Command="{Binding DisablePollCommand}" Content="Disable Poll Items" Background="Black" HorizontalAlignment="Center"/>
+            
+            <Button Grid.Column="0" Grid.Row="2" Name="enablePollButton" Height="30" Width="230" Margin="0" 
+                    Command="{Binding EnablePollCommand}" Content="Enable Poll Items" Background="Black" HorizontalAlignment="Center"/>
+        </StackPanel>        
         
     </Grid>
 </UserControl>

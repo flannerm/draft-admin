@@ -963,7 +963,6 @@ namespace DraftAdmin.ViewModels
 
                                         if (_playlistTimerRunning)
                                         {
-                                            //System.Timers.Timer timer = GlobalCollections.Instance.PlaylistTimers.FirstOrDefault(p => p.Key.PlaylistID == playlistID).Value;
                                             System.Timers.Timer timer = PlaylistTabVM.LoadedPlaylists.FirstOrDefault(p => p.PlaylistID == playlistID).Timer;
 
                                             if (timer != null) { timer.Start(); }
@@ -987,13 +986,22 @@ namespace DraftAdmin.ViewModels
 
                             if (_playlistTimerRunning)
                             {
-                                //System.Timers.Timer timer = GlobalCollections.Instance.PlaylistTimers.FirstOrDefault(p => p.Key.PlaylistID == playlistID).Value;
-                                System.Timers.Timer timer = PlaylistTabVM.LoadedPlaylists.FirstOrDefault(p => p.PlaylistID == playlistID).Timer;
+                                Playlist loadedPlaylist = PlaylistTabVM.LoadedPlaylists.FirstOrDefault(p => p.PlaylistID == playlistID);
+                                System.Timers.Timer timer = null;
 
-                                if (timer != null) { timer.Start(); }
+                                if (loadedPlaylist != null)
+                                {
+                                    timer = loadedPlaylist.Timer;
+
+                                    if (timer != null) { timer.Start(); }
+                                }  
                             }
 
-                            _playlistCommands.Remove(playlistCommand.Value.Key);
+                            if (playlistCommand.Value.Key != null)
+                            {
+                                _playlistCommands.Remove(playlistCommand.Value.Key);
+                            }
+                           
                         }
                     }
                     break;
@@ -1069,11 +1077,6 @@ namespace DraftAdmin.ViewModels
         {
             PromptMessage = "Get NFL teams from SDR?";
             AskGetTeamsFromSDR = true;
-        }
-
-        private void l3TimerElapsed(object sender, EventArgs e)
-        {
-            
         }
 
         private void refreshPollTimerElapsed(object sender, EventArgs e)

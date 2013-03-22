@@ -1672,9 +1672,13 @@ namespace DraftAdmin.DataAccess
                             {
                                 foreach (KeyValuePair<string, string> pair in playlistItem.AdditionalDataFields)
                                 {
-                                    if (pair.Key.ToString().ToUpper().IndexOf("INTEAMID") == -1)
+                                    if (pair.Key.ToString().ToUpper().IndexOf("INTEAMID") == -1) //non-teamid items
                                     {
-                                        xmlDataRow.Add(pair.Key, pair.Value);
+                                        //possibly put a db field to determine if additional fields should be loaded only on the first item
+                                        if (playlistItem.CurrentRow == 0)
+                                        {
+                                            xmlDataRow.Add(pair.Key, pair.Value);
+                                        }
                                     }
                                 }
                             }
@@ -1709,7 +1713,8 @@ namespace DraftAdmin.DataAccess
                             {
                                 foreach (KeyValuePair<string, string> pair in playlistItem.AdditionalDataFields)
                                 {
-                                    if (pair.Key.ToString().ToUpper().IndexOf("INTEAMID") == -1)
+                                    //possibly put a db field to determine if additional fields should be loaded only on the first item
+                                    if (playlistItem.CurrentRow == 0)
                                     {
                                         xmlDataRow.Add(pair.Key, pair.Value);
                                     }
@@ -1730,7 +1735,7 @@ namespace DraftAdmin.DataAccess
 
                         xmlDataRows.Add(xmlDataRow);  //adds in the last row
                     }
-                        break;
+                        break; 
                 }
 
                 //add all the team data to each xmlDataRow (so the team info is included with each data row)
@@ -1791,6 +1796,7 @@ namespace DraftAdmin.DataAccess
             }
             catch (Exception ex)
             {
+                SetStatusBarMsg("Error getting playlist item data (item " + playlistItem.PlaylistOrder.ToString() + "): " + ex.Message, "Red");
                 xmlDataRows.Clear();
             }
             finally

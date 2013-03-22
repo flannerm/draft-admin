@@ -11,6 +11,7 @@ using System.Collections.ObjectModel;
 using System.Timers;
 using System.Diagnostics;
 using System.ComponentModel;
+using System.Windows.Media;
 
 namespace DraftAdmin.ViewModels
 {
@@ -68,12 +69,6 @@ namespace DraftAdmin.ViewModels
             get { return _selectedPlaylistItem; }
             set { _selectedPlaylistItem = value; OnPropertyChanged("SelectedPlaylistItem"); }
         }
-
-        //public string PlayoutFeedback
-        //{
-        //    get { return _playoutFeedack; }
-        //    set { _playoutFeedack = value; OnPropertyChanged("PlayoutFeedback"); }
-        //}
 
         #endregion
 
@@ -161,6 +156,12 @@ namespace DraftAdmin.ViewModels
                 {
                     playlist.CurrentPlaylistItem = 0;
                 }
+
+                //set all the playlistitems to off air
+                //foreach (PlaylistItemViewModel playlistItemVM in playlist.PlaylistItems)
+                //{
+                //    playlistItemVM.OnAir = Colors.Gray;
+                //}
 
                 playlistItem = playlist.PlaylistItems[playlist.CurrentPlaylistItem];
 
@@ -263,8 +264,10 @@ namespace DraftAdmin.ViewModels
         {
             if (_loadedPlaylists != null)
             {
+                
                 foreach (Playlist playlist in _loadedPlaylists)
                 {
+                    playlist.PlaylistItems[playlist.CurrentPlaylistItem].CurrentRow = 0;
                     playlist.CurrentPlaylistItem = 0;
                     nextPlaylistItem(playlist);
                 }
