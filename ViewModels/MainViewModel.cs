@@ -574,10 +574,10 @@ namespace DraftAdmin.ViewModels
             }
 
             loadSchools();
-            loadTeams();
-            loadOnTheClock();
-            loadDraftOrder();
-            loadPlayers();
+            //loadTeams();
+            //loadOnTheClock();
+            //loadDraftOrder();
+            //loadPlayers();
 
             loadCategories();
             loadInterruptions();
@@ -641,19 +641,25 @@ namespace DraftAdmin.ViewModels
             {
                 if (ConfigurationManager.AppSettings["LoadSchools"].ToString().ToUpper() != "FALSE")
                 {
-                    setStatusBarMsg("Loading schools...", "Yellow");
+                    setStatusBarMsg("Loading schools...", "#f88803");
 
                     BackgroundWorker worker = new BackgroundWorker();
-                    worker.WorkerReportsProgress = false;
+                    worker.WorkerReportsProgress = true;
 
                     worker.DoWork += delegate(object s, DoWorkEventArgs args)
                     {
-                        GlobalCollections.Instance.LoadSchools();
+                        GlobalCollections.Instance.LoadSchools(worker);
+                    };
+
+                    worker.ProgressChanged += delegate(object s, ProgressChangedEventArgs args)
+                    {
+                        setStatusBarMsg("Loading schools (" + args.ProgressPercentage.ToString() + "%)", "#f88803");
                     };
 
                     worker.RunWorkerCompleted += delegate(object s, RunWorkerCompletedEventArgs args)
                     {
                         setStatusBarMsg("Schools loaded at: " + DateTime.Now.ToString("h:mm:ss tt"), "Green");
+                        loadTeams();                        
                     };
 
                     worker.RunWorkerAsync();
@@ -671,24 +677,30 @@ namespace DraftAdmin.ViewModels
             {
                 if (ConfigurationManager.AppSettings["LoadTeams"].ToString().ToUpper() != "FALSE")
                 {
-                    //setStatusBarMsg("Loading teams...", "Yellow");
+                    setStatusBarMsg("Loading teams...", "#f88803");
 
-                    //BackgroundWorker worker = new BackgroundWorker();
-                    //worker.WorkerReportsProgress = false;
+                    BackgroundWorker worker = new BackgroundWorker();
+                    worker.WorkerReportsProgress = true;
 
-                    //worker.DoWork += delegate(object s, DoWorkEventArgs args)
-                    //{
-                        GlobalCollections.Instance.LoadTeams();
-                    //};
+                    worker.DoWork += delegate(object s, DoWorkEventArgs args)
+                    {
+                        GlobalCollections.Instance.LoadTeams(worker);
+                    };
 
-                    //worker.RunWorkerCompleted += delegate(object s, RunWorkerCompletedEventArgs args)
-                    //{
-                    //    setStatusBarMsg("Teams loaded at: " + DateTime.Now.ToString("h:mm:ss tt"), "Green");
+                    worker.ProgressChanged += delegate(object s, ProgressChangedEventArgs args)
+                    {
+                        setStatusBarMsg("Loading teams (" + args.ProgressPercentage.ToString() + "%)", "#f88803");
+                    };
 
-                    //    loadDraftOrder();
-                    //};
+                    worker.RunWorkerCompleted += delegate(object s, RunWorkerCompletedEventArgs args)
+                    {
+                        setStatusBarMsg("Teams loaded at: " + DateTime.Now.ToString("h:mm:ss tt"), "Green");
 
-                    //worker.RunWorkerAsync();                    
+                        loadDraftOrder();                        
+                        loadPlayers();
+                    };
+
+                    worker.RunWorkerAsync();                    
                 }
             }
             catch (Exception ex)
@@ -751,6 +763,7 @@ namespace DraftAdmin.ViewModels
                     worker.RunWorkerCompleted += delegate(object s, RunWorkerCompletedEventArgs args)
                     {
                         setStatusBarMsg("Players loaded at: " + DateTime.Now.ToString("h:mm:ss tt"), "Green");
+                        loadOnTheClock();
                         nextOnTheClock();
                         PlayerTabVM.FilteredPlayers = GlobalCollections.Instance.Players;
                     };
@@ -1410,7 +1423,7 @@ namespace DraftAdmin.ViewModels
         {
             AskImportPlayers = false;
 
-            DbConnection.ImportPlayers(ConfigurationManager.AppSettings["PlayerDataFile"].ToString());            
+            DbConnection.ImportPlayers(ConfigurationManager.AppSettings["PlayersDataFile"].ToString());            
         }
 
         private void cancelImportPlayersAction(object parameter)

@@ -106,14 +106,16 @@ namespace DraftAdmin.Global
 
         #region Public Methods
 
-        public void LoadSchools()
+        public void LoadSchools(BackgroundWorker worker = null)
         {
-            Schools = DbConnection.GetSchools();
+            ObservableCollection<Team> schools = DbConnection.GetSchools(worker);
+            Schools = schools;
         }
 
-        public void LoadTeams()
+        public void LoadTeams(BackgroundWorker worker = null)
         {
-            Teams = DbConnection.GetProTeams();
+            ObservableCollection<Team> teams = DbConnection.GetProTeams(worker);
+            Teams = teams;
         }
 
         public void LoadPlayers(BackgroundWorker worker = null)

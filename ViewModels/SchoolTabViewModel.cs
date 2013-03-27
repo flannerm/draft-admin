@@ -7,6 +7,7 @@ using System.Collections.ObjectModel;
 using DraftAdmin.Models;
 using DraftAdmin.DataAccess;
 using System.Windows.Input;
+using System.ComponentModel;
 
 namespace DraftAdmin.ViewModels
 {
@@ -19,6 +20,8 @@ namespace DraftAdmin.ViewModels
         private SchoolEditViewModel _selectedSchoolEditVM;
 
         private bool _askSaveSchoolOnDirty = false;
+
+        private bool _refreshEnabled = true;
 
         private DelegateCommand _refreshSchoolsCommand;
 
@@ -61,6 +64,12 @@ namespace DraftAdmin.ViewModels
         {
             get { return _askSaveSchoolOnDirty; }
             set { _askSaveSchoolOnDirty = value; OnPropertyChanged("AskSaveSchoolOnDirty"); }
+        }
+
+        public bool RefreshEnabled
+        {
+            get { return _refreshEnabled; }
+            set { _refreshEnabled = value; OnPropertyChanged("RefreshEnabled"); }
         }
 
         #endregion
@@ -123,7 +132,29 @@ namespace DraftAdmin.ViewModels
 
         private void refreshSchools()
         {
-            Global.GlobalCollections.Instance.LoadSchools();
+            OnSetStatusBarMsg("Loading schools...", "#f88803");
+
+            BackgroundWorker worker = new BackgroundWorker();
+            worker.WorkerReportsProgress = true;
+
+            worker.DoWork += delegate(object s, DoWorkEventArgs args)
+            {
+                RefreshEnabled = false;
+                Global.GlobalCollections.Instance.LoadSchools(worker);
+            };
+
+            worker.ProgressChanged += delegate(object s, ProgressChangedEventArgs args)
+            {
+                OnSetStatusBarMsg("Loading schools (" + args.ProgressPercentage.ToString() + "%)", "#f88803");
+            };
+
+            worker.RunWorkerCompleted += delegate(object s, RunWorkerCompletedEventArgs args)
+            {
+                OnSetStatusBarMsg("Schools loaded at: " + DateTime.Now.ToString("h:mm:ss tt"), "Green");
+                RefreshEnabled = true;
+            };
+
+            worker.RunWorkerAsync();
         }
 
         #endregion

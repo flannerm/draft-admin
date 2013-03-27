@@ -6,6 +6,7 @@ using DraftAdmin.Models;
 using DraftAdmin.Commands;
 using DraftAdmin.DataAccess;
 using System.Windows.Input;
+using System.ComponentModel;
 
 namespace DraftAdmin.ViewModels
 {
@@ -18,6 +19,8 @@ namespace DraftAdmin.ViewModels
         private TeamEditViewModel _selectedTeamEditVM;
 
         private bool _askSaveTeamOnDirty = false;
+
+        private bool _refreshEnabled = true;
 
         private DelegateCommand _refreshTeamsCommand;
 
@@ -60,6 +63,12 @@ namespace DraftAdmin.ViewModels
         {
             get { return _askSaveTeamOnDirty; }
             set { _askSaveTeamOnDirty = value; OnPropertyChanged("AskSaveTeamOnDirty"); }
+        }
+
+        public bool RefreshEnabled
+        {
+            get { return _refreshEnabled; }
+            set { _refreshEnabled = value; OnPropertyChanged("RefreshEnabled"); }
         }
 
         #endregion
@@ -122,7 +131,29 @@ namespace DraftAdmin.ViewModels
 
         private void refreshTeams()
         {
-            Global.GlobalCollections.Instance.LoadTeams();
+            OnSetStatusBarMsg("Loading teams...", "#f88803");
+
+            BackgroundWorker worker = new BackgroundWorker();
+            worker.WorkerReportsProgress = true;
+
+            worker.DoWork += delegate(object s, DoWorkEventArgs args)
+            {
+                RefreshEnabled = false;
+                Global.GlobalCollections.Instance.LoadTeams(worker);
+            };
+
+            worker.ProgressChanged += delegate(object s, ProgressChangedEventArgs args)
+            {
+                OnSetStatusBarMsg("Loading teams (" + args.ProgressPercentage.ToString() + "%)", "#f88803");
+            };
+
+            worker.RunWorkerCompleted += delegate(object s, RunWorkerCompletedEventArgs args)
+            {
+                OnSetStatusBarMsg("Teams loaded at: " + DateTime.Now.ToString("h:mm:ss tt"), "Green");
+                RefreshEnabled = true;
+            };
+
+            worker.RunWorkerAsync(); 
         }
 
         #endregion

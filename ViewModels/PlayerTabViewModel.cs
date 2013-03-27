@@ -30,6 +30,8 @@ namespace DraftAdmin.ViewModels
         private bool _askSaveOnDirty = false;
         private bool _askDeletePlayer = false;
 
+        private bool _refreshEnabled = true;
+
         public delegate void DraftPlayerEventHandler(Int32 playerId);
 
         public event DraftPlayerEventHandler DraftPlayerEvent;
@@ -119,6 +121,12 @@ namespace DraftAdmin.ViewModels
         {
             get { return _filteredPlayers; }
             set { _filteredPlayers = value; OnPropertyChanged("FilteredPlayers"); }
+        }
+
+        public bool RefreshEnabled
+        {
+            get { return _refreshEnabled; }
+            set { _refreshEnabled = value; OnPropertyChanged("RefreshEnabled"); }
         }
 
         #endregion
@@ -277,6 +285,7 @@ namespace DraftAdmin.ViewModels
 
             worker.DoWork += delegate(object s, DoWorkEventArgs args)
             {
+                RefreshEnabled = false;
                 Global.GlobalCollections.Instance.LoadPlayers(worker);
             };
 
@@ -289,6 +298,7 @@ namespace DraftAdmin.ViewModels
             {
                 OnSetStatusBarMsg("Players loaded at: " + DateTime.Now.ToString("h:mm:ss tt"), "Green");
                 filterPlayers();
+                RefreshEnabled = true;
             };
 
             worker.RunWorkerAsync();            

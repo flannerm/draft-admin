@@ -31,9 +31,9 @@
 
             <TextBlock Text="First Name:" Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="5"/>           
             <TextBlock Text="School:" Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="5"/>
-            <TextBlock Text="Team:" Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="5"/>            
+            <TextBlock Text="Draft Team:" Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="5"/>            
             <TextBlock Text="Kiper Rank:" Grid.Row="3" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="5"/>            
-            <TextBlock Text="Headshot:" Grid.Row="4" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="5"/>
+            <!--<TextBlock Text="Headshot:" Grid.Row="4" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="5"/>-->
             <TextBlock Text="Height:" Grid.Row="5" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="5"/>
             <TextBlock Text="Trade:" Grid.Row="6" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="5"/>
 
@@ -58,17 +58,17 @@
             <TextBlock Text="Position:" Grid.Row="4" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="5"/>
             
             <TextBox Name="position" Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="3" HorizontalAlignment="Stretch" VerticalAlignment="Center"
-                    Height="30" Margin="5" Text="{Binding Position, UpdateSourceTrigger=PropertyChanged}"/> 
+                    Width="108" Height="30" Margin="5" Text="{Binding Position, UpdateSourceTrigger=PropertyChanged}"/> 
         </StackPanel>
 
         <StackPanel  Grid.Row="2" Grid.Column="1" Orientation="Horizontal">
-            <TextBlock Name="nflTeam" HorizontalAlignment="Left" VerticalAlignment="Center"
-                       Width="200" Margin="5" Text="{Binding Pick.Team.Name}"/>
+            <TextBlock Name="nflTeam" HorizontalAlignment="Left" VerticalAlignment="Center" Padding="2,7,0,0"
+                       Height="30" Width="200" Margin="5" Text="{Binding Pick.Team.Name}"/>
 
-            <TextBlock Text="Player ID:" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="5"/>
+            <TextBlock Text="Player ID:" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="5" />
 
-            <TextBlock Name="playerId" HorizontalAlignment="Stretch" VerticalAlignment="Center"
-                 Height="16" Width="94" Margin="0" 
+            <TextBlock Name="playerId" HorizontalAlignment="Stretch" VerticalAlignment="Center" Padding="2,7,0,0"
+                 Height="30" Width="108" Margin="0" 
                  Text="{Binding PlayerId}"></TextBlock>            
         </StackPanel>
 
@@ -91,9 +91,9 @@
                     Text="{Binding Class, UpdateSourceTrigger=PropertyChanged}"/>
         </StackPanel>
 
-        <TextBox Name="headshot" Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="3" HorizontalAlignment="Left" VerticalAlignment="Center"
+        <!--<TextBox Name="headshot" Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="3" HorizontalAlignment="Left" VerticalAlignment="Center"
             Height="30" Margin="5" Width="360"
-            Text="{Binding Headshot, UpdateSourceTrigger=PropertyChanged}"/>
+            Text="{Binding Headshot, UpdateSourceTrigger=PropertyChanged}"/>-->
 
         <StackPanel Grid.Row="5" Grid.Column="1" Orientation="Horizontal">
             <TextBox Name="height" HorizontalAlignment="Left" VerticalAlignment="Center"

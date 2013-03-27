@@ -81,7 +81,7 @@
         </Border>
 
         <Button Grid.Row="4" x:Name="refreshTeamsButton" Height="30" Width="100" Margin="5" Background="Black"
-                                Command="{Binding RefreshTeamsCommand}" Content="Refresh Teams"/>
+                Command="{Binding RefreshTeamsCommand}" Content="Refresh Teams" IsEnabled="{Binding RefreshEnabled}"/>
 
         <Border Grid.Column="1" Grid.Row="1" Grid.RowSpan="4" Background="White" BorderBrush="#FF000000" 
                             BorderThickness="1,1,1,1" CornerRadius="8,8,8,8" Width="485">

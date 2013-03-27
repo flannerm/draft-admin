@@ -626,7 +626,7 @@ namespace DraftAdmin.DataAccess
             return tidbits;
         }
 
-        public static ObservableCollection<Team> GetSchools()
+        public static ObservableCollection<Team> GetSchools(BackgroundWorker worker = null)
         {
             ObservableCollection<Team> schools = new ObservableCollection<Team>();
 
@@ -634,6 +634,8 @@ namespace DraftAdmin.DataAccess
             MySqlCommand cmd = null;
             MySqlDataReader rdr = null;
             DataTable tbl = null;
+
+            int i = 0;
 
             try
             {
@@ -691,6 +693,15 @@ namespace DraftAdmin.DataAccess
                     //school.Tidbits = GetTidbitsSDR(2, Convert.ToInt32(row["id"]));
                     
                     schools.Add(school);
+
+                    i++;
+
+                    int percent = Convert.ToInt32(((double)i / tbl.Rows.Count) * 100);
+
+                    if (worker != null)
+                    {
+                        worker.ReportProgress(percent);
+                    }    
                 }
             }
             finally
@@ -821,7 +832,7 @@ namespace DraftAdmin.DataAccess
             worker.RunWorkerAsync();
         }
 
-        public static ObservableCollection<Team> GetProTeams()
+        public static ObservableCollection<Team> GetProTeams(BackgroundWorker worker = null)
         {
             ObservableCollection<Team> teams = new ObservableCollection<Team>();
 
@@ -830,12 +841,14 @@ namespace DraftAdmin.DataAccess
             MySqlDataReader rdr = null;
             DataTable tbl = null;
 
+            int i = 0;
+
             try
             {
                 cn = createConnectionMySql();
 
-                //String sql = "select * from teams where league = '" + ConfigurationManager.AppSettings["DraftType"].ToString() + "' order by city asc, name asc";
-                String sql = "select * from teams where league = 'NFL' order by city asc, name asc";
+                String sql = "select * from teams where league = '" + ConfigurationManager.AppSettings["DraftType"].ToString() + "' order by city asc, name asc";
+                //String sql = "select * from teams where league = 'NFL' order by city asc, name asc";
 
                 cmd = new MySqlCommand(sql, cn);
                 rdr = cmd.ExecuteReader();
@@ -891,6 +904,15 @@ namespace DraftAdmin.DataAccess
                     }                    
 
                     teams.Add(team);
+
+                    i++;
+
+                    int percent = Convert.ToInt32(((double)i / tbl.Rows.Count) * 100);
+
+                    if (worker != null)
+                    {
+                        worker.ReportProgress(percent);
+                    }    
                 }
             }
             finally

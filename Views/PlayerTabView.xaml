@@ -142,7 +142,7 @@
                                 Command="{Binding DeletePlayerCommand}" Content="Delete Player"/>
 
             <Button x:Name="refreshButton" Height="30" Width="120" Margin="25,0,0,0" Background="Black"
-                                Command="{Binding RefreshPlayersCommand}" Content="Refresh Players"/>
+                                Command="{Binding RefreshPlayersCommand}" Content="Refresh Players" IsEnabled="{Binding RefreshEnabled}"/>
         </StackPanel>
 
         <Border Grid.Column="1" Grid.Row="1" Grid.RowSpan="4" Background="White" BorderThickness="0" BorderBrush="#ff000000" 

@@ -113,82 +113,37 @@ namespace DraftAdmin.Models
 
                 logoFilePath = logoFilePath.Replace("\\\\HEADSHOT01\\IMAGES", ConfigurationManager.AppSettings["ImsDirectory"].ToString());
 
-                _logoTga = new Uri(logoFilePath);                
+                _logoTga = new Uri(logoFilePath);
 
-                _logoTgaNoKey = new Uri(_logoTga.LocalPath.Replace("LOGOS", "LOGOS_NO_KEY"));
+                FileInfo tgaFile = new FileInfo(_logoTga.LocalPath);
 
-                //if (File.Exists(_logoTga.LocalPath))
-                //{
-                //    Bitmap bmp = TargaImage.LoadTargaImage(_logoTga.LocalPath);
-                //    var strm = new System.IO.MemoryStream();
-                //    bmp.Save(strm, System.Drawing.Imaging.ImageFormat.Bmp);
-
-                //    _logoBitmap = new BitmapImage();
-                //    _logoBitmap.BeginInit();
-                //    _logoBitmap.StreamSource = strm;
-                //    _logoBitmap.EndInit();
-
-                //    //_logoBitmap = img;
-                //}
-                //else
-                //{
-                //    _logoBitmap = null;
-                //}
-
-                string tgaPath = _logoTgaNoKey.LocalPath.ToUpper();
-
-                string newFile = tgaPath.Replace(ConfigurationManager.AppSettings["ImsDirectory"].ToString().ToUpper(), ConfigurationManager.AppSettings["LocalImageDirectory"].ToString().ToUpper());
-
-                newFile = newFile.Replace(".TGA", ".png");
-
-                string newFolder = newFile.Substring(0, newFile.LastIndexOf("\\"));
-
-                DirectoryInfo dir = new DirectoryInfo(newFolder);
-
-                if (dir.Exists == false)
+                if (tgaFile.Exists == false)
                 {
-                    dir.Create();
-                }
-
-                Bitmap bitmap = null;
-
-                FileInfo tgaFile = new FileInfo(_logoTgaNoKey.LocalPath);
-                FileInfo pngFile = new FileInfo(newFile);
-
-                if (pngFile.Exists == false)
-                {
-                    if (tgaFile.Exists)
+                    switch (_league)
                     {
-                        if (tgaFile.LastWriteTime > pngFile.LastWriteTime)
-                        {                           
-                            try
-                            {
-                                bitmap = TargaImage.LoadTargaImage(_logoTgaNoKey.LocalPath);
-                                bitmap.Save(newFile, System.Drawing.Imaging.ImageFormat.Png);
-                            }
-                            finally
-                            {
-
-                            }
-                            
-                        }
-                    }
+                        case "NCAAF":
+                        case "NCF23":
+                            _logoTga = new Uri("\\\\HEADSHOT01\\IMAGES\\IMS_IMAGES\\SD\\LOGOS\\FOOTBALL\\COLLEGE\\DIVISION_1\\NCAA_LOGO_256.TGA");
+                            break;
+                        case "NFL":
+                            _logoTga = new Uri("\\\\HEADSHOT01\\IMAGES\\IMS_IMAGES\\SD\\LOGOS\\FOOTBALL\\NFL\\NFL_SHEILD_256.TGA");
+                            break;
+                        default:
+                            _logoTga = new Uri("\\\\HEADSHOT01\\IMAGES\\IMS_IMAGES\\SD\\LOGOS_NO_KEY\\FLAGS\\COUNTRIES\\COUNTRY\\UNITED_STATES_256.TGA");
+                            break;
+                    }                    
                 }
 
-                FileInfo newFileInfo = new FileInfo(newFile);
+                _logoTgaNoKey = new Uri(_logoTga.LocalPath.ToUpper().Replace("LOGOS", "LOGOS_NO_KEY"));
 
-                if (newFileInfo.Exists)
+                tgaFile = new FileInfo(_logoTgaNoKey.LocalPath);
+
+                if (tgaFile.Exists == false)
                 {
-                    _logoPng = new Uri(newFile);
-                }
-                else
-                {
-                    _logoPng = new Uri(ConfigurationManager.AppSettings["LocalImageDirectory"].ToString() + "\\IMS_IMAGES\\SD\\LOGOS_NO_KEY\\FLAGS\\COUNTRIES\\COUNTRY\\UNITED_STATES_256.png");
+                    _logoTgaNoKey = _logoTga;
                 }
 
-                //bitmapImage = BitmapToBitmapImage.Convert(bitmap);                    
-
-                //_logoBitmap = bitmapImage;
+                _logoPng = new Uri(createPngFile(_logoTgaNoKey.LocalPath));                
             }
         }
 
@@ -204,16 +159,6 @@ namespace DraftAdmin.Models
             set { _logoPng = value; }
         }
 
-        //public BitmapImage LogoBitmap
-        //{
-        //    get 
-        //    {
-        //        //BitmapImage logo = (BitmapImage)Global.GlobalCollections.Instance.Logos.SingleOrDefault(l => l.Key == _Id).Value;
-        //        return null;             
-        //    }
-        //    //set { _logoBitmap = value; OnPropertyChanged("LogoBitmap"); }
-        //}
-
         public Uri SwatchTga
         {
             get { return _swatchTga; }
@@ -224,58 +169,8 @@ namespace DraftAdmin.Models
                 logoFilePath = logoFilePath.Replace("\\\\HEADSHOT01\\IMAGES", ConfigurationManager.AppSettings["ImsDirectory"].ToString());
 
                 _swatchTga = new Uri(logoFilePath);   
-
-                //string tgaPath = _swatchTga.LocalPath.ToUpper();
-
-                //string newFile = tgaPath.Replace(ConfigurationManager.AppSettings["ImsDirectory"].ToString().ToUpper(), ConfigurationManager.AppSettings["LocalImageDirectory"].ToString().ToUpper());
-
-                //newFile = newFile.Replace(".TGA", ".png");
-
-                //string newFolder = newFile.Substring(0, newFile.LastIndexOf("\\"));
-
-                //DirectoryInfo dir = new DirectoryInfo(newFolder);
-
-                //if (dir.Exists == false)
-                //{
-                //    dir.Create();
-                //}
-
-                //_swatchPng = new Uri(newFile);
-
-                //Bitmap bitmap = null;
-
-                //FileInfo tgaFile = new FileInfo(_swatchTga.LocalPath);
-                //FileInfo pngFile = new FileInfo(newFile);
-
-                //if (pngFile.Exists == false)
-                //{
-                //    if (tgaFile.Exists)
-                //    {
-                //        if (pngFile.Exists == false || (tgaFile.LastWriteTime > pngFile.LastWriteTime))
-                //        {
-                //            if (tgaFile.Exists)
-                //            {
-                //                try
-                //                {
-                //                    bitmap = TargaImage.LoadTargaImage(_swatchTga.LocalPath);
-                //                    bitmap.Save(newFile, System.Drawing.Imaging.ImageFormat.Png);
-                //                }
-                //                finally
-                //                {
-
-                //                }                                
-                //            }
-                //        }
-                //    }
-                //}
             }
         }
-
-        //public Uri SwatchPng
-        //{
-        //    get { return _swatchPng; }
-        //    set { _swatchPng = value; }
-        //}
 
         public Uri PickPlateTga
         {
@@ -309,5 +204,47 @@ namespace DraftAdmin.Models
 
         #endregion
 
+        #region Private Methods
+
+        private string createPngFile(string tgaPath)
+        {
+            string newFile = tgaPath.ToUpper().Replace(ConfigurationManager.AppSettings["ImsDirectory"].ToString().ToUpper(), ConfigurationManager.AppSettings["LocalImageDirectory"].ToString().ToUpper());
+
+            newFile = newFile.Replace(".TGA", ".png");
+
+            string newFolder = newFile.Substring(0, newFile.LastIndexOf("\\"));
+
+            DirectoryInfo dir = new DirectoryInfo(newFolder);
+
+            if (dir.Exists == false)
+            {
+                dir.Create();
+            }
+
+            Bitmap bitmap = null;
+
+            FileInfo tgaFile = new FileInfo(tgaPath);
+            FileInfo pngFile = new FileInfo(newFile);
+
+            if (tgaFile.Exists)
+            {
+                if (pngFile.Exists == false || tgaFile.CreationTime > pngFile.CreationTime)
+                {
+                    try
+                    {
+                        bitmap = TargaImage.LoadTargaImage(_logoTgaNoKey.LocalPath);
+                        bitmap.Save(newFile, System.Drawing.Imaging.ImageFormat.Png);
+                    }
+                    finally
+                    {
+
+                    }
+                }
+            }
+
+            return newFile;
+        }
+
+        #endregion
     }
 }
