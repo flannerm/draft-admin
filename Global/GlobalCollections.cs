@@ -141,19 +141,25 @@ namespace DraftAdmin.Global
 
         public void LoadOnTheClock()
         {
-            int currentPickNum = 0;
-
-            if (_draftOrder != null)
+            try
             {
-                if (_draftOrder.Count > 0)
+                int currentPickNum = 0;
+
+                if (_draftOrder != null)
                 {
-                    currentPickNum = _players.Where(p => p.Pick != null).DefaultIfEmpty().Max(p => p == null ? 0 : p.Pick.OverallPick);
+                    if (_draftOrder.Count > 0)
+                    {
+                        currentPickNum = _players.Where(p => p.Pick != null).DefaultIfEmpty().Max(p => p == null ? 0 : p.Pick.OverallPick);
 
-                    OnTheClock = (Pick)_draftOrder.SingleOrDefault(p => p.OverallPick == currentPickNum + 1);
+                        OnTheClock = (Pick)_draftOrder.SingleOrDefault(p => p.OverallPick == currentPickNum + 1);
 
-                    _lastPick = _draftOrder.Max(p => p.OverallPick);
+                        _lastPick = _draftOrder.Max(p => p.OverallPick);
+                    }
                 }
             }
+            catch (Exception ex)
+            { }
+
         }
 
         public void LoadLogos()

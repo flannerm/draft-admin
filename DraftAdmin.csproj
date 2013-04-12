@@ -115,6 +115,7 @@
     <Compile Include="Commands\DelegateReference.cs" />
     <Compile Include="Converters\BoolToString.cs" />
     <Compile Include="Converters\BoolToColor.cs" />
+    <Compile Include="Converters\BoolToVisibility.cs" />
     <Compile Include="Converters\NullToImage.cs" />
     <Compile Include="Converters\RankToString.cs" />
     <Compile Include="Global\GlobalCollections.cs" />
@@ -122,6 +123,7 @@
     <Compile Include="Models\LogoChip.cs" />
     <Compile Include="Models\Pick.cs" />
     <Compile Include="Models\Playlist.cs" />
+    <Compile Include="Models\Tweet.cs" />
     <Compile Include="PlayoutCommands\PlayerCommand.cs" />
     <Compile Include="Models\Conference.cs" />
     <Compile Include="Models\PlaylistItem.cs" />
@@ -152,6 +154,8 @@
     <Compile Include="ViewModels\TeamEditViewModel.cs" />
     <Compile Include="ViewModels\TeamTabViewModel.cs" />
     <Compile Include="ViewModels\TidbitViewModel.cs" />
+    <Compile Include="ViewModels\TweetViewModel.cs" />
+    <Compile Include="ViewModels\TwitterViewModel.cs" />
     <Compile Include="Views\CategoryEditView.xaml.cs">
       <DependentUpon>CategoryEditView.xaml</DependentUpon>
     </Compile>
@@ -197,6 +201,12 @@
     </Compile>
     <Compile Include="Views\TeamTabView.xaml.cs">
       <DependentUpon>TeamTabView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\TweetView.xaml.cs">
+      <DependentUpon>TweetView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\TwitterView.xaml.cs">
+      <DependentUpon>TwitterView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Web References\scliveweb\Reference.cs">
       <AutoGen>True</AutoGen>
@@ -277,6 +287,14 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\TeamTabView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\TweetView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\TwitterView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -418,6 +436,12 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="DraftAdminIcon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Twitter\TwitterLib\TwitterLib.csproj">
+      <Project>{886C2F07-7A96-4E16-8B20-82D8090173E0}</Project>
+      <Name>TwitterLib</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\Expression\Blend\.NETFramework\v4.0\Microsoft.Expression.Blend.WPF.targets" />

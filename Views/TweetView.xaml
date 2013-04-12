@@ -1,0 +1,97 @@
+﻿<UserControl x:Class="DraftAdmin.Views.TweetView"
+            xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d"
+             Height="Auto" Width="Auto">
+
+    <UserControl.Resources>
+
+        <Style x:Key="UsernameStyle"
+               TargetType="{x:Type TextBlock}">
+            <Setter Property="FontSize"
+                    Value="18" />
+            <Setter Property="FontFamily"
+                    Value="Klavika" />
+            <Setter Property="VerticalAlignment"
+                    Value="Center" />
+            <Setter Property="HorizontalAlignment"
+                    Value="Center" />
+        </Style>
+
+        <Style x:Key="TweetTextStyle"
+               TargetType="{x:Type TextBlock}">
+            <Setter Property="FontSize"
+                    Value="18" />
+            <Setter Property="FontFamily"
+                    Value="Klavika" />
+            <Setter Property="FontWeight"
+                    Value="Medium" />
+            <Setter Property="Foreground"
+                    Value="#000" />
+            <Setter Property="VerticalAlignment"
+                    Value="Top" />
+            <Setter Property="HorizontalAlignment"
+                    Value="Left" />
+        </Style>
+
+        <Style x:Key="TweetTimeStyle"
+               TargetType="{x:Type TextBlock}">
+            <Setter Property="FontSize"
+                    Value="18" />
+            <Setter Property="FontFamily"
+                    Value="Klavika" />
+            <Setter Property="FontWeight"
+                    Value="Medium" />
+            <Setter Property="Foreground"
+                    Value="#999" />
+            <Setter Property="VerticalAlignment"
+                    Value="Center" />
+            <Setter Property="HorizontalAlignment"
+                    Value="Center" />
+        </Style>
+
+    </UserControl.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="Auto"/>
+        </Grid.ColumnDefinitions>
+
+        <!--{Binding Tweet.UserImage}-->
+        <!--Z:\225906296141004800_normal.jpg-->
+
+        <Image Grid.Row="0" Grid.RowSpan="4" Grid.Column="0" x:Name="ProfilePic" Source="{Binding Tweet.UserImage}"
+               HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,10,10,0" Stretch="Fill"
+               Width="73" Height="73"/>
+
+        <Viewbox Grid.Row="0" Grid.Column="1" Width="820" Height="30" HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Top">
+            <TextBlock x:Name="username" TextAlignment="Center" Margin="0,0,0,0">
+                        <Run Text="{Binding Tweet.User}" FontWeight="Medium" FontSize="18" Foreground="Black"/>
+                        <Run Text=" "/>
+                        <Run Text="{Binding Tweet.ScreenName}" FontWeight="Regular" FontSize="18" Foreground="Gray"/>
+            </TextBlock>
+        </Viewbox>
+
+        <TextBlock Grid.Row="1" Grid.Column="1" x:Name="TweetText" TextWrapping="WrapWithOverflow" Style="{StaticResource TweetTextStyle}" TextAlignment="Left" Text="{Binding Tweet.Text}" Height="Auto" Width="800" HorizontalAlignment="Left" Margin="0,8,0,0"/>
+
+        <TextBlock Grid.Row="2" Grid.Column="1" x:Name="TweetTime" Style="{StaticResource TweetTimeStyle}" TextAlignment="Left" VerticalAlignment="Center" Text="{Binding Tweet.CreatedAt}" HorizontalAlignment="Left" Margin="0,8,0,5"/>
+        
+        <Separator Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2"/>
+        <!--<Line Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Width="900" Height="10" VerticalAlignment="Bottom" Stroke="Black" Margin="0,0,0,0"/>-->
+        
+        <!--<Image Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Width="927" Source="/ECU.Golf;component/Images/divider.png" Margin="5,6,0,0" HorizontalAlignment="Left" Height="9.15"/>-->
+    
+    </Grid>
+
+</UserControl>
+

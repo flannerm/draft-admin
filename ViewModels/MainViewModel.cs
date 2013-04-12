@@ -42,6 +42,7 @@ namespace DraftAdmin.ViewModels
         private PlaylistTabViewModel _playlistTabVM;
         private CurrentSelectionTabViewModel _currentSelectionTabVM;
         private TeamsAndPlayersViewModel _teamsAndPlayersVM;
+        private TwitterViewModel _twitterTabVM;
 
         private string _playoutMessageText;
         private string _playoutMessageColor;
@@ -83,6 +84,8 @@ namespace DraftAdmin.ViewModels
         private DelegateCommand _showRightLogoCommand;
 
         private DelegateCommand _nextOnTheClockCommand;
+
+        private DelegateCommand _animateBandCommand;
 
         public DelegateCommand<object> ImportPlayers { get; set; }
         public DelegateCommand<object> CancelImportPlayers { get; set; }
@@ -164,6 +167,10 @@ namespace DraftAdmin.ViewModels
         private string _playoutFeedack;
         private string _playoutOutgoingCommand;
 
+        private string _rightSideHashtag;
+
+        private string _animate = "Animate Off";
+
         #endregion
 
         #region Properties
@@ -220,6 +227,12 @@ namespace DraftAdmin.ViewModels
         {
             get { return _teamsAndPlayersVM; }
             set { _teamsAndPlayersVM = value; OnPropertyChanged("TeamsAndPlayersVM"); }
+        }
+
+        public TwitterViewModel TwitterTabVM
+        {
+            get { return _twitterTabVM; }
+            set { _twitterTabVM = value; OnPropertyChanged("TwitterTabVM"); }
         }
 
         public string PlayoutMessageText
@@ -512,7 +525,19 @@ namespace DraftAdmin.ViewModels
             get { return _playoutOutgoingCommand; }
             set { _playoutOutgoingCommand = value; OnPropertyChanged("PlayoutOutgoingCommand"); }
         }
-              
+
+        public string RightSideHashtag
+        {
+            get { return _rightSideHashtag; }
+            set { _rightSideHashtag = value; OnPropertyChanged("RightSideHashtag"); }
+        }
+
+        public string Animate
+        {
+            get { return _animate; }
+            set { _animate = value; OnPropertyChanged("Animate"); }
+        }
+
         #endregion
 
         #region Constructor
@@ -622,6 +647,11 @@ namespace DraftAdmin.ViewModels
             CurrentSelectionTabVM.StopCycleEvent += new CurrentSelectionTabViewModel.StopCycleEventHandler(stopCycle);
             CurrentSelectionTabVM.ResetCycleEvent += new CurrentSelectionTabViewModel.ResetCycleEventHandler(resetCycleNoPrompt);
             CurrentSelectionTabVM.RefreshPlayersEvent += new CurrentSelectionTabViewModel.RefreshPlayersEventHandler(refreshPlayers);
+
+            TwitterTabVM = new TwitterViewModel();
+            TwitterTabVM.SendCommandEvent += new InterruptionEditViewModel.SendCommandEventHandler(sendCommandToPlayout);
+            //TwitterTabVM.
+            //TwitterTabVM.SendCommandEvent += new InterruptionEditViewModel.SendCommandEventHandler(OnShowInterruption);
 
             loadClockOverlays();
             loadPollChips();
@@ -1555,10 +1585,10 @@ namespace DraftAdmin.ViewModels
                     {
                         PlaylistTimerRunning = true;
 
-                        if (StatusMessageText == "No playlists loaded")
-                        {
+                        //if (StatusMessageText == "No playlists loaded")
+                        //{
                             setStatusBarMsg("", "Green");
-                        }
+                        //}
                     }
                     else
                     {
@@ -1707,6 +1737,8 @@ namespace DraftAdmin.ViewModels
                     xmlRow.Add("CHIP_1", ConfigurationManager.AppSettings["RightLogoDirectory"].ToString() + "\\" + _selectedRightLogo.FileName);
                     xmlRow.Add("VISIBLE", "1");
                 }
+
+                xmlRow.Add("TIDBIT_1", _rightSideHashtag);
 
                 commandToSend.TemplateData = xmlRow.GetXMLString();
                 commandToSend.CommandID = Guid.NewGuid().ToString();
@@ -2016,6 +2048,47 @@ namespace DraftAdmin.ViewModels
             }
         }
 
+        private void animateBand()
+        {
+            PlayerCommand commandToSend = new PlayerCommand();
+
+            XmlDataRow xmlRow = new XmlDataRow();
+
+            switch (_animate)
+            {
+                case "Animate Off":
+                    //MJF
+                    commandToSend.Command = (DraftAdmin.PlayoutCommands.CommandType)Enum.Parse(typeof(DraftAdmin.PlayoutCommands.CommandType), "HidePage");
+                    commandToSend.CommandID = Guid.NewGuid().ToString();
+                    commandToSend.Parameters = new List<CommandParameter>();
+                    commandToSend.Parameters.Add(new CommandParameter("AnimateAll", "1"));
+
+                    xmlRow.Add("ANIMATE_ALL", "1");
+                    
+                    commandToSend.TemplateData = xmlRow.GetXMLString();
+                    
+                    //MJF
+
+                    Animate = "Animate On";
+                    break;
+                case "Animate On":
+                    Animate = "Animate Off";
+
+                    commandToSend.Command = (DraftAdmin.PlayoutCommands.CommandType)Enum.Parse(typeof(DraftAdmin.PlayoutCommands.CommandType), "ShowPage");
+                    commandToSend.CommandID = Guid.NewGuid().ToString();
+                    commandToSend.Parameters = new List<CommandParameter>();
+                    commandToSend.Parameters.Add(new CommandParameter("AnimateAll", "1"));
+
+                    xmlRow.Add("ANIMATE_ALL", "1");
+                    
+                    commandToSend.TemplateData = xmlRow.GetXMLString();
+
+                    break;
+            }
+
+            sendCommandToPlayout(commandToSend);
+        }
+
         #endregion
         
         #region Public Methods
@@ -2225,6 +2298,18 @@ namespace DraftAdmin.ViewModels
                     _showPollResultsCommand = new DelegateCommand(showPollResults);
                 }
                 return _showPollResultsCommand;
+            }
+        }
+
+        public ICommand AnimateBandCommand
+        {
+            get
+            {
+                if (_animateBandCommand == null)
+                {
+                    _animateBandCommand = new DelegateCommand(animateBand);
+                }
+                return _animateBandCommand;
             }
         }
 

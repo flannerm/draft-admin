@@ -66,8 +66,18 @@
                 <views:TeamsAndPlayersView/>
             </DataTemplate>
 
+            <DataTemplate DataType="{x:Type viewModels:TwitterViewModel}">
+                <views:TwitterView/>
+            </DataTemplate>
+
+            <DataTemplate DataType="{x:Type viewModels:TweetViewModel}">
+                <views:TweetView/>
+            </DataTemplate>
+
             <converters:BoolToString x:Key="boolToString" />
 
+            <converters:BoolToVisibility x:Key="boolToVis" />
+            
             <converters:NullToImage x:Key="nullToImage" />
 
             <converters:RankToString x:Key="rankToString" />

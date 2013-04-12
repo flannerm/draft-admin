@@ -1,0 +1,56 @@
+﻿<UserControl x:Class="DraftAdmin.Views.TwitterView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" 
+             d:DesignHeight="350" d:DesignWidth="540">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        
+        <Button Grid.Row="0" Width="100" Height="30" Content="Get Favorites" Background="Black" Margin="10" 
+                Command="{Binding GetFavoritesCommand}" IsEnabled="{Binding GetFavoritesButtonEnabled}"/>
+        
+        <ListBox Grid.Row="1" ItemsSource="{Binding TweetVMs}" SelectedItem="{Binding SelectedTweet}"></ListBox>
+
+        <StackPanel Grid.Row="2" VerticalAlignment="Top" Orientation="Vertical" Margin="10">
+            <ComboBox Height="60" Width="460" SelectedItem="{Binding SelectedLogo}" Margin="0,10,0,0"
+                                      ItemsSource="{Binding Logos}">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="{Binding Image}" Height="60" Stretch="Uniform"/>
+                            <TextBlock Text="{Binding FileName}"/>
+                        </StackPanel>
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
+
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="10">
+
+                <Button x:Name="refreshOverlaysButton" Height="30" Width="120" Margin="0,0,0,0"
+                                    Command="{Binding RefreshLogosCommand}" Content="Refresh List" Background="Black" IsEnabled="{Binding PlayoutEnabled}"/>
+
+            </StackPanel>
+        </StackPanel>
+
+        <StackPanel Grid.Row="3" HorizontalAlignment="Center" VerticalAlignment="Center" 
+                    Orientation="Horizontal" Background="LightGray" Margin="5">
+            
+            <StackPanel Orientation="Vertical">
+                <TextBox Margin="5" Height="30" Width="315" Text="{Binding SelectedTweetUsername}" TextWrapping="NoWrap"></TextBox>
+                <TextBox Margin="5" Height="70" Width="315" Text="{Binding SelectedTweetText}" TextWrapping="Wrap" AcceptsReturn="True"></TextBox>
+            </StackPanel>
+            
+            <Button Name="airButton" Height="30" Width="90" Margin="5"
+                    Command="{Binding ShowTweetCommand}" Content="Take To Air" Background="#ecd853" Foreground="Black" FontWeight="Bold" IsEnabled="{Binding PlayoutEnabled}">
+            </Button>
+        </StackPanel>
+
+    </Grid>
+</UserControl>

@@ -73,19 +73,20 @@
 
             <ListView.View>
                 <GridView>
-                    <!--<GridViewColumn Header="" Width="30">
+                    <GridViewColumn Header="" Width="30">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <Image Source="/DraftAdmin;component/Images/arrow_lg.png" Visibility="{Binding OnAir, Converter={StaticResource boolToVis}}"/>
+                                <Image Source="/DraftAdmin;component/Images/arrow_lg.png" Visibility="{Binding OnAir, Converter={StaticResource boolToVis}}" Height="20" Width="20"/>
+                                <!--<TextBlock Text="{Binding OnAir}"/>-->
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
-                    </GridViewColumn>-->
+                    </GridViewColumn>
                     <GridViewColumn Header="Order" Width="40">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <Border Background="{Binding OnAir}">
+                                <!--<Border Background="{Binding OnAir}">-->
                                     <TextBlock Text="{Binding PlaylistOrder}"/>
-                                </Border>
+                                <!--</Border>-->
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>

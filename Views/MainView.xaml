@@ -42,16 +42,19 @@
             </Grid.ColumnDefinitions>
             
             <StackPanel Orientation="Horizontal" Grid.Column="0">
-                <Button Grid.Column="0" x:Name="initializeButton" Height="30" Width="110" Margin="10" HorizontalAlignment="Left" VerticalAlignment="Center"
+                <Button Grid.Column="0" x:Name="initializeButton" Height="30" Width="110" Margin="5" HorizontalAlignment="Left" VerticalAlignment="Center"
                     Command="{Binding InitializePlayoutCommand}" Content="Initialize Playout" Background="Black" IsEnabled="{Binding PlayoutEnabled}"/>
 
-                <Button x:Name="connectPlayoutButton" Height="30" Width="120" Margin="10" 
+                <Button x:Name="connectPlayoutButton" Height="30" Width="120" Margin="5" 
                     Command="{Binding ConnectToPlayoutCommand}" Content="Connect To Playout" Background="Black"/>
+
+                <Button x:Name="animateBand" Height="30" Width="80" Margin="5" 
+                    Command="{Binding AnimateBandCommand}" Content="{Binding Animate}" Background="Black"/>
             </StackPanel>
 
 
             <Border Grid.Column="1" BorderThickness="1 0 1 0" BorderBrush="Black" HorizontalAlignment="Center">
-                <StackPanel Orientation="Horizontal" Margin="20,0,20,0" >
+                <StackPanel Orientation="Horizontal" Margin="10,0,10,0" >
                 
                     <TextBlock Text="Lower 3rd:" VerticalAlignment="Center" HorizontalAlignment="Left"/>
                 
@@ -336,14 +339,14 @@
             
             <TabItem Header="Branding Logo">
                 <Grid>
-                    <Border Grid.Column="0" Grid.Row="0" CornerRadius="10" Margin="10" Width="500" Height="150" HorizontalAlignment="Left" VerticalAlignment="Top">
+                    <Border Grid.Column="0" Grid.Row="0" CornerRadius="10" Margin="10" Width="500" Height="180" HorizontalAlignment="Left" VerticalAlignment="Top">
                         <Border.Background>
                             <SolidColorBrush Color="Red" Opacity="0.3"/>
                         </Border.Background>
 
                         <StackPanel Grid.Column="1" Grid.Row="0" VerticalAlignment="Center" Orientation="Vertical">
 
-                            <TextBlock Text="Available Branding Logos" Margin="20,0,0,0"/>
+                            <TextBlock Text="Available Branding Logos" Margin="20,10,0,0"/>
 
                             <ComboBox Height="60" Width="460" SelectedItem="{Binding SelectedRightLogo}" Margin="0,5,0,10" HorizontalAlignment="Center"
                                       ItemsSource="{Binding RightLogos}">
@@ -366,9 +369,19 @@
                                     Command="{Binding ShowRightLogoCommand}" Content="Show Right Logo" Background="Black" IsEnabled="{Binding PlayoutEnabled}"/>
 
                             </StackPanel>
+                            
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,10">
+                                <TextBlock Text="Hashtag:" VerticalAlignment="Center"/>
+                                <TextBox x:Name="hashtag" Text="{Binding RightSideHashtag}" Margin="10" Width="200" />
+                                
+                            </StackPanel>
                         </StackPanel>
                     </Border>
                 </Grid>
+            </TabItem>
+            
+            <TabItem Header="Twitter">
+                <ContentControl Content="{Binding TwitterTabVM}"/>
             </TabItem>
             
             <TabItem Header="Data">

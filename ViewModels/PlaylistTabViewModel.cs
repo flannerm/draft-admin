@@ -152,88 +152,100 @@ namespace DraftAdmin.ViewModels
 
             try
             {
-                if (playlist.CurrentPlaylistItem >= playlist.PlaylistItems.Count)
+                if (playlist.TimerRunning == true) //MJF
                 {
-                    playlist.CurrentPlaylistItem = 0;
-                }
-
-                //set all the playlistitems to off air
-                //foreach (PlaylistItemViewModel playlistItemVM in playlist.PlaylistItems)
-                //{
-                //    playlistItemVM.OnAir = Colors.Gray;
-                //}
-
-                playlistItem = playlist.PlaylistItems[playlist.CurrentPlaylistItem];
-
-                if (playlistItem.Enabled == false)
-                {
-                    playlist.CurrentPlaylistItem += 1;
-                    nextPlaylistItem(playlist);
-                }
-                else
-                {
-                    playlistItem.XmlDataRows = DbConnection.GetPlaylistItemData(playlistItem);
- 
-                    if (playlistItem.XmlDataRows != null)
+                    if (playlist.CurrentPlaylistItem >= playlist.PlaylistItems.Count)
                     {
-                        if (playlistItem.XmlDataRows.Count > 0) //check to see if there are any rows in this playlist item to show
+                        playlist.CurrentPlaylistItem = 0;
+                    }
+
+                    //set all the playlistitems to off air
+                    //foreach (PlaylistItem item in playlist.PlaylistItems)
+                    //{
+                    //    item.OnAir = false;
+                    //}
+
+                    playlistItem = playlist.PlaylistItems[playlist.CurrentPlaylistItem];
+
+                    playlistItem.OnAir = false;
+
+                    if (playlistItem.Enabled == false)
+                    {
+                        playlist.CurrentPlaylistItem += 1;
+                        nextPlaylistItem(playlist);
+                    }
+                    else
+                    {
+                        playlistItem.XmlDataRows = DbConnection.GetPlaylistItemData(playlistItem);
+
+                        if (playlistItem.XmlDataRows != null)
                         {
-                            if (playlistItem.CurrentRow >= playlistItem.XmlDataRows.Count) //at the end of this playlist item's data, go to the next item
+                            if (playlistItem.XmlDataRows.Count > 0) //check to see if there are any rows in this playlist item to show
                             {
-                                playlistItem.CurrentRow = 0;
-                                playlist.CurrentPlaylistItem += 1;
-                                nextPlaylistItem(playlist);
-                            }
-                            else
-                            {
-                                PlayerCommand commandToSend = new PlayerCommand();
-
-                                commandToSend.Command = (DraftAdmin.PlayoutCommands.CommandType)Enum.Parse(typeof(DraftAdmin.PlayoutCommands.CommandType), "ShowPage");
-                                commandToSend.CommandID = Guid.NewGuid().ToString();
-                                commandToSend.Parameters = new List<CommandParameter>();
-                                commandToSend.Parameters.Add(new CommandParameter("TemplateName", playlistItem.Template));
-
-                                commandToSend.TemplateData = playlistItem.XmlDataRows[playlistItem.CurrentRow].GetXMLString();
-
-                                playlist.Timer.Interval = Convert.ToDouble((playlistItem.Duration * 1000));
-
-                                if (playlistItem.MergeDataNoTransitions)
+                                if (playlistItem.CurrentRow >= playlistItem.XmlDataRows.Count) //at the end of this playlist item's data, go to the next item
                                 {
-                                    commandToSend.Parameters.Add(new CommandParameter("MergeDataWithoutTransitions", "true"));
-
-                                    OnSendCommandNoTransitions(commandToSend);
-
-                                    //Debug.Print("Clock sent to PageEngine: " + DateTime.Now);
-
-                                    if (playlist.TimerRunning)
-                                    {
-                                        playlist.Timer.Start();
-                                    }
+                                    playlistItem.CurrentRow = 0;
+                                    playlist.CurrentPlaylistItem += 1;
+                                    nextPlaylistItem(playlist);
                                 }
                                 else
                                 {
-                                    OnSendCommand(commandToSend, playlist);
+                                    PlayerCommand commandToSend = new PlayerCommand();
 
-                                    Debug.Print(playlistItem.Template.ToString() + " sent to PageEngine");
+                                    commandToSend.Command = (DraftAdmin.PlayoutCommands.CommandType)Enum.Parse(typeof(DraftAdmin.PlayoutCommands.CommandType), "ShowPage");
+                                    commandToSend.CommandID = Guid.NewGuid().ToString();
+                                    commandToSend.Parameters = new List<CommandParameter>();
+                                    commandToSend.Parameters.Add(new CommandParameter("TemplateName", playlistItem.Template));
+
+                                    commandToSend.TemplateData = playlistItem.XmlDataRows[playlistItem.CurrentRow].GetXMLString();
+
+                                    playlist.Timer.Interval = Convert.ToDouble((playlistItem.Duration * 1000));
+
+                                    if (playlistItem.MergeDataNoTransitions)
+                                    {
+                                        commandToSend.Parameters.Add(new CommandParameter("MergeDataWithoutTransitions", "true"));
+
+                                        OnSendCommandNoTransitions(commandToSend);
+
+                                        //Debug.Print("Clock sent to PageEngine: " + DateTime.Now);
+
+                                        if (playlist.TimerRunning)
+                                        {
+                                            playlist.Timer.Start();
+                                        }
+                                    }
+                                    else
+                                    {
+                                        OnSendCommand(commandToSend, playlist);
+
+                                        Debug.Print(playlistItem.Template.ToString() + " sent to PageEngine");
+                                    }
+
+                                    //SelectedPlaylist.PlaylistItems[SelectedPlaylist.CurrentPlaylistItem].OnAir = true;
+
+                                    //OnPropertyChanged("SelectedPlaylist.PlaylistItems");
+                                    playlistItem.OnAir = true;
+
+
+                                    playlistItem.CurrentRow += 1;
                                 }
 
-                                playlistItem.CurrentRow += 1;
                             }
-
-                        }
-                        else
-                        {
-                            if (playlist.PlaylistItems.Count > 1)
+                            else
                             {
-                                playlistItem.CurrentRow = 0;
-                                playlist.CurrentPlaylistItem += 1;
-                                nextPlaylistItem(playlist);
+                                if (playlist.PlaylistItems.Count > 1)
+                                {
+                                    playlistItem.CurrentRow = 0;
+                                    playlist.CurrentPlaylistItem += 1;
+                                    nextPlaylistItem(playlist);
+                                }
                             }
-                        }
 
-                    } //playlistItem.XmlDataRows != null
+                        } //playlistItem.XmlDataRows != null
 
-                } //playlistItem.Enabled == false
+                    } //playlistItem.Enabled == false
+
+                } //playlist.TimerRunning
             }
             catch (Exception ex)
             {
@@ -249,6 +261,8 @@ namespace DraftAdmin.ViewModels
                     nextPlaylistItem(playlist);
                 }
             }
+
+            //OnPropertyChanged("SelectedPlaylist");
         }
 
         #endregion
@@ -269,6 +283,12 @@ namespace DraftAdmin.ViewModels
                 {
                     playlist.PlaylistItems[playlist.CurrentPlaylistItem].CurrentRow = 0;
                     playlist.CurrentPlaylistItem = 0;
+
+                    foreach (PlaylistItem item in playlist.PlaylistItems)
+                    {
+                        item.OnAir = false;
+                    }
+
                     nextPlaylistItem(playlist);
                 }
 

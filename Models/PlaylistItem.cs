@@ -29,6 +29,7 @@ namespace DraftAdmin.Models
         private Dictionary<string, string> _additionalDataFields;
         private List<XmlDataRow> _xmlDataRows;
         private int _currentRow = 0;
+        private bool _onAir = false;
 
         #endregion
 
@@ -140,6 +141,12 @@ namespace DraftAdmin.Models
         {
             get { return _mergeDataNoTransitions; }
             set { _mergeDataNoTransitions = value; }
+        }
+
+        public bool OnAir
+        {
+            get { return _onAir; }
+            set { _onAir = value; OnPropertyChanged("OnAir");  }
         }
 
         //public int RowIndex

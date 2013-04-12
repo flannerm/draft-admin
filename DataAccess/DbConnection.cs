@@ -17,6 +17,7 @@ using System.Xml.Linq;
 using DraftAdmin.Global;
 using System.Windows.Forms;
 using DraftAdmin.PlayoutCommands;
+using System.Windows;
 
 namespace DraftAdmin.DataAccess
 {
@@ -144,7 +145,7 @@ namespace DraftAdmin.DataAccess
                 }
                 else
                 {
-                    MessageBox.Show("There was a problem connecting to the SDR database");
+                    System.Windows.MessageBox.Show("There was a problem connecting to the SDR database");
                 }
             }
             finally
@@ -212,7 +213,7 @@ namespace DraftAdmin.DataAccess
                 }
                 else
                 {
-                    MessageBox.Show("There was a problem connecting to the SDR database");
+                    System.Windows.MessageBox.Show("There was a problem connecting to the SDR database");
                 }
             }
             finally
@@ -262,7 +263,7 @@ namespace DraftAdmin.DataAccess
                 }
                 else
                 {
-                    MessageBox.Show("There was a problem connecting to the SDR database");
+                    System.Windows.MessageBox.Show("There was a problem connecting to the SDR database");
                 }
             }
             finally
@@ -310,7 +311,7 @@ namespace DraftAdmin.DataAccess
                 }
                 else
                 {
-                    MessageBox.Show("There was a problem connecting to the SDR database");
+                    System.Windows.MessageBox.Show("There was a problem connecting to the SDR database");
                 }
             }
             finally
@@ -376,7 +377,7 @@ namespace DraftAdmin.DataAccess
                 }
                  else
                 {
-                    MessageBox.Show("There was a problem connecting to the SDR database");
+                    System.Windows.MessageBox.Show("There was a problem connecting to the SDR database");
                 }
             }
             finally
@@ -454,7 +455,7 @@ namespace DraftAdmin.DataAccess
                 }
                 else
                 {
-                    MessageBox.Show("There was a problem connecting to the SDR database");
+                    System.Windows.MessageBox.Show("There was a problem connecting to the SDR database");
                 }
             }
             finally
@@ -563,7 +564,7 @@ namespace DraftAdmin.DataAccess
                 }
                 else
                 {
-                    MessageBox.Show("There was a problem connecting to the SDR database");
+                    System.Windows.MessageBox.Show("There was a problem connecting to the SDR database");
                 }
             }
             finally
@@ -807,7 +808,7 @@ namespace DraftAdmin.DataAccess
                     }
                     else
                     {
-                        MessageBox.Show("There was a problem connecting to the SDR database");
+                        System.Windows.MessageBox.Show("There was a problem connecting to the SDR database");
                     }
                 }
                 finally
@@ -866,7 +867,7 @@ namespace DraftAdmin.DataAccess
                 {
                     team = new Team();
                     team.ID = Convert.ToInt32(row["id"]);
-                    team.FullName = row["name"].ToString();
+                    team.FullName = row["city"].ToString() + " " + row["name"].ToString();
                     team.Tricode = row["tricode"].ToString();
                     team.City = row["city"].ToString();
                     team.Name = row["name"].ToString();
@@ -1018,7 +1019,7 @@ namespace DraftAdmin.DataAccess
                     }
                     else
                     {
-                        MessageBox.Show("There was a problem connecting to the SDR database");
+                        System.Windows.MessageBox.Show("There was a problem connecting to the SDR database");
                     }
                 }
                 finally
@@ -1577,10 +1578,54 @@ namespace DraftAdmin.DataAccess
 
                             break;
                         case "MYSQL":
-                            if (query != "")
                             {
                                 cnM = createConnectionMySql();
                                 cmdM = new MySqlCommand(query.ToString(), cnM);
+
+                                if (playlistItem.QueryType.ToUpper() == "SP")
+                                {
+                                    cmdM.CommandType = System.Data.CommandType.StoredProcedure;
+
+                                    if (playlistItem.QueryParameters.ToString() != "")
+                                    {
+                                        parms = playlistItem.QueryParameters.Split('|');
+
+                                        for (int i = 0; i < parms.Length; i++)
+                                        {
+                                            string[] parmval = parms[i].ToString().Split('=');
+
+                                            string parm = parmval[0].ToString();
+                                            string val = parmval[1].ToString();
+
+                                            if (parm.ToUpper() == "INTEAMID")
+                                            {
+                                                //adding a special case for the On The Clock (connected) items, to add the team swatch to the dataset
+                                                if (val.ToString().ToUpper() == "OTC")
+                                                {
+                                                    teamId = GlobalCollections.Instance.OnTheClock.Team.ID;
+                                                    val = teamId.ToString();
+                                                }
+                                                else
+                                                {
+                                                    if (val.Substring(0, 1) == "#")
+                                                    {
+                                                        if (ConfigurationManager.AppSettings[val.Substring(1)] != null)
+                                                        {
+                                                            val = ConfigurationManager.AppSettings[val.Substring(1)];
+                                                        }
+                                                    }
+
+                                                    Int32.TryParse(val, out teamId);
+                                                }
+
+                                                teamIds.Add(teamId);
+                                            }
+
+                                            cmdM.Parameters.AddWithValue(parm, val);
+                                        }
+                                    }
+                                }
+
                                 rdrM = cmdM.ExecuteReader();
                                 tbl.Load(rdrM);
                                 rdrM.Close();
@@ -2803,16 +2848,80 @@ namespace DraftAdmin.DataAccess
         {
             OracleConnection cn = null;
             OracleCommand cmd = null;
+            OracleDataAdapter adp = null;
+
+            MySqlConnection cnMySql = null;
+            MySqlCommand cmdMySql = null;
+
+            DataTable tbl = null;
+
             string sql = "";
             bool saved = false;
+
+            int fromTeam = 0;
 
             try
             {
                 cn = createConnectionSDR();
 
+                sql = "select teamid from draftorder where pick = " + pick.OverallPick;
+                cmd = new OracleCommand(sql, cn);
+                adp = new OracleDataAdapter(cmd);
+
+                tbl = new DataTable();
+
+                adp.Fill(tbl);
+
+                if (tbl.Rows.Count > 0)
+                {
+                    fromTeam = int.Parse(tbl.Rows[0][0].ToString());
+                }
+
                 sql = "update draftorder set teamid = " + newTeam.ID + " where pick = " + pick.OverallPick;
                 cmd = new OracleCommand(sql, cn);
                 cmd.ExecuteNonQuery();
+
+                //update the MySql database's teams table with the new total pick counts
+                try
+                {
+                    cnMySql = createConnectionMySql();
+
+                    sql = "select count(*) from draftorder where teamid = " + fromTeam; 
+                    cmd = new OracleCommand(sql, cn);
+                    adp = new OracleDataAdapter(cmd);
+
+                    tbl = new DataTable();
+
+                    adp.Fill(tbl);
+
+                    if (tbl.Rows.Count > 0)
+                    {
+                        sql = "update teams set totalpicks = '" + tbl.Rows[0][0].ToString() + "' where id = " + fromTeam;
+                        cmdMySql = new MySqlCommand(sql, cnMySql);
+                        cmdMySql.ExecuteNonQuery(); 
+                    }
+
+                    sql = "select count(*) from draftorder where teamid = " + newTeam.ID;
+                    cmd = new OracleCommand(sql, cn);
+                    adp = new OracleDataAdapter(cmd);
+
+                    tbl = new DataTable();
+
+                    adp.Fill(tbl);
+
+                    if (tbl.Rows.Count > 0)
+                    {
+                        sql = "update teams set totalpicks = '" + tbl.Rows[0][0].ToString() + "' where id = " + newTeam.ID;
+                        cmdMySql = new MySqlCommand(sql, cnMySql);
+                        cmdMySql.ExecuteNonQuery();
+                    }
+                }
+                finally
+                {
+                    cmd.Dispose();
+                    adp.Dispose();
+                    tbl.Dispose();
+                }
 
                 saved = true;
             }
@@ -2927,6 +3036,20 @@ namespace DraftAdmin.DataAccess
                             else
                             {
                                 row = tbl.Rows[0];
+
+                                if (row["lastname"].ToString() != xmlRow["lastname"].ToString())
+                                {
+                                    string message = "Duplicate player id for " + xmlRow["firstname"].ToString() + " " + xmlRow["lastname"].ToString();
+
+                                    MessageBoxResult result = System.Windows.MessageBox.Show(message, "Duplicate Player ID", MessageBoxButton.OK, MessageBoxImage.Exclamation);
+                                    
+                                    //if (result == MessageBoxResult.Yes)
+                                    //{
+                                    //    Application.Current.Shutdown();
+                                    //}
+                                    
+                                }
+                                
                             }
 
                             row["firstname"] = xmlRow["firstname"].ToString();
@@ -3120,6 +3243,13 @@ namespace DraftAdmin.DataAccess
                 OracleDataReader rdr = null;
                 OracleDataAdapter adp = null;
                 OracleCommandBuilder bldr = null;
+
+                MySqlConnection cnMySql = null;
+                MySqlCommand cmdMySql = null;
+                MySqlDataReader rdrMySql = null;
+                MySqlDataAdapter adpMySql = null;
+                MySqlCommandBuilder bldrMySql = null;
+
                 //DataTable tblPlayer = null;
                 DataTable tbl = null;
                 DataRow row;
@@ -3127,6 +3257,8 @@ namespace DraftAdmin.DataAccess
                 string sql;
                 //long teamId;
                 int i;
+
+                int totalPicks = 0;
 
                 DataSet dsTeams = new DataSet();
 
@@ -3140,11 +3272,39 @@ namespace DraftAdmin.DataAccess
 
                     foreach (DataRow xmlRow in dsTeams.Tables["team"].Rows)
                     {
+                        totalPicks = 0;
+
                         if (xmlRow["teamid"].ToString().Trim() != "")
                         {
 
                             if (ConfigurationManager.AppSettings["DraftType"].ToUpper() == "NFL")
                             {
+
+                                #region Picks
+
+                                try
+                                {
+                                    sql = "select count(*) from draftorder where teamid = " + xmlRow["teamid"];
+                                    cmd = new OracleCommand(sql, cn);
+                                    adp = new OracleDataAdapter(cmd);
+
+                                    tbl = new DataTable();
+
+                                    adp.Fill(tbl);
+
+                                    if (tbl.Rows.Count > 0)
+                                    {
+                                        totalPicks = int.Parse(tbl.Rows[0][0].ToString());
+                                    }
+                                }
+                                finally
+                                {
+                                    cmd.Dispose();
+                                    adp.Dispose();
+                                    tbl.Dispose();
+                                }
+
+                                #endregion
 
                                 #region 4 Matrix Notes
 
@@ -3168,6 +3328,7 @@ namespace DraftAdmin.DataAccess
                                             row["referencetype"] = 2;
                                             row["referenceid"] = xmlRow["teamid"];
                                             row["tidbitorder"] = i;
+                                            row["enabled"] = 1;
                                         }
                                         else
                                         {
@@ -3175,7 +3336,6 @@ namespace DraftAdmin.DataAccess
                                         }
 
                                         row["text"] = xmlRow["note" + i.ToString()].ToString();
-                                        row["enabled"] = 1;
 
                                         adp.Update(tbl.GetChanges());
                                         tbl.AcceptChanges();
@@ -3189,620 +3349,652 @@ namespace DraftAdmin.DataAccess
 
                                 #endregion
 
-                                #region Off Rank Points Per Game
+                                #region MySql team ranks/results
 
-                                //off. rank Points Per Game
-                                sql = "select * from espnews.drafttidbits where referencetype = 2 and tidbitorder = 10 and referenceid = " + xmlRow["teamid"];
-                                cmd = new OracleCommand(sql, cn);
-                                adp = new OracleDataAdapter(cmd);
-                                bldr = new OracleCommandBuilder(adp);
+                                cnMySql = createConnectionMySql();
 
-                                tbl = new DataTable();
-
-                                adp.Fill(tbl);
-
-                                if (tbl.Rows.Count == 0)
-                                {
-                                    row = tbl.Rows.Add();
-                                    row["referencetype"] = 2;
-                                    row["referenceid"] = xmlRow["teamid"];
-                                    row["tidbitorder"] = 10;
-
-                                }
-                                else
-                                {
-                                    row = tbl.Rows[0];
-                                }
-
-                                row["text"] = "Points Per Game: " + xmlRow["offrankppg"].ToString();
-                                //row["enabled"] = 1;
-
-                                adp.Update(tbl.GetChanges());
-                                tbl.AcceptChanges();
-
-                                cmd.Dispose();
-                                adp.Dispose();
-                                bldr.Dispose();
-                                tbl.Dispose();
-
-                                #endregion
-
-                                #region Off Rank Turnovers
-
-                                //off. rank Turnovers
-                                sql = "select * from espnews.drafttidbits where referencetype = 2 and tidbitorder = 11 and referenceid = " + xmlRow["teamid"];
-                                cmd = new OracleCommand(sql, cn);
-                                adp = new OracleDataAdapter(cmd);
-                                bldr = new OracleCommandBuilder(adp);
+                                sql = "select * from teams where id = " + xmlRow["teamid"];
+                                cmdMySql = new MySqlCommand(sql, cnMySql);
+                                adpMySql = new MySqlDataAdapter(cmdMySql);
+                                bldrMySql = new MySqlCommandBuilder(adpMySql);
 
                                 tbl = new DataTable();
 
-                                adp.Fill(tbl);
+                                adpMySql.Fill(tbl);
 
-                                if (tbl.Rows.Count == 0)
-                                {
-                                    row = tbl.Rows.Add();
-                                    row["referencetype"] = 2;
-                                    row["referenceid"] = xmlRow["teamid"];
-                                    row["tidbitorder"] = 11;
-
-                                }
-                                else
+                                if (tbl.Rows.Count > 0)
                                 {
                                     row = tbl.Rows[0];
+
+                                    row["totalpicks"] = totalPicks;
+                                    row["overallrecord"] = xmlRow["record"];
+                                    row["divisionresult"] = xmlRow["divresult"];
+                                    row["playoffs"] = xmlRow["playoffs"];
+                                    row["offrankppg"] = xmlRow["offrankppg"];
+                                    row["offrankypg"] = xmlRow["offrankypg"];
+                                    row["offrankturns"] = xmlRow["offrankturns"];
+                                    row["offrankrush"] = xmlRow["offrankrushyds"];
+                                    row["offrankpass"] = xmlRow["offrankpassyds"];
+                                    row["defrankppg"] = xmlRow["defrankppg"];
+                                    row["defrankypg"] = xmlRow["defrankypg"];
+                                    row["defranktakeaways"] = xmlRow["defranktakeaways"];
+                                    row["defrankrush"] = xmlRow["defrankrushing"];
+                                    row["defrankpass"] = xmlRow["defrankpassing"];
+                                    row["teamneeds"] = xmlRow["melsneeds"];
+
+                                    adpMySql.Update(tbl.GetChanges());
+                                    tbl.AcceptChanges();
+
+                                    cmdMySql.Dispose();
+                                    adpMySql.Dispose();
+                                    bldrMySql.Dispose();
+                                    tbl.Dispose();
                                 }
 
-                                row["text"] = "Turnovers: " + xmlRow["offrankturns"].ToString();
+
+                                #endregion
+
+                                //#region Off Rank Points Per Game
+
+                                ////off. rank Points Per Game
+                                //sql = "select * from espnews.drafttidbits where referencetype = 2 and tidbitorder = 10 and referenceid = " + xmlRow["teamid"];
+                                //cmd = new OracleCommand(sql, cn);
+                                //adp = new OracleDataAdapter(cmd);
+                                //bldr = new OracleCommandBuilder(adp);
+
+                                //tbl = new DataTable();
+
+                                //adp.Fill(tbl);
+
+                                //if (tbl.Rows.Count == 0)
+                                //{
+                                //    row = tbl.Rows.Add();
+                                //    row["referencetype"] = 2;
+                                //    row["referenceid"] = xmlRow["teamid"];
+                                //    row["tidbitorder"] = 10;
+                                //    row["enabled"] = 1;
+                                //}
+                                //else
+                                //{
+                                //    row = tbl.Rows[0];
+                                //}
+
+                                //row["text"] = "Points Per Game: " + xmlRow["offrankppg"].ToString();
+
+                                //adp.Update(tbl.GetChanges());
+                                //tbl.AcceptChanges();
+
+                                //cmd.Dispose();
+                                //adp.Dispose();
+                                //bldr.Dispose();
+                                //tbl.Dispose();
+
+                                //#endregion
+
+                                //#region Off Rank Turnovers
+
+                                ////off. rank Turnovers
+                                //sql = "select * from espnews.drafttidbits where referencetype = 2 and tidbitorder = 11 and referenceid = " + xmlRow["teamid"];
+                                //cmd = new OracleCommand(sql, cn);
+                                //adp = new OracleDataAdapter(cmd);
+                                //bldr = new OracleCommandBuilder(adp);
+
+                                //tbl = new DataTable();
+
+                                //adp.Fill(tbl);
+
+                                //if (tbl.Rows.Count == 0)
+                                //{
+                                //    row = tbl.Rows.Add();
+                                //    row["referencetype"] = 2;
+                                //    row["referenceid"] = xmlRow["teamid"];
+                                //    row["tidbitorder"] = 11;
+                                //    row["enabled"] = 1;
+                                //}
+                                //else
+                                //{
+                                //    row = tbl.Rows[0];
+                                //}
+
+                                //row["text"] = "Turnovers: " + xmlRow["offrankturns"].ToString();
+
+                                //adp.Update(tbl.GetChanges());
+                                //tbl.AcceptChanges();
+
+                                //cmd.Dispose();
+                                //adp.Dispose();
+                                //bldr.Dispose();
+                                //tbl.Dispose();
+
+                                //#endregion
+
+                                //#region Off Rank Rush Yards
+
+                                ////off. rank Rush Yards
+                                //sql = "select * from espnews.drafttidbits where referencetype = 2 and tidbitorder = 12 and referenceid = " + xmlRow["teamid"];
+                                //cmd = new OracleCommand(sql, cn);
+                                //adp = new OracleDataAdapter(cmd);
+                                //bldr = new OracleCommandBuilder(adp);
+
+                                //tbl = new DataTable();
+
+                                //adp.Fill(tbl);
+
+                                //if (tbl.Rows.Count == 0)
+                                //{
+                                //    row = tbl.Rows.Add();
+                                //    row["referencetype"] = 2;
+                                //    row["referenceid"] = xmlRow["teamid"];
+                                //    row["tidbitorder"] = 12;
+                                //    row["enabled"] = 1;
+                                //}
+                                //else
+                                //{
+                                //    row = tbl.Rows[0];
+                                //}
+
+                                //row["text"] = "Rush yards: " + xmlRow["offrankrushyds"].ToString();
+
+                                //adp.Update(tbl.GetChanges());
+                                //tbl.AcceptChanges();
+
+                                //cmd.Dispose();
+                                //adp.Dispose();
+                                //bldr.Dispose();
+                                //tbl.Dispose();
+
+                                //#endregion
+
+                                //#region Off Rank Pass Yards
+
+                                ////off. rank Pass Yards
+                                //sql = "select * from espnews.drafttidbits where referencetype = 2 and tidbitorder = 13 and referenceid = " + xmlRow["teamid"];
+                                //cmd = new OracleCommand(sql, cn);
+                                //adp = new OracleDataAdapter(cmd);
+                                //bldr = new OracleCommandBuilder(adp);
+
+                                //tbl = new DataTable();
+
+                                //adp.Fill(tbl);
+
+                                //if (tbl.Rows.Count == 0)
+                                //{
+                                //    row = tbl.Rows.Add();
+                                //    row["referencetype"] = 2;
+                                //    row["referenceid"] = xmlRow["teamid"];
+                                //    row["tidbitorder"] = 13;
+                                //    row["enabled"] = 1;
+                                //}
+                                //else
+                                //{
+                                //    row = tbl.Rows[0];
+                                //}
+
+                                //row["text"] = "Pass yards: " + xmlRow["offrankpassyds"].ToString();
+
+                                //adp.Update(tbl.GetChanges());
+                                //tbl.AcceptChanges();
+
+                                //cmd.Dispose();
+                                //adp.Dispose();
+                                //bldr.Dispose();
+                                //tbl.Dispose();
+
+                                //#endregion
+
+                                //#region Def Rank Points Allowed
+
+                                ////def. rank Points Allowed
+                                //sql = "select * from espnews.drafttidbits where referencetype = 2 and tidbitorder = 14 and referenceid = " + xmlRow["teamid"];
+                                //cmd = new OracleCommand(sql, cn);
+                                //adp = new OracleDataAdapter(cmd);
+                                //bldr = new OracleCommandBuilder(adp);
+
+                                //tbl = new DataTable();
+
+                                //adp.Fill(tbl);
+
+                                //if (tbl.Rows.Count == 0)
+                                //{
+                                //    row = tbl.Rows.Add();
+                                //    row["referencetype"] = 2;
+                                //    row["referenceid"] = xmlRow["teamid"];
+                                //    row["tidbitorder"] = 14;
+                                //    row["enabled"] = 1;
+                                //}
+                                //else
+                                //{
+                                //    row = tbl.Rows[0];
+                                //}
+
+                                //row["text"] = "Points Allowed: " + xmlRow["defrankppg"].ToString();
+
+                                //adp.Update(tbl.GetChanges());
+                                //tbl.AcceptChanges();
+
+                                //cmd.Dispose();
+                                //adp.Dispose();
+                                //bldr.Dispose();
+                                //tbl.Dispose();
+
+                                //#endregion
+
+                                //#region Def Rank Takeaways
+
+                                ////def. rank Takeaways
+                                //sql = "select * from espnews.drafttidbits where referencetype = 2 and tidbitorder = 15 and referenceid = " + xmlRow["teamid"];
+                                //cmd = new OracleCommand(sql, cn);
+                                //adp = new OracleDataAdapter(cmd);
+                                //bldr = new OracleCommandBuilder(adp);
+
+                                //tbl = new DataTable();
+
+                                //adp.Fill(tbl);
+
+                                //if (tbl.Rows.Count == 0)
+                                //{
+                                //    row = tbl.Rows.Add();
+                                //    row["referencetype"] = 2;
+                                //    row["referenceid"] = xmlRow["teamid"];
+                                //    row["tidbitorder"] = 15;
+                                //    row["enabled"] = 1;
+                                //}
+                                //else
+                                //{
+                                //    row = tbl.Rows[0];
+                                //}
+
+                                //row["text"] = "Takeaways: " + xmlRow["defranktakeaways"].ToString();
+
+                                //adp.Update(tbl.GetChanges());
+                                //tbl.AcceptChanges();
+
+                                //cmd.Dispose();
+                                //adp.Dispose();
+                                //bldr.Dispose();
+                                //tbl.Dispose();
+
+                                //#endregion
+
+                                //#region Def Rank Rush Defense
+
+                                ////def. rank Rush Defense
+                                //sql = "select * from espnews.drafttidbits where referencetype = 2 and tidbitorder = 16 and referenceid = " + xmlRow["teamid"];
+                                //cmd = new OracleCommand(sql, cn);
+                                //adp = new OracleDataAdapter(cmd);
+                                //bldr = new OracleCommandBuilder(adp);
+
+                                //tbl = new DataTable();
+
+                                //adp.Fill(tbl);
+
+                                //if (tbl.Rows.Count == 0)
+                                //{
+                                //    row = tbl.Rows.Add();
+                                //    row["referencetype"] = 2;
+                                //    row["referenceid"] = xmlRow["teamid"];
+                                //    row["tidbitorder"] = 16;
+                                //    row["enabled"] = 1;
+                                //}
+                                //else
+                                //{
+                                //    row = tbl.Rows[0];
+                                //}
+
+                                //row["text"] = "Rush Defense: " + xmlRow["defrankrushing"].ToString();
+
+                                //adp.Update(tbl.GetChanges());
+                                //tbl.AcceptChanges();
+
+                                //cmd.Dispose();
+                                //adp.Dispose();
+                                //bldr.Dispose();
+                                //tbl.Dispose();
+
+                                //#endregion
+
+                                //#region Def Rank Pass Defense
+
+                                ////def. rank Pass Defense
+                                //sql = "select * from espnews.drafttidbits where referencetype = 2 and tidbitorder = 17 and referenceid = " + xmlRow["teamid"];
+                                //cmd = new OracleCommand(sql, cn);
+                                //adp = new OracleDataAdapter(cmd);
+                                //bldr = new OracleCommandBuilder(adp);
+
+                                //tbl = new DataTable();
+
+                                //adp.Fill(tbl);
+
+                                //if (tbl.Rows.Count == 0)
+                                //{
+                                //    row = tbl.Rows.Add();
+                                //    row["referencetype"] = 2;
+                                //    row["referenceid"] = xmlRow["teamid"];
+                                //    row["tidbitorder"] = 17;
+
+                                //}
+                                //else
+                                //{
+                                //    row = tbl.Rows[0];
+                                //}
+
+                                //row["text"] = "Pass Defense: " + xmlRow["defrankpassing"].ToString();
                                 //row["enabled"] = 1;
 
-                                adp.Update(tbl.GetChanges());
-                                tbl.AcceptChanges();
+                                //adp.Update(tbl.GetChanges());
+                                //tbl.AcceptChanges();
+
+                                //cmd.Dispose();
+                                //adp.Dispose();
+                                //bldr.Dispose();
+                                //tbl.Dispose();
+
+                                //#endregion
+
+                                //#region Off Rank (PPG)
+
+                                ////off. rank (PPG)
+                                //sql = "select * from espnews.drafttidbits where referencetype = 2 and tidbitorder = 30 and referenceid = " + xmlRow["teamid"];
+                                //cmd = new OracleCommand(sql, cn);
+                                //adp = new OracleDataAdapter(cmd);
+                                //bldr = new OracleCommandBuilder(adp);
+
+                                //tbl = new DataTable();
+
+                                //adp.Fill(tbl);
+
+                                //if (tbl.Rows.Count == 0)
+                                //{
+                                //    row = tbl.Rows.Add();
+                                //    row["referencetype"] = 2;
+                                //    row["referenceid"] = xmlRow["teamid"];
+                                //    row["tidbitorder"] = 30;
+                                //    row["enabled"] = 1;
+                                //}
+                                //else
+                                //{
+                                //    row = tbl.Rows[0];
+                                //}
 
-                                cmd.Dispose();
-                                adp.Dispose();
-                                bldr.Dispose();
-                                tbl.Dispose();
+                                //row["text"] = xmlRow["offrankppg"].ToString();
 
-                                #endregion
+                                //adp.Update(tbl.GetChanges());
+                                //tbl.AcceptChanges();
+
+                                //cmd.Dispose();
+                                //adp.Dispose();
+                                //bldr.Dispose();
+                                //tbl.Dispose();
+
+                                //#endregion
+
+                                //#region Off Rank (YPG)
+
+                                ////off. rank (YPG)
+                                //sql = "select * from espnews.drafttidbits where referencetype = 2 and tidbitorder = 31 and referenceid = " + xmlRow["teamid"];
+                                //cmd = new OracleCommand(sql, cn);
+                                //adp = new OracleDataAdapter(cmd);
+                                //bldr = new OracleCommandBuilder(adp);
+
+                                //tbl = new DataTable();
+
+                                //adp.Fill(tbl);
+
+                                //if (tbl.Rows.Count == 0)
+                                //{
+                                //    row = tbl.Rows.Add();
+                                //    row["referencetype"] = 2;
+                                //    row["referenceid"] = xmlRow["teamid"];
+                                //    row["tidbitorder"] = 31;
+                                //    row["enabled"] = 1;
+                                //}
+                                //else
+                                //{
+                                //    row = tbl.Rows[0];
+                                //}
 
-                                #region Off Rank Rush Yards
+                                //row["text"] = xmlRow["offrankypg"].ToString();
+
+                                //adp.Update(tbl.GetChanges());
+                                //tbl.AcceptChanges();
+
+                                //cmd.Dispose();
+                                //adp.Dispose();
+                                //bldr.Dispose();
+                                //tbl.Dispose();
+
+                                //#endregion
+
+                                //#region Def Rank (PPG)
+
+                                ////def. rank (PPG)
+                                //sql = "select * from espnews.drafttidbits where referencetype = 2 and tidbitorder = 32 and referenceid = " + xmlRow["teamid"];
+                                //cmd = new OracleCommand(sql, cn);
+                                //adp = new OracleDataAdapter(cmd);
+                                //bldr = new OracleCommandBuilder(adp);
+
+                                //tbl = new DataTable();
+
+                                //adp.Fill(tbl);
+
+                                //if (tbl.Rows.Count == 0)
+                                //{
+                                //    row = tbl.Rows.Add();
+                                //    row["referencetype"] = 2;
+                                //    row["referenceid"] = xmlRow["teamid"];
+                                //    row["tidbitorder"] = 32;
+                                //    row["enabled"] = 1;
+                                //}
+                                //else
+                                //{
+                                //    row = tbl.Rows[0];
+                                //}
 
-                                //off. rank Rush Yards
-                                sql = "select * from espnews.drafttidbits where referencetype = 2 and tidbitorder = 12 and referenceid = " + xmlRow["teamid"];
-                                cmd = new OracleCommand(sql, cn);
-                                adp = new OracleDataAdapter(cmd);
-                                bldr = new OracleCommandBuilder(adp);
+                                //row["text"] = xmlRow["defrankppg"].ToString();
+
+                                //adp.Update(tbl.GetChanges());
+                                //tbl.AcceptChanges();
+
+                                //cmd.Dispose();
+                                //adp.Dispose();
+                                //bldr.Dispose();
+                                //tbl.Dispose();
+
+                                //#endregion
+
+                                //#region Def Rank (YPG)
+
+                                ////def. rank (YPG)
+                                //sql = "select * from espnews.drafttidbits where referencetype = 2 and tidbitorder = 33 and referenceid = " + xmlRow["teamid"];
+                                //cmd = new OracleCommand(sql, cn);
+                                //adp = new OracleDataAdapter(cmd);
+                                //bldr = new OracleCommandBuilder(adp);
+
+                                //tbl = new DataTable();
+
+                                //adp.Fill(tbl);
 
-                                tbl = new DataTable();
+                                //if (tbl.Rows.Count == 0)
+                                //{
+                                //    row = tbl.Rows.Add();
+                                //    row["referencetype"] = 2;
+                                //    row["referenceid"] = xmlRow["teamid"];
+                                //    row["tidbitorder"] = 33;
+                                //    row["enabled"] = 1;
+                                //}
+                                //else
+                                //{
+                                //    row = tbl.Rows[0];
+                                //}
+
+                                //row["text"] = xmlRow["defrankypg"].ToString();
+
+                                //adp.Update(tbl.GetChanges());
+                                //tbl.AcceptChanges();
+
+                                //cmd.Dispose();
+                                //adp.Dispose();
+                                //bldr.Dispose();
+                                //tbl.Dispose();
+
+                                //#endregion
+
+                                //#region Record
+
+                                //sql = "select * from espnews.drafttidbits where referencetype = 2 and tidbitorder = 20 and referenceid = " + xmlRow["teamid"];
+                                //cmd = new OracleCommand(sql, cn);
+                                //adp = new OracleDataAdapter(cmd);
+                                //bldr = new OracleCommandBuilder(adp);
+
+                                //tbl = new DataTable();
+
+                                //adp.Fill(tbl);
+
+                                //if (tbl.Rows.Count == 0)
+                                //{
+                                //    row = tbl.Rows.Add();
+                                //    row["referencetype"] = 2;
+                                //    row["referenceid"] = xmlRow["teamid"];
+                                //    row["tidbitorder"] = 20;
+                                //    row["enabled"] = 1;
+                                //}
+                                //else
+                                //{
+                                //    row = tbl.Rows[0];
+                                //}
+
+                                //row["text"] = xmlRow["record"].ToString();
+
+                                //adp.Update(tbl.GetChanges());
+                                //tbl.AcceptChanges();
 
-                                adp.Fill(tbl);
-
-                                if (tbl.Rows.Count == 0)
-                                {
-                                    row = tbl.Rows.Add();
-                                    row["referencetype"] = 2;
-                                    row["referenceid"] = xmlRow["teamid"];
-                                    row["tidbitorder"] = 12;
-
-                                }
-                                else
-                                {
-                                    row = tbl.Rows[0];
-                                }
-
-                                row["text"] = "Rush yards: " + xmlRow["offrankrushyds"].ToString();
-                                //row["enabled"] = 1;
-
-                                adp.Update(tbl.GetChanges());
-                                tbl.AcceptChanges();
-
-                                cmd.Dispose();
-                                adp.Dispose();
-                                bldr.Dispose();
-                                tbl.Dispose();
-
-                                #endregion
-
-                                #region Off Rank Pass Yards
-
-                                //off. rank Pass Yards
-                                sql = "select * from espnews.drafttidbits where referencetype = 2 and tidbitorder = 13 and referenceid = " + xmlRow["teamid"];
-                                cmd = new OracleCommand(sql, cn);
-                                adp = new OracleDataAdapter(cmd);
-                                bldr = new OracleCommandBuilder(adp);
-
-                                tbl = new DataTable();
-
-                                adp.Fill(tbl);
-
-                                if (tbl.Rows.Count == 0)
-                                {
-                                    row = tbl.Rows.Add();
-                                    row["referencetype"] = 2;
-                                    row["referenceid"] = xmlRow["teamid"];
-                                    row["tidbitorder"] = 13;
-
-                                }
-                                else
-                                {
-                                    row = tbl.Rows[0];
-                                }
-
-                                row["text"] = "Pass yards: " + xmlRow["offrankpassyds"].ToString();
-                                //row["enabled"] = 1;
-
-                                adp.Update(tbl.GetChanges());
-                                tbl.AcceptChanges();
-
-                                cmd.Dispose();
-                                adp.Dispose();
-                                bldr.Dispose();
-                                tbl.Dispose();
-
-                                #endregion
-
-                                #region Def Rank Points Allowed
-
-                                //def. rank Points Allowed
-                                sql = "select * from espnews.drafttidbits where referencetype = 2 and tidbitorder = 14 and referenceid = " + xmlRow["teamid"];
-                                cmd = new OracleCommand(sql, cn);
-                                adp = new OracleDataAdapter(cmd);
-                                bldr = new OracleCommandBuilder(adp);
-
-                                tbl = new DataTable();
-
-                                adp.Fill(tbl);
-
-                                if (tbl.Rows.Count == 0)
-                                {
-                                    row = tbl.Rows.Add();
-                                    row["referencetype"] = 2;
-                                    row["referenceid"] = xmlRow["teamid"];
-                                    row["tidbitorder"] = 14;
-
-                                }
-                                else
-                                {
-                                    row = tbl.Rows[0];
-                                }
-
-                                row["text"] = "Points Allowed: " + xmlRow["defrankppg"].ToString();
-                                //row["enabled"] = 1;
-
-                                adp.Update(tbl.GetChanges());
-                                tbl.AcceptChanges();
-
-                                cmd.Dispose();
-                                adp.Dispose();
-                                bldr.Dispose();
-                                tbl.Dispose();
-
-                                #endregion
-
-                                #region Def Rank Takeaways
-
-                                //def. rank Takeaways
-                                sql = "select * from espnews.drafttidbits where referencetype = 2 and tidbitorder = 15 and referenceid = " + xmlRow["teamid"];
-                                cmd = new OracleCommand(sql, cn);
-                                adp = new OracleDataAdapter(cmd);
-                                bldr = new OracleCommandBuilder(adp);
-
-                                tbl = new DataTable();
-
-                                adp.Fill(tbl);
-
-                                if (tbl.Rows.Count == 0)
-                                {
-                                    row = tbl.Rows.Add();
-                                    row["referencetype"] = 2;
-                                    row["referenceid"] = xmlRow["teamid"];
-                                    row["tidbitorder"] = 15;
-
-                                }
-                                else
-                                {
-                                    row = tbl.Rows[0];
-                                }
-
-                                row["text"] = "Takeaways: " + xmlRow["defranktakeaways"].ToString();
-                                //row["enabled"] = 1;
-
-                                adp.Update(tbl.GetChanges());
-                                tbl.AcceptChanges();
-
-                                cmd.Dispose();
-                                adp.Dispose();
-                                bldr.Dispose();
-                                tbl.Dispose();
-
-                                #endregion
-
-                                #region Def Rank Rush Defense
-
-                                //def. rank Rush Defense
-                                sql = "select * from espnews.drafttidbits where referencetype = 2 and tidbitorder = 16 and referenceid = " + xmlRow["teamid"];
-                                cmd = new OracleCommand(sql, cn);
-                                adp = new OracleDataAdapter(cmd);
-                                bldr = new OracleCommandBuilder(adp);
-
-                                tbl = new DataTable();
-
-                                adp.Fill(tbl);
-
-                                if (tbl.Rows.Count == 0)
-                                {
-                                    row = tbl.Rows.Add();
-                                    row["referencetype"] = 2;
-                                    row["referenceid"] = xmlRow["teamid"];
-                                    row["tidbitorder"] = 16;
-
-                                }
-                                else
-                                {
-                                    row = tbl.Rows[0];
-                                }
-
-                                row["text"] = "Rush Defense: " + xmlRow["defrankrushing"].ToString();
-                                //row["enabled"] = 1;
-
-                                adp.Update(tbl.GetChanges());
-                                tbl.AcceptChanges();
-
-                                cmd.Dispose();
-                                adp.Dispose();
-                                bldr.Dispose();
-                                tbl.Dispose();
-
-                                #endregion
-
-                                #region Def Rank Pass Defense
-
-                                //def. rank Pass Defense
-                                sql = "select * from espnews.drafttidbits where referencetype = 2 and tidbitorder = 17 and referenceid = " + xmlRow["teamid"];
-                                cmd = new OracleCommand(sql, cn);
-                                adp = new OracleDataAdapter(cmd);
-                                bldr = new OracleCommandBuilder(adp);
-
-                                tbl = new DataTable();
-
-                                adp.Fill(tbl);
-
-                                if (tbl.Rows.Count == 0)
-                                {
-                                    row = tbl.Rows.Add();
-                                    row["referencetype"] = 2;
-                                    row["referenceid"] = xmlRow["teamid"];
-                                    row["tidbitorder"] = 17;
-
-                                }
-                                else
-                                {
-                                    row = tbl.Rows[0];
-                                }
-
-                                row["text"] = "Pass Defense: " + xmlRow["defrankpassing"].ToString();
-                                //row["enabled"] = 1;
-
-                                adp.Update(tbl.GetChanges());
-                                tbl.AcceptChanges();
-
-                                cmd.Dispose();
-                                adp.Dispose();
-                                bldr.Dispose();
-                                tbl.Dispose();
-
-                                #endregion
-
-                                #region Off Rank (PPG)
-
-                                //off. rank (PPG)
-                                sql = "select * from espnews.drafttidbits where referencetype = 2 and tidbitorder = 30 and referenceid = " + xmlRow["teamid"];
-                                cmd = new OracleCommand(sql, cn);
-                                adp = new OracleDataAdapter(cmd);
-                                bldr = new OracleCommandBuilder(adp);
-
-                                tbl = new DataTable();
-
-                                adp.Fill(tbl);
-
-                                if (tbl.Rows.Count == 0)
-                                {
-                                    row = tbl.Rows.Add();
-                                    row["referencetype"] = 2;
-                                    row["referenceid"] = xmlRow["teamid"];
-                                    row["tidbitorder"] = 30;
-
-                                }
-                                else
-                                {
-                                    row = tbl.Rows[0];
-                                }
-
-                                row["text"] = xmlRow["offrankppg"].ToString();
-                                //row["enabled"] = 1;
-
-                                adp.Update(tbl.GetChanges());
-                                tbl.AcceptChanges();
-
-                                cmd.Dispose();
-                                adp.Dispose();
-                                bldr.Dispose();
-                                tbl.Dispose();
-
-                                #endregion
-
-                                #region Off Rank (YPG)
-
-                                //off. rank (YPG)
-                                sql = "select * from espnews.drafttidbits where referencetype = 2 and tidbitorder = 31 and referenceid = " + xmlRow["teamid"];
-                                cmd = new OracleCommand(sql, cn);
-                                adp = new OracleDataAdapter(cmd);
-                                bldr = new OracleCommandBuilder(adp);
-
-                                tbl = new DataTable();
-
-                                adp.Fill(tbl);
-
-                                if (tbl.Rows.Count == 0)
-                                {
-                                    row = tbl.Rows.Add();
-                                    row["referencetype"] = 2;
-                                    row["referenceid"] = xmlRow["teamid"];
-                                    row["tidbitorder"] = 31;
-
-                                }
-                                else
-                                {
-                                    row = tbl.Rows[0];
-                                }
-
-                                row["text"] = xmlRow["offrankypg"].ToString();
-                                //row["enabled"] = 1;
-
-                                adp.Update(tbl.GetChanges());
-                                tbl.AcceptChanges();
-
-                                cmd.Dispose();
-                                adp.Dispose();
-                                bldr.Dispose();
-                                tbl.Dispose();
-
-                                #endregion
-
-                                #region Def Rank (PPG)
-
-                                //def. rank (PPG)
-                                sql = "select * from espnews.drafttidbits where referencetype = 2 and tidbitorder = 32 and referenceid = " + xmlRow["teamid"];
-                                cmd = new OracleCommand(sql, cn);
-                                adp = new OracleDataAdapter(cmd);
-                                bldr = new OracleCommandBuilder(adp);
-
-                                tbl = new DataTable();
-
-                                adp.Fill(tbl);
-
-                                if (tbl.Rows.Count == 0)
-                                {
-                                    row = tbl.Rows.Add();
-                                    row["referencetype"] = 2;
-                                    row["referenceid"] = xmlRow["teamid"];
-                                    row["tidbitorder"] = 32;
-
-                                }
-                                else
-                                {
-                                    row = tbl.Rows[0];
-                                }
-
-                                row["text"] = xmlRow["defrankppg"].ToString();
-                                //row["enabled"] = 1;
-
-                                adp.Update(tbl.GetChanges());
-                                tbl.AcceptChanges();
-
-                                cmd.Dispose();
-                                adp.Dispose();
-                                bldr.Dispose();
-                                tbl.Dispose();
-
-                                #endregion
-
-                                #region Def Rank (YPG)
-
-                                //def. rank (YPG)
-                                sql = "select * from espnews.drafttidbits where referencetype = 2 and tidbitorder = 33 and referenceid = " + xmlRow["teamid"];
-                                cmd = new OracleCommand(sql, cn);
-                                adp = new OracleDataAdapter(cmd);
-                                bldr = new OracleCommandBuilder(adp);
-
-                                tbl = new DataTable();
-
-                                adp.Fill(tbl);
-
-                                if (tbl.Rows.Count == 0)
-                                {
-                                    row = tbl.Rows.Add();
-                                    row["referencetype"] = 2;
-                                    row["referenceid"] = xmlRow["teamid"];
-                                    row["tidbitorder"] = 33;
-
-                                }
-                                else
-                                {
-                                    row = tbl.Rows[0];
-                                }
-
-                                row["text"] = xmlRow["defrankypg"].ToString();
-                                //row["enabled"] = 1;
-
-                                adp.Update(tbl.GetChanges());
-                                tbl.AcceptChanges();
-
-                                cmd.Dispose();
-                                adp.Dispose();
-                                bldr.Dispose();
-                                tbl.Dispose();
-
-                                #endregion
-
-                                #region Record
-
-                                sql = "select * from espnews.drafttidbits where referencetype = 2 and tidbitorder = 20 and referenceid = " + xmlRow["teamid"];
-                                cmd = new OracleCommand(sql, cn);
-                                adp = new OracleDataAdapter(cmd);
-                                bldr = new OracleCommandBuilder(adp);
-
-                                tbl = new DataTable();
-
-                                adp.Fill(tbl);
-
-                                if (tbl.Rows.Count == 0)
-                                {
-                                    row = tbl.Rows.Add();
-                                    row["referencetype"] = 2;
-                                    row["referenceid"] = xmlRow["teamid"];
-                                    row["tidbitorder"] = 20;
-
-                                }
-                                else
-                                {
-                                    row = tbl.Rows[0];
-                                }
-
-                                row["text"] = xmlRow["record"].ToString();
-                                //row["enabled"] = 1;
-
-                                adp.Update(tbl.GetChanges());
-                                tbl.AcceptChanges();
-
-                                cmd.Dispose();
-                                adp.Dispose();
-                                bldr.Dispose();
-                                tbl.Dispose();
-
-                                #endregion
-
-                                #region Div Result
-
-                                sql = "select * from espnews.drafttidbits where referencetype = 2 and tidbitorder = 21 and referenceid = " + xmlRow["teamid"];
-                                cmd = new OracleCommand(sql, cn);
-                                adp = new OracleDataAdapter(cmd);
-                                bldr = new OracleCommandBuilder(adp);
-
-                                tbl = new DataTable();
-
-                                adp.Fill(tbl);
-
-                                if (tbl.Rows.Count == 0)
-                                {
-                                    row = tbl.Rows.Add();
-                                    row["referencetype"] = 2;
-                                    row["referenceid"] = xmlRow["teamid"];
-                                    row["tidbitorder"] = 21;
-
-                                }
-                                else
-                                {
-                                    row = tbl.Rows[0];
-                                }
-
-                                row["text"] = xmlRow["divresult"].ToString();
-                                //row["enabled"] = 1;
-
-                                adp.Update(tbl.GetChanges());
-                                tbl.AcceptChanges();
-
-                                cmd.Dispose();
-                                adp.Dispose();
-                                bldr.Dispose();
-                                tbl.Dispose();
-
-                                #endregion
-
-                                #region Playoffs
-
-                                sql = "select * from espnews.drafttidbits where referencetype = 2 and tidbitorder = 22 and referenceid = " + xmlRow["teamid"];
-                                cmd = new OracleCommand(sql, cn);
-                                adp = new OracleDataAdapter(cmd);
-                                bldr = new OracleCommandBuilder(adp);
-
-                                tbl = new DataTable();
-
-                                adp.Fill(tbl);
-
-                                if (tbl.Rows.Count == 0)
-                                {
-                                    row = tbl.Rows.Add();
-                                    row["referencetype"] = 2;
-                                    row["referenceid"] = xmlRow["teamid"];
-                                    row["tidbitorder"] = 22;
-
-                                }
-                                else
-                                {
-                                    row = tbl.Rows[0];
-                                }
-
-                                row["text"] = xmlRow["playoffs"].ToString();
-                                //row["enabled"] = 1;
-
-                                adp.Update(tbl.GetChanges());
-                                tbl.AcceptChanges();
-
-                                cmd.Dispose();
-                                adp.Dispose();
-                                bldr.Dispose();
-                                tbl.Dispose();
-
-                                #endregion
-
-                                #region Mel's Needs
-
-                                if (xmlRow["melsneeds"].ToString().Trim() != "")
-                                {
-                                    string[] melNeeds = xmlRow["melsneeds"].ToString().Split(',');
-
-                                    int tidbitOrder = 40;
-
-                                    for (i = 0; i < melNeeds.Length; i++)
-                                    {
-                                        sql = "select * from espnews.drafttidbits where referencetype = 2 and tidbitorder = " + tidbitOrder + " and referenceid = " + xmlRow["teamid"];
-                                        cmd = new OracleCommand(sql, cn);
-                                        adp = new OracleDataAdapter(cmd);
-                                        bldr = new OracleCommandBuilder(adp);
-
-                                        tbl = new DataTable();
-
-                                        adp.Fill(tbl);
-
-                                        if (tbl.Rows.Count == 0)
-                                        {
-                                            row = tbl.Rows.Add();
-                                            row["referencetype"] = 2;
-                                            row["referenceid"] = xmlRow["teamid"];
-                                            row["tidbitorder"] = tidbitOrder;
-                                        }
-                                        else
-                                        {
-                                            row = tbl.Rows[0];
-                                        }
-
-                                        row["text"] = melNeeds[i].ToString().Trim();
-                                        //row["enabled"] = 1;
-
-                                        adp.Update(tbl.GetChanges());
-                                        tbl.AcceptChanges();
-
-                                        cmd.Dispose();
-                                        adp.Dispose();
-                                        bldr.Dispose();
-                                        tbl.Dispose();
-
-                                        tidbitOrder++;
-                                    }
-                                }
-
-                                #endregion
+                                //cmd.Dispose();
+                                //adp.Dispose();
+                                //bldr.Dispose();
+                                //tbl.Dispose();
+
+                                //#endregion
+
+                                //#region Div Result
+
+                                //sql = "select * from espnews.drafttidbits where referencetype = 2 and tidbitorder = 21 and referenceid = " + xmlRow["teamid"];
+                                //cmd = new OracleCommand(sql, cn);
+                                //adp = new OracleDataAdapter(cmd);
+                                //bldr = new OracleCommandBuilder(adp);
+
+                                //tbl = new DataTable();
+
+                                //adp.Fill(tbl);
+
+                                //if (tbl.Rows.Count == 0)
+                                //{
+                                //    row = tbl.Rows.Add();
+                                //    row["referencetype"] = 2;
+                                //    row["referenceid"] = xmlRow["teamid"];
+                                //    row["tidbitorder"] = 21;
+                                //    row["enabled"] = 1;
+                                //}
+                                //else
+                                //{
+                                //    row = tbl.Rows[0];
+                                //}
+
+                                //row["text"] = xmlRow["divresult"].ToString();
+
+                                //adp.Update(tbl.GetChanges());
+                                //tbl.AcceptChanges();
+
+                                //cmd.Dispose();
+                                //adp.Dispose();
+                                //bldr.Dispose();
+                                //tbl.Dispose();
+
+                                //#endregion
+
+                                //#region Playoffs
+
+                                //sql = "select * from espnews.drafttidbits where referencetype = 2 and tidbitorder = 22 and referenceid = " + xmlRow["teamid"];
+                                //cmd = new OracleCommand(sql, cn);
+                                //adp = new OracleDataAdapter(cmd);
+                                //bldr = new OracleCommandBuilder(adp);
+
+                                //tbl = new DataTable();
+
+                                //adp.Fill(tbl);
+
+                                //if (tbl.Rows.Count == 0)
+                                //{
+                                //    row = tbl.Rows.Add();
+                                //    row["referencetype"] = 2;
+                                //    row["referenceid"] = xmlRow["teamid"];
+                                //    row["tidbitorder"] = 22;
+                                //    row["enabled"] = 1;
+                                //}
+                                //else
+                                //{
+                                //    row = tbl.Rows[0];
+                                //}
+
+                                //row["text"] = xmlRow["playoffs"].ToString();
+                                
+
+                                //adp.Update(tbl.GetChanges());
+                                //tbl.AcceptChanges();
+
+                                //cmd.Dispose();
+                                //adp.Dispose();
+                                //bldr.Dispose();
+                                //tbl.Dispose();
+
+                                //#endregion
+
+                                //#region Mel's Needs
+
+                                //if (xmlRow["melsneeds"].ToString().Trim() != "")
+                                //{
+                                //    string[] melNeeds = xmlRow["melsneeds"].ToString().Split(',');
+
+                                //    int tidbitOrder = 40;
+
+                                //    for (i = 0; i < melNeeds.Length; i++)
+                                //    {
+                                //        sql = "select * from espnews.drafttidbits where referencetype = 2 and tidbitorder = " + tidbitOrder + " and referenceid = " + xmlRow["teamid"];
+                                //        cmd = new OracleCommand(sql, cn);
+                                //        adp = new OracleDataAdapter(cmd);
+                                //        bldr = new OracleCommandBuilder(adp);
+
+                                //        tbl = new DataTable();
+
+                                //        adp.Fill(tbl);
+
+                                //        if (tbl.Rows.Count == 0)
+                                //        {
+                                //            row = tbl.Rows.Add();
+                                //            row["referencetype"] = 2;
+                                //            row["referenceid"] = xmlRow["teamid"];
+                                //            row["tidbitorder"] = tidbitOrder;
+                                //            row["enabled"] = 1;
+                                //        }
+                                //        else
+                                //        {
+                                //            row = tbl.Rows[0];
+                                //        }
+
+                                //        row["text"] = melNeeds[i].ToString().Trim();
+                                        
+                                //        adp.Update(tbl.GetChanges());
+                                //        tbl.AcceptChanges();
+
+                                //        cmd.Dispose();
+                                //        adp.Dispose();
+                                //        bldr.Dispose();
+                                //        tbl.Dispose();
+
+                                //        tidbitOrder++;
+                                //    }
+                                //}
+
+                                //#endregion
                             }
                             else if (ConfigurationManager.AppSettings["DraftType"].ToUpper() == "NBA")
                             {
