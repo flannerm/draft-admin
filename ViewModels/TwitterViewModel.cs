@@ -81,7 +81,7 @@ namespace DraftAdmin.ViewModels
                 if (_selectedTweet != null)
                 {
                     SelectedTweetText = _selectedTweet.Tweet.Text;
-                    SelectedTweetUsername = _selectedTweet.Tweet.User;
+                    SelectedTweetUsername = _selectedTweet.Tweet.User.ToUpper() + " <color 0x45c4f1>@" + _selectedTweet.Tweet.ScreenName;
                 }
                 
             }
@@ -299,7 +299,7 @@ namespace DraftAdmin.ViewModels
 
         private void showTweet()
         {
-            if (_selectedTweetText != null && _selectedTweetText != "")
+            if (_selectedTweetText != null && _selectedTweetText != "" && _selectedLogo != null)
             {
                 if (OnStopCycle != null) OnStopCycle();
 

@@ -2058,6 +2058,16 @@ namespace DraftAdmin.ViewModels
             {
                 case "Animate Off":
                     //MJF
+                    commandToSend.Command = (DraftAdmin.PlayoutCommands.CommandType)Enum.Parse(typeof(DraftAdmin.PlayoutCommands.CommandType), "ShowPage");
+                    commandToSend.CommandID = Guid.NewGuid().ToString();
+                    commandToSend.Parameters = new List<CommandParameter>();
+                    commandToSend.Parameters.Add(new CommandParameter("TemplateName", "BandCover"));
+
+                    //xmlRow.Add("ANIMATE_ALL", "1");
+                    
+                    //commandToSend.TemplateData = xmlRow.GetXMLString();
+                    sendCommandToPlayout(commandToSend);
+                    
                     commandToSend.Command = (DraftAdmin.PlayoutCommands.CommandType)Enum.Parse(typeof(DraftAdmin.PlayoutCommands.CommandType), "HidePage");
                     commandToSend.CommandID = Guid.NewGuid().ToString();
                     commandToSend.Parameters = new List<CommandParameter>();
@@ -2070,9 +2080,18 @@ namespace DraftAdmin.ViewModels
                     //MJF
 
                     Animate = "Animate On";
+
                     break;
                 case "Animate On":
-                    Animate = "Animate Off";
+                    commandToSend.Command = (DraftAdmin.PlayoutCommands.CommandType)Enum.Parse(typeof(DraftAdmin.PlayoutCommands.CommandType), "ShowPage");
+                    commandToSend.CommandID = Guid.NewGuid().ToString();
+                    commandToSend.Parameters = new List<CommandParameter>();
+                    commandToSend.Parameters.Add(new CommandParameter("TemplateName", "BandCover"));
+
+                    //xmlRow.Add("ANIMATE_ALL", "1");
+                    
+                    //commandToSend.TemplateData = xmlRow.GetXMLString();
+                    sendCommandToPlayout(commandToSend);
 
                     commandToSend.Command = (DraftAdmin.PlayoutCommands.CommandType)Enum.Parse(typeof(DraftAdmin.PlayoutCommands.CommandType), "ShowPage");
                     commandToSend.CommandID = Guid.NewGuid().ToString();
@@ -2082,6 +2101,8 @@ namespace DraftAdmin.ViewModels
                     xmlRow.Add("ANIMATE_ALL", "1");
                     
                     commandToSend.TemplateData = xmlRow.GetXMLString();
+
+                    Animate = "Animate Off";
 
                     break;
             }

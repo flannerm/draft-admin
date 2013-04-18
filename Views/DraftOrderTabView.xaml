@@ -19,7 +19,7 @@
             <RowDefinition/>
         </Grid.RowDefinitions>
         
-        <ListView Grid.Column="0" Grid.Row="0" x:Name="listDraftOrder" Margin="10" Height="440"
+        <ListView Grid.Column="0" Grid.Row="0" x:Name="listDraftOrder" Margin="10" Height="430"
                 ItemsSource="{Binding DraftOrder, Source={x:Static global:GlobalCollections.Instance}}"               
                 ScrollViewer.CanContentScroll="True"
                 ScrollViewer.VerticalScrollBarVisibility="Auto"
