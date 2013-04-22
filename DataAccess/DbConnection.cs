@@ -875,6 +875,7 @@ namespace DraftAdmin.DataAccess
                     team.SwatchTga = new Uri(row["swatch"].ToString());
                     team.OverallRecord = row["overallrecord"].ToString();
                     team.ConferenceRecord = row["conferencerecord"].ToString();
+                    team.Hashtag = row["hashtag"].ToString();
 
                     if (row["lotterypctrank"] != DBNull.Value)
                     {
@@ -3306,10 +3307,10 @@ namespace DraftAdmin.DataAccess
 
                                 #endregion
 
-                                #region 4 Matrix Notes
+                                #region 6 Matrix Notes
 
                                 //import the 4 matrix notes
-                                for (i = 1; i <= 4; i++)
+                                for (i = 1; i <= 6; i++)
                                 {
                                     if (xmlRow["note" + i.ToString()].ToString().Trim() != "")
                                     {

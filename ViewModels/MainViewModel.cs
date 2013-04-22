@@ -171,6 +171,8 @@ namespace DraftAdmin.ViewModels
 
         private string _animate = "Animate Off";
 
+        private bool _otcHashtag = false;
+
         #endregion
 
         #region Properties
@@ -400,7 +402,13 @@ namespace DraftAdmin.ViewModels
         public LogoChip SelectedRightLogo
         {
             get { return _selectedRightLogo; }
-            set { _selectedRightLogo = value; OnPropertyChanged("SelectedRightLogo"); }
+            set 
+            { 
+                _selectedRightLogo = value; 
+                OnPropertyChanged("SelectedRightLogo");
+
+                _currentSelectionTabVM.SelectedRightLogoFilename = _selectedRightLogo.FileName;
+            }
         }
 
         public ObservableCollection<LogoChip> RightLogos
@@ -538,6 +546,18 @@ namespace DraftAdmin.ViewModels
             set { _animate = value; OnPropertyChanged("Animate"); }
         }
 
+        public bool OTCHashtag
+        {
+            get { return _otcHashtag; }
+            set 
+            { 
+                _otcHashtag = value; 
+                OnPropertyChanged("OTCHashtag");
+
+                _currentSelectionTabVM.OTCHashtag = value;
+            }
+        }
+
         #endregion
 
         #region Constructor
@@ -649,7 +669,8 @@ namespace DraftAdmin.ViewModels
             CurrentSelectionTabVM.RefreshPlayersEvent += new CurrentSelectionTabViewModel.RefreshPlayersEventHandler(refreshPlayers);
 
             TwitterTabVM = new TwitterViewModel();
-            TwitterTabVM.SendCommandEvent += new InterruptionEditViewModel.SendCommandEventHandler(sendCommandToPlayout);
+            TwitterTabVM.SendCommandEvent += new TwitterViewModel.SendCommandEventHandler(sendCommandToPlayout);
+            TwitterTabVM.OnStopCycle += new TwitterViewModel.StopCycleEventHandler(stopCycle);
             //TwitterTabVM.
             //TwitterTabVM.SendCommandEvent += new InterruptionEditViewModel.SendCommandEventHandler(OnShowInterruption);
 
@@ -1867,6 +1888,29 @@ namespace DraftAdmin.ViewModels
             commandToSend.Parameters = new List<CommandParameter>();
             commandToSend.Parameters.Add(new CommandParameter("TemplateName", "CurrentSelection"));
             //commandToSend.Parameters.Add(new CommandParameter("QueueCommand", "true"));
+
+            sendCommandToPlayout(commandToSend);
+
+            //show the hashtag on the right side
+            commandToSend = new PlayerCommand();
+
+            commandToSend.Command = (DraftAdmin.PlayoutCommands.CommandType)Enum.Parse(typeof(DraftAdmin.PlayoutCommands.CommandType), "ShowPage");
+            commandToSend.Parameters = new List<CommandParameter>();
+            commandToSend.Parameters.Add(new CommandParameter("TemplateName", "RightLogo"));
+
+            xmlRow = new XmlDataRow();
+
+            string hashtag = "";
+
+            if (OTCHashtag && SelectedRightLogo.FileName.ToUpper().IndexOf("HASHTAG") > -1)
+            {
+                hashtag = Global.GlobalCollections.Instance.OnTheClock.Team.Hashtag;                
+            }
+
+            xmlRow.Add("TIDBIT_1", hashtag);
+
+            commandToSend.TemplateData = xmlRow.GetXMLString();
+            commandToSend.CommandID = Guid.NewGuid().ToString();
 
             sendCommandToPlayout(commandToSend);
         }

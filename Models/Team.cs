@@ -39,6 +39,7 @@ namespace DraftAdmin.Models
         private int _lotteryPctRank;
         private int _lotteryOrder;
         private bool _isDirty;
+        private string _hashtag;
 
         #endregion
 
@@ -202,6 +203,12 @@ namespace DraftAdmin.Models
             set { _isDirty = value; }
         }
 
+        public string Hashtag
+        {
+            get { return _hashtag; }
+            set { _hashtag = value; }
+        }
+
         #endregion
 
         #region Private Methods
@@ -210,37 +217,42 @@ namespace DraftAdmin.Models
         {
             string newFile = tgaPath.ToUpper().Replace(ConfigurationManager.AppSettings["ImsDirectory"].ToString().ToUpper(), ConfigurationManager.AppSettings["LocalImageDirectory"].ToString().ToUpper());
 
-            newFile = newFile.Replace(".TGA", ".png");
-
-            string newFolder = newFile.Substring(0, newFile.LastIndexOf("\\"));
-
-            DirectoryInfo dir = new DirectoryInfo(newFolder);
-
-            if (dir.Exists == false)
+            try
             {
-                dir.Create();
-            }
+                newFile = newFile.Replace(".TGA", ".png");
 
-            Bitmap bitmap = null;
+                string newFolder = newFile.Substring(0, newFile.LastIndexOf("\\"));
 
-            FileInfo tgaFile = new FileInfo(tgaPath);
-            FileInfo pngFile = new FileInfo(newFile);
+                DirectoryInfo dir = new DirectoryInfo(newFolder);
 
-            if (tgaFile.Exists)
-            {
-                if (pngFile.Exists == false || tgaFile.CreationTime > pngFile.CreationTime)
+                if (dir.Exists == false)
                 {
-                    try
-                    {
-                        bitmap = TargaImage.LoadTargaImage(_logoTgaNoKey.LocalPath);
-                        bitmap.Save(newFile, System.Drawing.Imaging.ImageFormat.Png);
-                    }
-                    finally
-                    {
+                    dir.Create();
+                }
 
+                Bitmap bitmap = null;
+
+                FileInfo tgaFile = new FileInfo(tgaPath);
+                FileInfo pngFile = new FileInfo(newFile);
+
+                if (tgaFile.Exists)
+                {
+                    if (pngFile.Exists == false || tgaFile.CreationTime > pngFile.CreationTime)
+                    {
+                        try
+                        {
+                            bitmap = TargaImage.LoadTargaImage(_logoTgaNoKey.LocalPath);
+                            bitmap.Save(newFile, System.Drawing.Imaging.ImageFormat.Png);
+                        }
+                        finally
+                        {
+
+                        }
                     }
                 }
             }
+            catch (Exception ex)
+            { }
 
             return newFile;
         }

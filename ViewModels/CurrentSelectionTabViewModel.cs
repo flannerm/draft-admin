@@ -33,6 +33,9 @@ namespace DraftAdmin.ViewModels
 
         private bool _refreshPlayersAfterSelection = true;
 
+        private bool _otcHashtag = false;
+        private string _selectedRightLogoFilename = "";
+
         #endregion
 
         #region Public Members
@@ -66,6 +69,18 @@ namespace DraftAdmin.ViewModels
         {
             get { return _refreshPlayersAfterSelection; }
             set { _refreshPlayersAfterSelection = value; OnPropertyChanged("RefreshPlayersAfterSelection"); }
+        }
+
+        public bool OTCHashtag
+        {
+            get { return _otcHashtag; }
+            set { _otcHashtag = value; }
+        }
+
+        public string SelectedRightLogoFilename
+        {
+            get { return _selectedRightLogoFilename; }
+            set { _selectedRightLogoFilename = value; }
         }
 
         #endregion
@@ -252,13 +267,21 @@ namespace DraftAdmin.ViewModels
 
             CurrentPlayer = null;
 
+            updateClock(isLastPick);
+
+            updateHashtag();
+
+            updateContent(isLastPick);
+        }
+
+        private void updateClock(bool isLastPick)
+        {
             PlayerCommand commandToSend;
 
             //send a command to change the clock on-air
             commandToSend = new PlayerCommand();
 
             commandToSend.Command = (DraftAdmin.PlayoutCommands.CommandType)Enum.Parse(typeof(DraftAdmin.PlayoutCommands.CommandType), "ShowPage");
-            commandToSend.CommandID = Guid.NewGuid().ToString();
             commandToSend.Parameters = new List<CommandParameter>();
             commandToSend.Parameters.Add(new CommandParameter("TemplateName", "Clock"));
 
@@ -286,14 +309,44 @@ namespace DraftAdmin.ViewModels
             //xmlRow.Add("CLOCK_COLOR", "NORMAL");
 
             commandToSend.TemplateData = xmlRow.GetXMLString();
+            commandToSend.CommandID = Guid.NewGuid().ToString();
 
             OnSendCommand(commandToSend, null);
-            
+        }
+
+        private void updateHashtag()
+        {
+            //show the hashtag on the right side
+            PlayerCommand commandToSend = new PlayerCommand();
+
+            commandToSend.Command = (DraftAdmin.PlayoutCommands.CommandType)Enum.Parse(typeof(DraftAdmin.PlayoutCommands.CommandType), "ShowPage");
+            commandToSend.Parameters = new List<CommandParameter>();
+            commandToSend.Parameters.Add(new CommandParameter("TemplateName", "RightLogo"));
+
+            XmlDataRow xmlRow = new XmlDataRow();
+
+            string hashtag = "";
+
+            if (OTCHashtag && SelectedRightLogoFilename.ToUpper().IndexOf("HASHTAG") > -1)
+            {
+                hashtag = Global.GlobalCollections.Instance.OnTheClock.Team.Hashtag;
+            }
+
+            xmlRow.Add("TIDBIT_1", hashtag);
+
+            commandToSend.TemplateData = xmlRow.GetXMLString();
+            commandToSend.CommandID = Guid.NewGuid().ToString();
+
+            OnSendCommand(commandToSend, null);
+        }
+
+        private void updateContent(bool isLastPick)
+        {
+            PlayerCommand commandToSend = new PlayerCommand();
+
             if (isLastPick) //show the end of draft template
             {
                 //hide lower3rd templates
-                commandToSend = new PlayerCommand();
-
                 commandToSend.Command = (DraftAdmin.PlayoutCommands.CommandType)Enum.Parse(typeof(DraftAdmin.PlayoutCommands.CommandType), "HidePage");
                 commandToSend.CommandID = Guid.NewGuid().ToString();
                 commandToSend.Parameters = new List<CommandParameter>();
@@ -317,6 +370,8 @@ namespace DraftAdmin.ViewModels
                 commandToSend.CommandID = Guid.NewGuid().ToString();
                 commandToSend.Parameters = new List<CommandParameter>();
                 commandToSend.Parameters.Add(new CommandParameter("TemplateName", "EndOfDraft"));
+
+                OnSendCommand(commandToSend, null);
             }
             else
             {
@@ -327,7 +382,64 @@ namespace DraftAdmin.ViewModels
                 commandToSend.CommandID = Guid.NewGuid().ToString();
                 commandToSend.Parameters = new List<CommandParameter>();
                 commandToSend.Parameters.Add(new CommandParameter("TemplateName", "CurrentSelection"));
+
+                OnSendCommand(commandToSend, null);
+
+                //commandToSend.Command = (DraftAdmin.PlayoutCommands.CommandType)Enum.Parse(typeof(DraftAdmin.PlayoutCommands.CommandType), "HidePage");
+                //commandToSend.CommandID = Guid.NewGuid().ToString();
+                //commandToSend.Parameters = new List<CommandParameter>();
+                //commandToSend.Parameters.Add(new CommandParameter("TemplateName", "Lower3rd_Connected"));
+
+                //OnSendCommand(commandToSend, null);
             }
+        }
+
+        private void updateTotem(bool changeTotem = false)
+        {
+            PlayerCommand commandToSend = new PlayerCommand();
+
+            commandToSend.Command = (DraftAdmin.PlayoutCommands.CommandType)Enum.Parse(typeof(DraftAdmin.PlayoutCommands.CommandType), "ShowPage");
+            commandToSend.Parameters = new List<CommandParameter>();
+            commandToSend.Parameters.Add(new CommandParameter("TemplateName", "Next"));
+
+            XmlDataRow xmlRow = new XmlDataRow();
+
+            Pick nextPick1;
+            Pick nextPick2;
+
+            nextPick1 = (Pick)Global.GlobalCollections.Instance.DraftOrder.SingleOrDefault(p => p.OverallPick == Global.GlobalCollections.Instance.OnTheClock.OverallPick + 1);
+            nextPick2 = (Pick)Global.GlobalCollections.Instance.DraftOrder.SingleOrDefault(p => p.OverallPick == Global.GlobalCollections.Instance.OnTheClock.OverallPick + 2);
+
+            if (nextPick1 != null)
+            {
+                xmlRow.Add("ABBREV_4_1", nextPick1.Team.Tricode);
+
+                if (nextPick2 != null)
+                {
+                    xmlRow.Add("ABBREV_4_2", nextPick2.Team.Tricode);
+                }
+                else
+                {
+                    xmlRow.Add("ABBREV_4_2", "");
+                }
+            }
+            else
+            {
+                xmlRow.Add("ABBREV_4_1", "");
+                xmlRow.Add("ABBREV_4_2", "");
+            }
+
+            if (changeTotem)
+            {
+                xmlRow.Add("CHANGE_TOTEM_FLAG", "1");
+            }
+            else
+            {
+                xmlRow.Add("CHANGE_TOTEM_FLAG", "");
+            }
+
+            commandToSend.TemplateData = xmlRow.GetXMLString();
+            commandToSend.CommandID = Guid.NewGuid().ToString();
 
             OnSendCommand(commandToSend, null);
         }
@@ -358,56 +470,6 @@ namespace DraftAdmin.ViewModels
             commandToSend.CommandID = Guid.NewGuid().ToString();
             commandToSend.Parameters = new List<CommandParameter>();
             commandToSend.Parameters.Add(new CommandParameter("TemplateName", "EndOfDraft"));
-
-            OnSendCommand(commandToSend, null);
-        }
-
-        private void updateTotem(bool changeTotem = false)
-        {
-            PlayerCommand commandToSend = new PlayerCommand();
-
-            commandToSend.Command = (DraftAdmin.PlayoutCommands.CommandType)Enum.Parse(typeof(DraftAdmin.PlayoutCommands.CommandType), "ShowPage");
-            commandToSend.CommandID = Guid.NewGuid().ToString();
-            commandToSend.Parameters = new List<CommandParameter>();
-            commandToSend.Parameters.Add(new CommandParameter("TemplateName", "Next"));
-
-            XmlDataRow xmlRow = new XmlDataRow();
-
-            Pick nextPick1;
-            Pick nextPick2;
-
-            nextPick1 = (Pick)Global.GlobalCollections.Instance.DraftOrder.SingleOrDefault(p => p.OverallPick == Global.GlobalCollections.Instance.OnTheClock.OverallPick + 1);
-            nextPick2 = (Pick)Global.GlobalCollections.Instance.DraftOrder.SingleOrDefault(p => p.OverallPick == Global.GlobalCollections.Instance.OnTheClock.OverallPick + 2);
-
-            if (nextPick1 != null)
-            {
-                xmlRow.Add("ABBREV_4_1", nextPick1.Team.Tricode);
-
-                if (nextPick2 != null)
-                {
-                    xmlRow.Add("ABBREV_4_2", nextPick2.Team.Tricode);
-                }
-                else
-                {
-                    xmlRow.Add("ABBREV_4_2", "");
-                }
-            }
-            else
-            {
-                xmlRow.Add("ABBREV_4_1", "");
-                xmlRow.Add("ABBREV_4_2", "");
-            } 
-
-            if (changeTotem)
-            {
-                xmlRow.Add("CHANGE_TOTEM_FLAG", "1");
-            }
-            else
-            {
-                xmlRow.Add("CHANGE_TOTEM_FLAG", "");
-            }
-
-            commandToSend.TemplateData = xmlRow.GetXMLString();
 
             OnSendCommand(commandToSend, null);
         }

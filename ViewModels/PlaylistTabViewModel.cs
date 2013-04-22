@@ -36,6 +36,8 @@ namespace DraftAdmin.ViewModels
         public delegate void JumpToItemEventHandler(int playlistItemOrder);
         public event JumpToItemEventHandler JumpToItemEvent;
 
+        private string _timerText = "";
+
         #endregion
 
         #region Properties
@@ -68,6 +70,12 @@ namespace DraftAdmin.ViewModels
         {
             get { return _selectedPlaylistItem; }
             set { _selectedPlaylistItem = value; OnPropertyChanged("SelectedPlaylistItem"); }
+        }
+
+        public string TimerText
+        {
+            get { return _timerText; }
+            set { _timerText = value; OnPropertyChanged("TimerText"); }
         }
 
         #endregion
@@ -146,24 +154,18 @@ namespace DraftAdmin.ViewModels
             nextPlaylistItem(playlist);
         }
 
-        private void nextPlaylistItem(Playlist playlist)
+        private void nextPlaylistItem(Playlist playlist, bool forceRestart = false)
         {
             PlaylistItem playlistItem = null;
 
             try
             {
-                if (playlist.TimerRunning == true) //MJF
+                if (playlist.TimerRunning == true || forceRestart) //MJF
                 {
                     if (playlist.CurrentPlaylistItem >= playlist.PlaylistItems.Count)
                     {
                         playlist.CurrentPlaylistItem = 0;
                     }
-
-                    //set all the playlistitems to off air
-                    //foreach (PlaylistItem item in playlist.PlaylistItems)
-                    //{
-                    //    item.OnAir = false;
-                    //}
 
                     playlistItem = playlist.PlaylistItems[playlist.CurrentPlaylistItem];
 
@@ -237,7 +239,7 @@ namespace DraftAdmin.ViewModels
                                 {
                                     playlistItem.CurrentRow = 0;
                                     playlist.CurrentPlaylistItem += 1;
-                                    nextPlaylistItem(playlist);
+                                    nextPlaylistItem(playlist, forceRestart);
                                 }
                             }
 
@@ -289,7 +291,7 @@ namespace DraftAdmin.ViewModels
                         item.OnAir = false;
                     }
 
-                    nextPlaylistItem(playlist);
+                    nextPlaylistItem(playlist, true);
                 }
 
                 //if (_currentL3PlaylistItem < GlobalCollections.Instance.PlaylistItems.Count)

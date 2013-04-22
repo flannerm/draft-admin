@@ -55,9 +55,11 @@
 
             <Border Grid.Column="1" BorderThickness="1 0 1 0" BorderBrush="Black" HorizontalAlignment="Center">
                 <StackPanel Orientation="Horizontal" Margin="10,0,10,0" >
-                
-                    <TextBlock Text="Lower 3rd:" VerticalAlignment="Center" HorizontalAlignment="Left"/>
-                
+                    <StackPanel Orientation="Vertical" VerticalAlignment="Center">
+                        <TextBlock Text="Lower 3rd:" VerticalAlignment="Top" HorizontalAlignment="Left"/>
+                        <TextBlock VerticalAlignment="Bottom" TextAlignment="Right" HorizontalAlignment="Right" Text="{Binding TimerText}"/>
+                    </StackPanel>
+                    
                     <Button x:Name="togglePlaylistTimerButton" Height="30" Width="100" Margin="5,10,10,10" HorizontalAlignment="Left" VerticalAlignment="Center"
                         Command="{Binding TogglePlaylistTimerCommand}" Content="{Binding PlaylistTimerRunning, Converter={StaticResource boolToString}}" Background="Black" IsEnabled="{Binding PlayoutEnabled}"/>
                 
@@ -71,7 +73,10 @@
                 <Button x:Name="nextOTCButton" Grid.Column="3" VerticalAlignment="Top" HorizontalAlignment="Right" Height="30" Width="130" Margin="0,10,10,10" 
                         Command="{Binding NextOnTheClockCommand}" Content="Next On The Clock" Background="Black"/>
 
-                <TextBlock Text="On The Clock:" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                <StackPanel Orientation="Vertical" VerticalAlignment="Center">
+                    <TextBlock Text="On The Clock:" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                    <CheckBox Content="Hashtag" IsChecked="{Binding OTCHashtag}"/>
+                </StackPanel>
                 
                 <Border BorderThickness="2" Height="44" Width="64" CornerRadius="10" Margin="0,0,5,0">
                     
@@ -371,8 +376,10 @@
                             </StackPanel>
                             
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,10">
+                                
                                 <TextBlock Text="Hashtag:" VerticalAlignment="Center"/>
                                 <TextBox x:Name="hashtag" Text="{Binding RightSideHashtag}" Margin="10" Width="200" />
+                                <!--<CheckBox Content="Match OTC with Hashtag" Checked="{Binding MatchOTCHashtag}" Margin="0,0,15,0" VerticalAlignment="Center"/>-->
                                 
                             </StackPanel>
                         </StackPanel>
