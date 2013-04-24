@@ -8,13 +8,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TwitterLib", "..\..\..\Twitter\TwitterLib\TwitterLib.csproj", "{886C2F07-7A96-4E16-8B20-82D8090173E0}"
 EndProject
 Global
-	GlobalSection(SourceCodeControl) = preSolution
-		SccNumberOfProjects = 1
-		SccProjectUniqueName0 = ..\\..\\..\\Twitter\\TwitterLib\\TwitterLib.csproj
-		SccProjectName0 = \u0022$/2011/Twitter/Twitter.root/Twitter/TwitterLib\u0022,\u0020TPIJAAAA
-		SccLocalPath0 = ..\\..\\..\\Twitter\\TwitterLib
-		SccProvider0 = MSSCCI:Microsoft\u0020Visual\u0020SourceSafe
-	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Debug|Mixed Platforms = Debug|Mixed Platforms

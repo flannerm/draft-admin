@@ -33,7 +33,7 @@ namespace DraftAdmin.Models
         private Uri _pickPlateTga;
         private string _league;
         private Conference _conference;
-        private ObservableCollection<Tidbit> _tidbits;
+        private List<Tidbit> _tidbits;
         private string _overallRecord;
         private string _confRecord;
         private int _lotteryPctRank;
@@ -185,7 +185,7 @@ namespace DraftAdmin.Models
             set { _conference = value; }
         }
 
-        public ObservableCollection<Tidbit> Tidbits
+        public List<Tidbit> Tidbits
         {
             get { return _tidbits; }
             set { _tidbits = value; }
@@ -221,17 +221,6 @@ namespace DraftAdmin.Models
             {
                 newFile = newFile.Replace(".TGA", ".png");
 
-                string newFolder = newFile.Substring(0, newFile.LastIndexOf("\\"));
-
-                DirectoryInfo dir = new DirectoryInfo(newFolder);
-
-                if (dir.Exists == false)
-                {
-                    dir.Create();
-                }
-
-                Bitmap bitmap = null;
-
                 FileInfo tgaFile = new FileInfo(tgaPath);
                 FileInfo pngFile = new FileInfo(newFile);
 
@@ -241,6 +230,17 @@ namespace DraftAdmin.Models
                     {
                         try
                         {
+                            string newFolder = newFile.Substring(0, newFile.LastIndexOf("\\"));
+
+                            DirectoryInfo dir = new DirectoryInfo(newFolder);
+
+                            if (dir.Exists == false)
+                            {
+                                dir.Create();
+                            }
+
+                            Bitmap bitmap = null;
+
                             bitmap = TargaImage.LoadTargaImage(_logoTgaNoKey.LocalPath);
                             bitmap.Save(newFile, System.Drawing.Imaging.ImageFormat.Png);
                         }

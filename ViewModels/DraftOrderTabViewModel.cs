@@ -29,6 +29,9 @@ namespace DraftAdmin.ViewModels
 
         private string _tradeString = "";
 
+        private string _selectedRightLogoFilename = "";
+        private bool _otcHashtag = false;
+
         #endregion
 
         #region Public Members
@@ -65,6 +68,18 @@ namespace DraftAdmin.ViewModels
         {
             get { return _askAnimateTrade; }
             set { _askAnimateTrade = value; OnPropertyChanged("AskAnimateTrade"); }
+        }
+
+        public string SelectedRightLogoFilename
+        {
+            get { return _selectedRightLogoFilename; }
+            set { _selectedRightLogoFilename = value; }
+        }
+
+        public bool OTCHashtag
+        {
+            get { return _otcHashtag; }
+            set { _otcHashtag = value; }
         }
 
         #endregion
@@ -140,6 +155,7 @@ namespace DraftAdmin.ViewModels
                         xmlRow.Add("CHANGE_TOTEM_FLAG", "0");
 
                         commandToSend.TemplateData = xmlRow.GetXMLString();
+                        commandToSend.CommandID = Guid.NewGuid().ToString();
 
                         OnSendCommand(commandToSend, null);
                     }
@@ -190,6 +206,7 @@ namespace DraftAdmin.ViewModels
             xmlRow.Add("TIDBIT_1", _tradeString);
 
             commandToSend.TemplateData = xmlRow.GetXMLString();
+            commandToSend.CommandID = Guid.NewGuid().ToString();
 
             OnSendCommand(commandToSend, null);
 
@@ -218,6 +235,7 @@ namespace DraftAdmin.ViewModels
             xmlRow.Add("ABBREV_4_1", Global.GlobalCollections.Instance.OnTheClock.Team.Tricode);
 
             commandToSend.TemplateData = xmlRow.GetXMLString();
+            commandToSend.CommandID = Guid.NewGuid().ToString();
 
             //raise an event to the main...
             OnSendCommand(commandToSend, null);
@@ -242,15 +260,40 @@ namespace DraftAdmin.ViewModels
             xmlRow.Add("ABBREV_4_1", Global.GlobalCollections.Instance.OnTheClock.Team.Tricode);
 
             commandToSend.TemplateData = xmlRow.GetXMLString();
+            commandToSend.CommandID = Guid.NewGuid().ToString();
 
             OnSendCommand(commandToSend, null);
-            
+
+            //show the hashtag on the right side
+            commandToSend = new PlayerCommand();
+
+            commandToSend.Command = (DraftAdmin.PlayoutCommands.CommandType)Enum.Parse(typeof(DraftAdmin.PlayoutCommands.CommandType), "ShowPage");
+            commandToSend.Parameters = new List<CommandParameter>();
+            commandToSend.Parameters.Add(new CommandParameter("TemplateName", "RightLogo"));
+
+            xmlRow = new XmlDataRow();
+
+            string hashtag = "";
+
+            if (OTCHashtag && SelectedRightLogoFilename != null && SelectedRightLogoFilename.ToUpper().IndexOf("HASHTAG") > -1)
+            {
+                hashtag = Global.GlobalCollections.Instance.OnTheClock.Team.Hashtag;
+            }
+
+            xmlRow.Add("TIDBIT_1", hashtag);
+
+            commandToSend.TemplateData = xmlRow.GetXMLString();
+            commandToSend.CommandID = Guid.NewGuid().ToString();
+
+            OnSendCommand(commandToSend, null);
+
             commandToSend = new PlayerCommand();
 
             commandToSend.Command = (DraftAdmin.PlayoutCommands.CommandType)Enum.Parse(typeof(DraftAdmin.PlayoutCommands.CommandType), "HidePage");
+            commandToSend.CommandID = Guid.NewGuid().ToString();
             commandToSend.Parameters = new List<CommandParameter>();
             commandToSend.Parameters.Add(new CommandParameter("TemplateName", "TradeInterruption"));
-
+            
             OnSendCommand(commandToSend, null);
         }
 

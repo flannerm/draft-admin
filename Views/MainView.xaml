@@ -13,7 +13,7 @@
         mc:Ignorable="d" x:Class="DraftAdmin.Views.MainView"
         Icon="/DraftAdmin;component/DraftAdminIcon.ico"
         Title="NFL Draft Compression Admin"
-        Height="768" Width="1024">
+        Height="768" Width="1050">
     
     <Grid>
         <Grid.Background>

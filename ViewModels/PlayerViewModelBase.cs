@@ -34,7 +34,7 @@ namespace DraftAdmin.ViewModels
         protected Team _school;
         protected Pick _pick;
 
-        protected ObservableCollection<Tidbit> _tidbits;
+        protected List<Tidbit> _tidbits;
         private ObservableCollection<TidbitViewModel> _tidbitVMs;
 
         #endregion
@@ -137,7 +137,7 @@ namespace DraftAdmin.ViewModels
             set { _pick = value; OnPropertyChanged("Pick"); }
         }
 
-        public ObservableCollection<Tidbit> Tidbits
+        public List<Tidbit> Tidbits
         {
             get { return _tidbits; }
             set 

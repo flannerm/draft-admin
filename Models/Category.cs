@@ -23,7 +23,7 @@ namespace DraftAdmin.Models
         private Uri _logoPng;
         private BitmapImage _logoBitmap;
         private Uri _swatchFile;
-        private ObservableCollection<Tidbit> _tidbits;
+        private List<Tidbit> _tidbits;
         private bool _isDirty;
 
         #endregion
@@ -148,7 +148,7 @@ namespace DraftAdmin.Models
             set { _swatchFile = value; }
         }
 
-        public ObservableCollection<Tidbit> Tidbits
+        public List<Tidbit> Tidbits
         {
             get { return _tidbits; }
             set { _tidbits = value; }

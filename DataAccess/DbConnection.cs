@@ -111,12 +111,26 @@ namespace DraftAdmin.DataAccess
 
             try
             {
+                List<Tidbit> tidbits = GetAllPlayerTidbitsSDR();
+
                 cn = createConnectionSDR();
 
                 if (cn != null)
                 {
-                    String sql = "select a.*, b.*, c.*, (select text from espnews.drafttidbits where referencetype = 1 and referenceid = a.playerid and tidbitorder = 999) as tradetidbit ";
-                    sql += "from espnews.draftplayers a left join espnews.news_teams b on a.schoolid = b.team_id left join espnews.draftorder c on a.pick = c.pick order by a.pick asc, lastname asc, firstname asc";
+                    String sql = "";
+
+                    switch (ConfigurationManager.AppSettings["DraftType"].ToUpper())
+                    {
+                        case "LHN":
+                        case "NFL":
+                            sql = "select a.*, b.*, c.* ";
+                            sql += "from espnews.draftplayers a left join espnews.news_teams b on a.schoolid = b.team_id left join espnews.draftorder c on a.pick = c.pick order by a.pick asc, lastname asc, firstname asc";
+                            break;
+                        case "NBA":
+                            sql = "select a.*, b.*, c.*, (select text from espnews.drafttidbits where referencetype = 1 and referenceid = a.playerid and tidbitorder = 999) as tradetidbit ";
+                            sql += "from espnews.draftplayers a left join espnews.news_teams b on a.schoolid = b.team_id left join espnews.draftorder c on a.pick = c.pick order by a.pick asc, lastname asc, firstname asc";
+                            break;
+                    }     
 
                     cmd = new OracleCommand(sql, cn);
                     rdr = cmd.ExecuteReader();
@@ -130,7 +144,8 @@ namespace DraftAdmin.DataAccess
 
                     foreach (DataRow row in tbl.Rows)
                     {
-                        Player player = createPlayerModel(row);
+                        Player player = createPlayerModel(row, tidbits);
+
                         players.Add(player);
 
                         i++;
@@ -324,6 +339,64 @@ namespace DraftAdmin.DataAccess
             return player;
         }
 
+        private static Player createPlayerModel(DataRow row, List<Tidbit> tidbits = null)
+        {
+            Player player = new Player();
+
+            player.PlayerId = Convert.ToInt32(row["playerid"]);
+            player.FirstName = row["firstname"].ToString();
+            player.LastName = row["lastname"].ToString();
+            player.Height = row["height"].ToString();
+            player.Weight = row["weight"].ToString();
+            player.Class = row["class"].ToString();
+
+            if (row.Table.Columns["TradeTidbit"] != null)
+            {
+                player.TradeTidbit = row["tradetidbit"].ToString();
+            }
+
+            if (row["kiperrank"] != DBNull.Value)
+            {
+                player.KiperRank = Convert.ToInt16(row["kiperrank"]);
+            }
+
+            if (row["mcshayrank"] != DBNull.Value)
+            {
+                player.McShayRank = Convert.ToInt16(row["mcshayrank"]);
+            }
+
+            player.Position = row["position"].ToString();
+
+            if (tidbits != null)
+            {
+                player.Tidbits = tidbits.Where(t => t.ReferenceID == player.PlayerId).ToList();
+            }
+            else
+            {
+                player.Tidbits = GetTidbitsSDR(1, player.PlayerId);
+            }
+
+            try
+            {
+                if (row["schoolid"].ToString() != "")
+                {
+                    player.School = (Team)GlobalCollections.Instance.Schools.SingleOrDefault(s => s.ID == Convert.ToInt32(row["schoolid"]));
+                }
+            }
+            catch (Exception ex)
+            { }
+
+            if (row["pick"] != DBNull.Value)
+            {
+                if (Convert.ToInt16(row["pick"]) > 0)
+                {
+                    player.Pick = GlobalCollections.Instance.DraftOrder.FirstOrDefault(p => p.OverallPick == Convert.ToInt16(row["pick"]));
+                }
+            }
+
+            return player;
+        }
+
         public static Team GetTeam(Int32 teamId)
         {
             MySqlConnection cn = null;
@@ -468,57 +541,71 @@ namespace DraftAdmin.DataAccess
             return category;
         }
 
-        private static Player createPlayerModel(DataRow row)
+        public static List<Tidbit> GetAllPlayerTidbitsSDR()
         {
-            Player player = new Player();
-            player.PlayerId = Convert.ToInt32(row["playerid"]);
-            player.FirstName = row["firstname"].ToString();
-            player.LastName = row["lastname"].ToString();
-            player.Height = row["height"].ToString();
-            player.Weight = row["weight"].ToString();
-            player.Class = row["class"].ToString();
-            player.TradeTidbit = row["tradetidbit"].ToString();
+            List<Tidbit> tidbits = new List<Tidbit>();
 
-            if (row["kiperrank"] != DBNull.Value)
-            {
-                player.KiperRank = Convert.ToInt16(row["kiperrank"]);
-            }
-
-            if (row["mcshayrank"] != DBNull.Value)
-            {
-                player.McShayRank = Convert.ToInt16(row["mcshayrank"]);
-            }
-
-            player.Position = row["position"].ToString();
-
-            player.Tidbits = GetTidbitsSDR(1, player.PlayerId);
+            OracleConnection cn = null;
+            OracleCommand cmd = null;
+            OracleDataReader rdr = null;
+            DataTable tbl = null;
 
             try
             {
-                if (row["schoolid"].ToString() != "")
+                cn = createConnectionSDR();
+
+                if (cn != null)
                 {
-                    player.School = (Team)GlobalCollections.Instance.Schools.SingleOrDefault(s => s.ID == Convert.ToInt32(row["schoolid"]));
+                    String sql = "select * from drafttidbits where referencetype = 1 and tidbitorder < 999";
+                    cmd = new OracleCommand(sql, cn);
+                    rdr = cmd.ExecuteReader();
+
+                    tbl = new DataTable();
+
+                    tbl.Load(rdr);
+
+                    rdr.Close();
+                    rdr.Dispose();
+
+                    foreach (DataRow row in tbl.Rows)
+                    {
+                        Tidbit tidbit = new Tidbit();
+
+                        tidbit.ReferenceType = Convert.ToInt16(row["referencetype"]);
+                        tidbit.ReferenceID = Convert.ToInt32(row["referenceid"]);
+                        tidbit.TidbitOrder = Convert.ToInt16(row["tidbitorder"]);
+                        tidbit.TidbitText = row["text"].ToString();
+
+                        if (row["enabled"] != DBNull.Value)
+                        {
+                            tidbit.Enabled = Convert.ToBoolean(row["enabled"]);
+                        }
+                        else
+                        {
+                            tidbit.Enabled = false;
+                        }
+
+                        tidbits.Add(tidbit);
+                    }
+                }
+                else
+                {
+                    System.Windows.MessageBox.Show("There was a problem connecting to the SDR database");
                 }
             }
-            catch (Exception ex)
+            finally
             {
-
-            }
-            
-            if (row["pick"] != DBNull.Value)
-            {
-                if (Convert.ToInt16(row["pick"]) > 0)
-                {
-                    player.Pick = GlobalCollections.Instance.DraftOrder.FirstOrDefault(p => p.OverallPick == Convert.ToInt16(row["pick"]));
-                }
+                if (cmd != null) cmd.Dispose();
+                if (tbl != null) tbl.Dispose();
+                if (cn != null) cn.Close(); cn.Dispose();
             }
 
-            return player;
+            return tidbits;
         }
 
-        public static ObservableCollection<Tidbit> GetTidbitsSDR(int typeId, Int32 refId)
+        public static List<Tidbit> GetTidbitsSDR(int typeId, Int32 refId)
         {
-            ObservableCollection<Tidbit> tidbits = new ObservableCollection<Tidbit>();
+            List<Tidbit> tidbits = new List<Tidbit>();
                         
             OracleConnection cn = null;
             OracleCommand cmd = null;
@@ -545,6 +632,7 @@ namespace DraftAdmin.DataAccess
                     foreach (DataRow row in tbl.Rows)
                     {
                         Tidbit tidbit = new Tidbit();
+
                         tidbit.ReferenceType = Convert.ToInt16(row["referencetype"]);
                         tidbit.ReferenceID = Convert.ToInt32(row["referenceid"]);
                         tidbit.TidbitOrder = Convert.ToInt16(row["tidbitorder"]);
@@ -577,9 +665,9 @@ namespace DraftAdmin.DataAccess
             return tidbits;
         }
 
-        public static ObservableCollection<Tidbit> GetTidbitsMySql(int typeId, Int32 refId)
+        public static List<Tidbit> GetTidbitsMySql(int typeId, Int32 refId)
         {
-            ObservableCollection<Tidbit> tidbits = new ObservableCollection<Tidbit>();
+            List<Tidbit> tidbits = new List<Tidbit>();
 
             MySqlConnection cn = null;
             MySqlCommand cmd = null;
@@ -677,16 +765,20 @@ namespace DraftAdmin.DataAccess
                     school.Name = row["name"].ToString();
                     school.League = row["league"].ToString();
 
-                    if (row["logo"].ToString() != "")
+                    if (ConfigurationManager.AppSettings["LoadSchoolLogos"].ToString().ToUpper() == "TRUE" || ConfigurationManager.AppSettings["LoadSchoolLogos"].ToString().ToUpper() == "YES")
                     {
-                        school.LogoTga = new Uri(row["logo"].ToString());
+                        if (row["logo"].ToString() != "")
+                        {
+                            school.LogoTga = new Uri(row["logo"].ToString());
+                        }
+
+                        if (row["swatch"].ToString() != "")
+                        {
+                            //don't really need school swatches for anything
+                            //school.SwatchTga = new Uri(row["swatch"].ToString());
+                        }
                     }
-                    
-                    if (row["swatch"].ToString() != "")
-                    {
-                        school.SwatchTga = new Uri(row["swatch"].ToString());
-                    }
-                    
+
                     school.OverallRecord = row["overallrecord"].ToString();
                     school.ConferenceRecord = row["conferencerecord"].ToString();
 
@@ -849,7 +941,6 @@ namespace DraftAdmin.DataAccess
                 cn = createConnectionMySql();
 
                 String sql = "select * from teams where league = '" + ConfigurationManager.AppSettings["DraftType"].ToString() + "' order by city asc, name asc";
-                //String sql = "select * from teams where league = 'NFL' order by city asc, name asc";
 
                 cmd = new MySqlCommand(sql, cn);
                 rdr = cmd.ExecuteReader();
@@ -4419,7 +4510,6 @@ namespace DraftAdmin.DataAccess
                 handler(command);
             }
         }
-
 
     }
 

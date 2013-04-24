@@ -408,6 +408,7 @@ namespace DraftAdmin.ViewModels
                 OnPropertyChanged("SelectedRightLogo");
 
                 _currentSelectionTabVM.SelectedRightLogoFilename = _selectedRightLogo.FileName;
+                _draftOrderTabVM.SelectedRightLogoFilename = _selectedRightLogo.FileName;
             }
         }
 
@@ -555,6 +556,7 @@ namespace DraftAdmin.ViewModels
                 OnPropertyChanged("OTCHashtag");
 
                 _currentSelectionTabVM.OTCHashtag = value;
+                _draftOrderTabVM.OTCHashtag = value;
             }
         }
 
@@ -564,17 +566,26 @@ namespace DraftAdmin.ViewModels
 
         public MainViewModel()
         {
-            DbConnection.WebService = new scliveweb.Service();
-            DbConnection.WebService.Url = ConfigurationManager.AppSettings["WebServiceUrl"].ToString();
+            
 
-            if (ConfigurationManager.AppSettings["WebServiceUrl"].ToString() == "http://misdevtest1/dataserver/service.asmx")
+            try
             {
-                //WebRequest.DefaultWebProxy = new System.Net.WebProxy("http://misdevtest1:80");
+                DbConnection.WebService = new scliveweb.Service();
+                DbConnection.WebService.Url = ConfigurationManager.AppSettings["WebServiceUrl"].ToString();
+
+                if (ConfigurationManager.AppSettings["WebServiceUrl"].ToString() == "http://misdevtest1/dataserver/service.asmx")
+                {
+                    //WebRequest.DefaultWebProxy = new System.Net.WebProxy("http://misdevtest1:80");
+                }
+                else
+                {
+                    //WebRequest.DefaultWebProxy = new System.Net.WebProxy("http://scliveweb:80");
+                }
             }
-            else
+            catch (Exception ex)
             {
-                //WebRequest.DefaultWebProxy = new System.Net.WebProxy("http://scliveweb:80");
-            }   
+                MessageBox.Show("Cannot connect to web server: " + ConfigurationManager.AppSettings["WebServiceUrl"].ToString());
+            }
 
             DbConnection.SetStatusBarMsg += new DbConnection.SetStatusBarMsgEventHandler(setStatusBarMsg);
             DbConnection.SendCommandNoTransitionsEvent += new DbConnection.SendCommandNoTransitionsEventHandler(sendCommandNoTransitions);
@@ -618,14 +629,14 @@ namespace DraftAdmin.ViewModels
                 _refreshPollTimer.Start();
             }
 
-            loadSchools();
-            //loadTeams();
-            //loadOnTheClock();
-            //loadDraftOrder();
-            //loadPlayers();
+            //loadSchools();
+            ////loadTeams();
+            ////loadOnTheClock();
+            ////loadDraftOrder();
+            ////loadPlayers();
 
-            loadCategories();
-            loadInterruptions();
+            //loadCategories();
+            //loadInterruptions();
 
             TeamsAndPlayersVM = new TeamsAndPlayersViewModel(DbConnection.WebService);
 
@@ -680,6 +691,17 @@ namespace DraftAdmin.ViewModels
             getPollData();
 
             PollChip = "4GMC_logo_chip_ele.tga";
+
+            loadCategories();
+            loadInterruptions();
+
+            loadSchools();
+            //loadTeams();
+            //loadOnTheClock();
+            //loadDraftOrder();
+            //loadPlayers();
+
+            
         }
 
         #endregion
@@ -1012,7 +1034,12 @@ namespace DraftAdmin.ViewModels
 
                                 if (_playlistCommands.Count > 0)
                                 {
-                                    _playlistCommands.Remove(playlistCommand.Value.Key);
+                                    try
+                                    {
+                                        _playlistCommands.Remove(playlistCommand.Value.Key);
+                                    }
+                                    catch (Exception ex)
+                                    { }
                                 }                                 
                             }
                             else
@@ -1042,32 +1069,58 @@ namespace DraftAdmin.ViewModels
                 case "CommandFailed":
                     if (_playlistTimerRunning)
                     {
-                        playlistCommand = _playlistCommands.SingleOrDefault(p => p.Key == CommandToProcess.CommandID.ToString());
+                        int playlistID = 0;
 
-                        if (playlistCommand != null)
+                        try
                         {
-                            int playlistID = playlistCommand.Value.Value;
+                            playlistCommand = _playlistCommands.SingleOrDefault(p => p.Key == CommandToProcess.CommandID.ToString());
 
-                            if (_playlistTimerRunning)
+                            if (playlistCommand != null)
                             {
-                                Playlist loadedPlaylist = PlaylistTabVM.LoadedPlaylists.FirstOrDefault(p => p.PlaylistID == playlistID);
-                                System.Timers.Timer timer = null;
+                                playlistID = playlistCommand.Value.Value;
 
-                                if (loadedPlaylist != null)
+                                //if (_playlistTimerRunning)
+                                //{
+                                //Playlist loadedPlaylist = PlaylistTabVM.LoadedPlaylists.FirstOrDefault(p => p.PlaylistID == playlistID);
+                                //System.Timers.Timer timer = null;
+
+                                //if (loadedPlaylist != null)
+                                //{
+                                //timer = loadedPlaylist.Timer;
+
+                                //if (timer != null) { timer.Start(); }
+                                //}
+                                //}
+
+                                if (playlistCommand.Value.Key != null)
                                 {
-                                    timer = loadedPlaylist.Timer;
+                                    _playlistCommands.Remove(playlistCommand.Value.Key);
+                                }
 
-                                    if (timer != null) { timer.Start(); }
-                                }  
                             }
+                        }
+                        catch (Exception ex)
+                        { }
+                        finally
+                        {
+                            Playlist loadedPlaylist = PlaylistTabVM.LoadedPlaylists[0];
 
-                            if (playlistCommand.Value.Key != null)
+                            if (playlistID > 0)
                             {
-                                _playlistCommands.Remove(playlistCommand.Value.Key);
+                                loadedPlaylist = PlaylistTabVM.LoadedPlaylists.FirstOrDefault(p => p.PlaylistID == playlistID);
                             }
-                           
+                            
+                            System.Timers.Timer timer = null;
+
+                            if (loadedPlaylist != null)
+                            {
+                                timer = loadedPlaylist.Timer;
+
+                                if (timer != null) { timer.Start(); }
+                            }
                         }
                     }
+
                     break;
             }
         }
@@ -1759,7 +1812,10 @@ namespace DraftAdmin.ViewModels
                     xmlRow.Add("VISIBLE", "1");
                 }
 
-                xmlRow.Add("TIDBIT_1", _rightSideHashtag);
+                if (_selectedRightLogo.FileName.ToUpper().IndexOf("HASHTAG") > -1)
+                {
+                    xmlRow.Add("TIDBIT_1", _rightSideHashtag);
+                }
 
                 commandToSend.TemplateData = xmlRow.GetXMLString();
                 commandToSend.CommandID = Guid.NewGuid().ToString();
@@ -1902,7 +1958,7 @@ namespace DraftAdmin.ViewModels
 
             string hashtag = "";
 
-            if (OTCHashtag && SelectedRightLogo.FileName.ToUpper().IndexOf("HASHTAG") > -1)
+            if (OTCHashtag && SelectedRightLogo != null && SelectedRightLogo.FileName.ToUpper().IndexOf("HASHTAG") > -1)
             {
                 hashtag = Global.GlobalCollections.Instance.OnTheClock.Team.Hashtag;                
             }
