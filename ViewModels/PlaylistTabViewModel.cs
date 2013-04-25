@@ -38,6 +38,8 @@ namespace DraftAdmin.ViewModels
 
         private string _timerText = "";
 
+        private string _lastTemplateData = "";
+
         #endregion
 
         #region Properties
@@ -134,11 +136,29 @@ namespace DraftAdmin.ViewModels
         private void disablePollItems()
         {
             DbConnection.DisablePollItems(_selectedPlaylist.PlaylistID);
+
+            int selectedPlaylistItem = _selectedPlaylist.CurrentPlaylistItem;
+
+            SelectedPlaylist.PlaylistItems = DbConnection.GetPlaylistItems(_selectedPlaylist.PlaylistID);
+
+            if (selectedPlaylistItem <= SelectedPlaylist.PlaylistItems.Count)
+            {
+                SelectedPlaylist.CurrentPlaylistItem = selectedPlaylistItem;
+            }
         }
 
         private void enablePollItems()
         {
             DbConnection.EnablePollItems(_selectedPlaylist.PlaylistID);
+
+            int selectedPlaylistItem = _selectedPlaylist.CurrentPlaylistItem;
+
+            SelectedPlaylist.PlaylistItems = DbConnection.GetPlaylistItems(_selectedPlaylist.PlaylistID);
+
+            if (selectedPlaylistItem <= SelectedPlaylist.PlaylistItems.Count)
+            {
+                SelectedPlaylist.CurrentPlaylistItem = selectedPlaylistItem;
+            }
         }
 
         private void playlistTimer_Elapsed(object sender, ElapsedEventArgs e, int playlistID)
@@ -218,9 +238,28 @@ namespace DraftAdmin.ViewModels
                                     }
                                     else
                                     {
-                                        OnSendCommand(commandToSend, playlist);
+                                        //don't send data to the playout for the prompter if it hasn't changed.  too many graphics causes the clock to choke
+                                        if (playlistItem.Template.ToUpper() == "PROMPTER")
+                                        {
+                                            if (_lastTemplateData != commandToSend.TemplateData)
+                                            {
+                                                _lastTemplateData = commandToSend.TemplateData;
+                                                OnSendCommand(commandToSend, playlist);
+                                            }
+                                            else
+                                            {
+                                                if (playlist.TimerRunning)
+                                                {
+                                                    playlist.Timer.Start();
+                                                }
+                                            }
+                                        }
+                                        else
+                                        {
+                                            OnSendCommand(commandToSend, playlist);
+                                        }
 
-                                        Debug.Print(playlistItem.Template.ToString() + " sent to PageEngine");
+                                        //Debug.Print(playlistItem.Template.ToString() + " sent to PageEngine");
                                     }
 
                                     //SelectedPlaylist.PlaylistItems[SelectedPlaylist.CurrentPlaylistItem].OnAir = true;

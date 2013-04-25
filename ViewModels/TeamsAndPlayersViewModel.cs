@@ -6,6 +6,7 @@ using System.Data;
 using System.Windows.Input;
 using DraftAdmin.Commands;
 using DraftAdmin.DataAccess;
+using System.Net;
 
 namespace DraftAdmin.ViewModels
 {
@@ -150,12 +151,12 @@ namespace DraftAdmin.ViewModels
                 else
                 {
                     Leagues = null;
-                }                
+                }
             }
+            catch (WebException ex)
+            { }
             finally
-            {
-
-            }
+            { }
         }
 
         private void loadTeams()
@@ -176,10 +177,10 @@ namespace DraftAdmin.ViewModels
                     Teams = null;
                 }
             }
+            catch (WebException ex)
+            { }
             finally
-            {
-
-            }
+            { }
         }
 
         private void loadPlayers()
@@ -200,10 +201,10 @@ namespace DraftAdmin.ViewModels
                     Players = null;
                 }
             }
+            catch (WebException ex)
+            { }
             finally
-            {
-
-            }
+            { }
         }
 
         private void addPlayer()

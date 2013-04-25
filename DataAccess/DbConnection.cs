@@ -962,8 +962,13 @@ namespace DraftAdmin.DataAccess
                     team.Tricode = row["tricode"].ToString();
                     team.City = row["city"].ToString();
                     team.Name = row["name"].ToString();
-                    team.LogoTga = new Uri(row["logo"].ToString());
-                    team.SwatchTga = new Uri(row["swatch"].ToString());
+
+                    if (ConfigurationManager.AppSettings["LoadTeamLogos"].ToString().ToUpper() == "TRUE" || ConfigurationManager.AppSettings["LoadTeamLogos"].ToString().ToUpper() == "YES")
+                    {
+                        team.LogoTga = new Uri(row["logo"].ToString());
+                        team.SwatchTga = new Uri(row["swatch"].ToString());
+                    }
+
                     team.OverallRecord = row["overallrecord"].ToString();
                     team.ConferenceRecord = row["conferencerecord"].ToString();
                     team.Hashtag = row["hashtag"].ToString();
@@ -986,15 +991,18 @@ namespace DraftAdmin.DataAccess
                     {
                         team.PickPlateTga = new Uri(ConfigurationManager.AppSettings["PickPlateDirectory"].ToString() + "\\" + row["name"].ToString().ToUpper() + ".tga");
                     }
-                    
-                    if (ConfigurationManager.AppSettings["TeamTidbitsDatabase"].ToString().ToUpper() == "MYSQL")
+
+                    if (ConfigurationManager.AppSettings["LoadTeamTidbits"].ToString().ToUpper() == "TRUE" || ConfigurationManager.AppSettings["LoadTeamTidbits"].ToString().ToUpper() == "YES")
                     {
-                        team.Tidbits = GetTidbitsMySql(2, Convert.ToInt32(row["id"]));
+                        if (ConfigurationManager.AppSettings["TeamTidbitsDatabase"].ToString().ToUpper() == "MYSQL")
+                        {
+                            team.Tidbits = GetTidbitsMySql(2, Convert.ToInt32(row["id"]));
+                        }
+                        else
+                        {
+                            team.Tidbits = GetTidbitsSDR(2, Convert.ToInt32(row["id"]));
+                        }
                     }
-                    else
-                    {
-                        team.Tidbits = GetTidbitsSDR(2, Convert.ToInt32(row["id"]));
-                    }                    
 
                     teams.Add(team);
 
@@ -2339,6 +2347,12 @@ namespace DraftAdmin.DataAccess
                 else
                 {
                     row = tbl.Rows[0];
+                }
+
+                for (int i = 1; i <= 5; i++)
+                {
+                    row["answer" + i.ToString()] = "";
+                    row["answer" + i.ToString() + "pct"] = "";
                 }
 
                 if (lines.Count > 0)

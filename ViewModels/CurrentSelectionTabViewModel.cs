@@ -346,24 +346,6 @@ namespace DraftAdmin.ViewModels
 
             if (isLastPick) //show the end of draft template
             {
-                //hide lower3rd templates
-                commandToSend.Command = (DraftAdmin.PlayoutCommands.CommandType)Enum.Parse(typeof(DraftAdmin.PlayoutCommands.CommandType), "HidePage");
-                commandToSend.CommandID = Guid.NewGuid().ToString();
-                commandToSend.Parameters = new List<CommandParameter>();
-                commandToSend.Parameters.Add(new CommandParameter("TemplateName", "Lower3rd_Connected"));
-                commandToSend.Parameters.Add(new CommandParameter("QueueCommand", "true"));
-
-                OnSendCommand(commandToSend, null);
-
-                commandToSend = new PlayerCommand();
-
-                commandToSend.Command = (DraftAdmin.PlayoutCommands.CommandType)Enum.Parse(typeof(DraftAdmin.PlayoutCommands.CommandType), "HidePage");
-                commandToSend.CommandID = Guid.NewGuid().ToString();
-                commandToSend.Parameters = new List<CommandParameter>();
-                commandToSend.Parameters.Add(new CommandParameter("TemplateName", "Lower3rd_Separated"));
-
-                OnSendCommand(commandToSend, null);
-
                 commandToSend = new PlayerCommand();
 
                 commandToSend.Command = (DraftAdmin.PlayoutCommands.CommandType)Enum.Parse(typeof(DraftAdmin.PlayoutCommands.CommandType), "ShowPage");
@@ -372,6 +354,24 @@ namespace DraftAdmin.ViewModels
                 commandToSend.Parameters.Add(new CommandParameter("TemplateName", "EndOfDraft"));
 
                 OnSendCommand(commandToSend, null);
+
+                //hide lower3rd templates
+                //commandToSend.Command = (DraftAdmin.PlayoutCommands.CommandType)Enum.Parse(typeof(DraftAdmin.PlayoutCommands.CommandType), "HidePage");
+                //commandToSend.CommandID = Guid.NewGuid().ToString();
+                //commandToSend.Parameters = new List<CommandParameter>();
+                //commandToSend.Parameters.Add(new CommandParameter("TemplateName", "Lower3rd_Connected"));
+                //commandToSend.Parameters.Add(new CommandParameter("QueueCommand", "true"));
+
+                //OnSendCommand(commandToSend, null);
+
+                //commandToSend = new PlayerCommand();
+
+                //commandToSend.Command = (DraftAdmin.PlayoutCommands.CommandType)Enum.Parse(typeof(DraftAdmin.PlayoutCommands.CommandType), "HidePage");
+                //commandToSend.CommandID = Guid.NewGuid().ToString();
+                //commandToSend.Parameters = new List<CommandParameter>();
+                //commandToSend.Parameters.Add(new CommandParameter("TemplateName", "Lower3rd_Separated"));
+
+                //OnSendCommand(commandToSend, null);                
             }
             else
             {
@@ -465,6 +465,15 @@ namespace DraftAdmin.ViewModels
         private void hideEndOfDraft()
         {
             PlayerCommand commandToSend = new PlayerCommand();
+
+            commandToSend.Command = (DraftAdmin.PlayoutCommands.CommandType)Enum.Parse(typeof(DraftAdmin.PlayoutCommands.CommandType), "HidePage");
+            commandToSend.CommandID = Guid.NewGuid().ToString();
+            commandToSend.Parameters = new List<CommandParameter>();
+            commandToSend.Parameters.Add(new CommandParameter("TemplateName", "CurrentSelection"));
+
+            OnSendCommand(commandToSend, null);
+
+            commandToSend = new PlayerCommand();
 
             commandToSend.Command = (DraftAdmin.PlayoutCommands.CommandType)Enum.Parse(typeof(DraftAdmin.PlayoutCommands.CommandType), "HidePage");
             commandToSend.CommandID = Guid.NewGuid().ToString();

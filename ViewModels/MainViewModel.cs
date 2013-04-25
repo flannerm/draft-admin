@@ -566,8 +566,6 @@ namespace DraftAdmin.ViewModels
 
         public MainViewModel()
         {
-            
-
             try
             {
                 DbConnection.WebService = new scliveweb.Service();
@@ -582,7 +580,7 @@ namespace DraftAdmin.ViewModels
                     //WebRequest.DefaultWebProxy = new System.Net.WebProxy("http://scliveweb:80");
                 }
             }
-            catch (Exception ex)
+            catch (WebException ex)
             {
                 MessageBox.Show("Cannot connect to web server: " + ConfigurationManager.AppSettings["WebServiceUrl"].ToString());
             }
@@ -688,6 +686,7 @@ namespace DraftAdmin.ViewModels
             loadClockOverlays();
             loadPollChips();
             loadRightLogos();
+
             getPollData();
 
             PollChip = "4GMC_logo_chip_ele.tga";
@@ -732,10 +731,14 @@ namespace DraftAdmin.ViewModels
                     worker.RunWorkerCompleted += delegate(object s, RunWorkerCompletedEventArgs args)
                     {
                         setStatusBarMsg("Schools loaded at: " + DateTime.Now.ToString("h:mm:ss tt"), "Green");
-                        loadTeams();                        
+                        loadTeams();
                     };
 
                     worker.RunWorkerAsync();
+                }
+                else
+                {
+                    loadTeams();
                 }
             }
             catch (Exception ex)
@@ -769,11 +772,16 @@ namespace DraftAdmin.ViewModels
                     {
                         setStatusBarMsg("Teams loaded at: " + DateTime.Now.ToString("h:mm:ss tt"), "Green");
 
-                        loadDraftOrder();                        
+                        loadDraftOrder();
                         loadPlayers();
                     };
 
-                    worker.RunWorkerAsync();                    
+                    worker.RunWorkerAsync();
+                }
+                else
+                {
+                    loadDraftOrder();
+                    loadPlayers();
                 }
             }
             catch (Exception ex)
@@ -1263,52 +1271,62 @@ namespace DraftAdmin.ViewModels
                     xmlRow.Add("TURN_CLOCK_RED", _clockRedUnderMin.ToString().ToUpper());
                 }
 
-                switch (_clockSeconds)
+                if (_playlistTabVM.SelectedPlaylist != null)
                 {
-                    case 0:
-                        if (_prevClockSeconds != 0)
+                    if (_playlistTabVM.SelectedPlaylist.PlaylistName.ToUpper() != "BREAK CLOCK" && _playlistTabVM.SelectedPlaylist.PlaylistName.ToUpper() != "PROMPTER")
+                    {
+                        switch (_clockSeconds)
                         {
-                            xmlRow.Add("CLOCK_OVERLAY", "PICK IS IN");
-                        }
-                        break;
-                    case 60:
-                        if (_clockRedUnderMin)
-                        {
-                            xmlRow.Add("CLOCK_COLOR", "RED");
-                        }
-                        break;
-                    default:
-                        if (_clockSeconds > _prevClockSeconds && _prevClockSeconds > 0)
-                        {
-                            xmlRow.Add("CLOCK_OVERLAY", "PICK IS IN");
-                            xmlRow.Add("CLOCK", "");
-                            _pickIsIn = true;
-                        }
-                        else
-                        {
-                            //if (_useCountdownClock)
-                            //{
-                            //    xmlRow.Add("CLOCK", _countdownClock);
-                            //}
-                            //else
-                            //{
-                            //    if (_pickIsIn == false)
-                            //    {
-                            //        xmlRow.Add("CLOCK", _clock);
-                            //    }
-                            //}      
+                            case 0:
+                                if (_prevClockSeconds != 0)
+                                {
+                                    xmlRow.Add("CLOCK_OVERLAY", "PICK IS IN");
+                                }
+                                break;
+                            case 60:
+                                if (_clockRedUnderMin)
+                                {
+                                    xmlRow.Add("CLOCK_COLOR", "RED");
+                                }
+                                break;
+                            default:
+                                if (_clockSeconds > _prevClockSeconds && _prevClockSeconds > 0)
+                                {
+                                    xmlRow.Add("CLOCK_OVERLAY", "PICK IS IN");
+                                    xmlRow.Add("CLOCK", "");
+                                    _pickIsIn = true;
+                                }
+                                else
+                                {
+                                    //if (_useCountdownClock)
+                                    //{
+                                    //    xmlRow.Add("CLOCK", _countdownClock);
+                                    //}
+                                    //else
+                                    //{
+                                    //    if (_pickIsIn == false)
+                                    //    {
+                                    //        xmlRow.Add("CLOCK", _clock);
+                                    //    }
+                                    //}      
 
-                            commandToSend.Parameters.Add(new CommandParameter("MergeDataWithoutTransitions", "true"));
+                                    commandToSend.Parameters.Add(new CommandParameter("MergeDataWithoutTransitions", "true"));
+                                }
+
+                                break;
                         }
 
-                        break;
+                        if (_clockSeconds == 0)
+                        {
+                            _takeClock = false;
+
+                        }
+                    }
                 }
-
-                if (_clockSeconds == 0)
+                else
                 {
-                    _takeClock = false;
-                        
-                }
+                    _takeClock = true;
+                }                
             }
             else
             {
@@ -1922,8 +1940,17 @@ namespace DraftAdmin.ViewModels
             {
                 xmlRow.Add("ROUND_1", Global.GlobalCollections.Instance.OnTheClock.Round.ToString());
                 xmlRow.Add("PICK_1", Global.GlobalCollections.Instance.OnTheClock.OverallPick.ToString());
-                xmlRow.Add("LOGO_1", Global.GlobalCollections.Instance.OnTheClock.Team.LogoTgaNoKey.LocalPath);
-                xmlRow.Add("SWATCH_1", Global.GlobalCollections.Instance.OnTheClock.Team.SwatchTga.LocalPath);
+
+                if (Global.GlobalCollections.Instance.OnTheClock.Team.LogoTgaNoKey != null)
+                {
+                    xmlRow.Add("LOGO_1", Global.GlobalCollections.Instance.OnTheClock.Team.LogoTgaNoKey.LocalPath);
+                }
+
+                if (Global.GlobalCollections.Instance.OnTheClock.Team.SwatchTga != null)
+                {
+                    xmlRow.Add("SWATCH_1", Global.GlobalCollections.Instance.OnTheClock.Team.SwatchTga.LocalPath);
+                }
+                
                 xmlRow.Add("ABBREV_4_1", Global.GlobalCollections.Instance.OnTheClock.Team.Tricode);
             }
 
@@ -1982,11 +2009,14 @@ namespace DraftAdmin.ViewModels
 
             XmlDataRow xmlRow = new XmlDataRow();
 
-            Pick nextPick1;
-            Pick nextPick2;
+            Pick nextPick1 = null;
+            Pick nextPick2 = null;
 
-            nextPick1 = (Pick)Global.GlobalCollections.Instance.DraftOrder.SingleOrDefault(p => p.OverallPick == Global.GlobalCollections.Instance.OnTheClock.OverallPick + 1);
-            nextPick2 = (Pick)Global.GlobalCollections.Instance.DraftOrder.SingleOrDefault(p => p.OverallPick == Global.GlobalCollections.Instance.OnTheClock.OverallPick + 2);
+            if (Global.GlobalCollections.Instance.OnTheClock != null)
+            {
+                nextPick1 = (Pick)Global.GlobalCollections.Instance.DraftOrder.SingleOrDefault(p => p.OverallPick == Global.GlobalCollections.Instance.OnTheClock.OverallPick + 1);
+                nextPick2 = (Pick)Global.GlobalCollections.Instance.DraftOrder.SingleOrDefault(p => p.OverallPick == Global.GlobalCollections.Instance.OnTheClock.OverallPick + 2);
+            }
 
             if (nextPick1 != null)
             {
