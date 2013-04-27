@@ -269,7 +269,10 @@ namespace DraftAdmin.ViewModels
 
             updateClock(isLastPick);
 
-            updateHashtag();
+            if (_otcHashtag)
+            {
+                updateHashtag();
+            }
 
             updateContent(isLastPick);
         }
