@@ -122,7 +122,28 @@ namespace DraftAdmin.ViewModels
 
                     int pick = _selectedPick.OverallPick;
 
-                    _tradeString = "<font EventFranklinGothic-Demi>" + _selectedPick.Team.Name.ToUpper() + "<\\font> trade pick to <font EventFranklinGothic-Demi>" + _selectedTradePickTeam.Name.ToUpper() + "<\\font>";
+                    string fromTeam = "";
+                    string toTeam = "";
+
+                    if (_selectedPick.Team.Name.ToUpper() == "49ERS")
+                    {
+                        fromTeam = "49ers";
+                    }
+                    else
+                    {
+                        fromTeam = _selectedPick.Team.Name.ToUpper();
+                    }
+
+                    if (_selectedTradePickTeam.Name.ToUpper() == "49ERS")
+                    {
+                        toTeam = "49ers";
+                    }
+                    else
+                    {
+                        toTeam = _selectedTradePickTeam.Name.ToUpper();
+                    }
+
+                    _tradeString = "<font EventFranklinGothic-Demi>" + fromTeam + "<\\font> trade pick to <font EventFranklinGothic-Demi>" + toTeam + "<\\font>";
 
                     Global.GlobalCollections.Instance.LoadDraftOrder();
                     Global.GlobalCollections.Instance.LoadOnTheClock();
