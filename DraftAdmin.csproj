@@ -79,6 +79,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\Program Files (x86)\MySQL\MySQL Connector Net 6.6.5\Assemblies\v4.0\MySql.Data.dll</HintPath>
     </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\..\..\JSON.NET\Bin\Net40\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="Oracle.DataAccess, Version=2.111.7.0, Culture=neutral, PublicKeyToken=89b483f429c47342, processorArchitecture=x86" />
     <Reference Include="Skt_05">
       <HintPath>..\Libraries\Skt_05.dll</HintPath>
@@ -124,6 +127,7 @@
     <Compile Include="Models\Pick.cs" />
     <Compile Include="Models\Playlist.cs" />
     <Compile Include="Models\Tweet.cs" />
+    <Compile Include="Models\TweetResponse.cs" />
     <Compile Include="PlayoutCommands\PlayerCommand.cs" />
     <Compile Include="Models\Conference.cs" />
     <Compile Include="Models\PlaylistItem.cs" />

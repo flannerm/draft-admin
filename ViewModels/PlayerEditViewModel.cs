@@ -7,6 +7,7 @@ using System.Collections.ObjectModel;
 using DraftAdmin.DataAccess;
 using System.Windows.Input;
 using DraftAdmin.Commands;
+using System.Configuration;
 
 namespace DraftAdmin.ViewModels
 {
@@ -36,6 +37,9 @@ namespace DraftAdmin.ViewModels
 
         private bool _askDraftPlayer = false;
         private bool _showMessagePrompt = false;
+
+        private string _rank1Title;
+        private string _rank2Title;
 
         #endregion
 
@@ -71,12 +75,37 @@ namespace DraftAdmin.ViewModels
             set { _showMessagePrompt = value; OnPropertyChanged("ShowMessagePrompt"); }
         }
 
+        public string Rank1Title
+        {
+            get { return _rank1Title; }
+            set { _rank1Title = value; OnPropertyChanged("Rank1Title"); }
+        }
+
+        public string Rank2Title
+        {
+            get { return _rank2Title; }
+            set { _rank2Title = value; OnPropertyChanged("Rank2Title"); }
+        }
+
         #endregion
 
         #region Constructor
 
         public PlayerEditViewModel(Player player) : base(player)
-        {            
+        {
+            switch (ConfigurationManager.AppSettings["DraftType"].ToString().ToUpper())
+            {
+                case "NBA":
+                    _rank1Title = "Jay Rank:";
+                    _rank2Title = "Fran Rank:";
+                    break;
+                case "NFL":
+                    _rank1Title = "Kiper Rank:";
+                    _rank2Title = "McShay Rank:";
+                    break;
+            }
+
+
             DraftPlayer = new DelegateCommand<object>(draftPlayerAction);
             CancelDraftPlayer = new DelegateCommand<object>(cancelDraftPlayerAction);
 
@@ -102,6 +131,7 @@ namespace DraftAdmin.ViewModels
             player.LastName = _lastName;
             player.TvName = _tvName;
             player.Position = _position;
+            player.PositionFull = _positionFull;
             player.Height = _height;
             player.Weight = _weight;
             player.Headshot = _headshot;

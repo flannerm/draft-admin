@@ -93,6 +93,7 @@ namespace DraftAdmin.ViewModels
             {
                 SelectedTeamEditVM = new TeamEditViewModel(_selectedTeam);
                 SelectedTeamEditVM.SetStatusBarMsg += new SetStatusBarMsgEventHandler(OnSetStatusBarMsg);
+                SelectedTeamEditVM.SendCommandEvent += new SendCommandEventHandler(OnSendCommand);
             }
         }
 

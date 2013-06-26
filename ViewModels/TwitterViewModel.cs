@@ -18,6 +18,8 @@ using DraftAdmin.Output;
 using System.Drawing;
 using DraftAdmin.Utilities;
 using System.Windows.Media.Imaging;
+using Newtonsoft.Json.Linq;
+using Newtonsoft.Json;
 
 namespace DraftAdmin.ViewModels
 {
@@ -147,9 +149,30 @@ namespace DraftAdmin.ViewModels
             //textBlock1.Text = e.XmlData;
         }
 
-        private void GotFavorites(object sender, TwitterEventArgs e)
+        private void GotFavorites(object sender, TwitterEventArgs e, string rateLimitStatus)
         {
-            List<Tweet> tweets = ParseTweets(e.XmlData);
+            JArray dynObjs = (JArray)JsonConvert.DeserializeObject(e.XmlData);
+
+            List<TweetResponse> tweetResponses = new List<TweetResponse>();
+            tweetResponses = JsonConvert.DeserializeObject<List<TweetResponse>>(e.XmlData);
+
+            //string tweetIds = "";
+
+            //foreach (var tweetResponse in tweetResponses)
+            //{
+            //    //tweetIds += "," + tweet.Id;
+            //    Tweet tweet = new Tweet();
+
+            //    tweet.CreatedAt = tweetResponse.createdAt;
+
+
+            //    TweetViewModel tweetVM = new TweetViewModel(tweet);
+
+            //    tweetVMs.Add(tweetVM);
+            //}
+
+
+            List<Tweet> tweets = ParseTweets(tweetResponses);
 
             ObservableCollection<TweetViewModel> tweetVMs = new ObservableCollection<TweetViewModel>();
 
@@ -165,7 +188,7 @@ namespace DraftAdmin.ViewModels
             GetFavoritesButtonEnabled = true;
         }
 
-        public List<Tweet> ParseTweets(string xmlData)
+        public List<Tweet> ParseTweets(List<TweetResponse> tweetResponses)
         {
             int days = 0;
             int hours = 0;
@@ -179,12 +202,7 @@ namespace DraftAdmin.ViewModels
 
             try
             {
-                XmlDocument xmlDoc = new XmlDocument();
-                xmlDoc.LoadXml(xmlData);
-
-                XmlNodeList statusNodes = xmlDoc.SelectNodes("//status");
-
-                foreach (XmlNode statusNode in statusNodes)
+                foreach (TweetResponse tweetResponse in tweetResponses)
                 {
                     days = 0;
                     hours = 0;
@@ -195,15 +213,11 @@ namespace DraftAdmin.ViewModels
                     try
                     {
                         Tweet tweet = new Tweet();
+     
+                        tweet.TweetID = tweetResponse.Id;
 
-                        XmlNode id = statusNode.SelectSingleNode("descendant::id");
-
-                        tweet.TweetID = id.FirstChild.Value.ToString();                         
-
-                        string createdAt = statusNode.SelectSingleNode("descendant::created_at").FirstChild.Value.ToString();
+                        string createdAt = tweetResponse.createdAt;
                         DateTime createdAtDate = DateTime.ParseExact(createdAt, "ddd MMM dd HH:mm:ss zzzz yyyy", CultureInfo.InvariantCulture);
-
-                        //tweet.CreatedAt = createdAtDate.ToString("yyyy-MM-dd HH:mm");
 
                         System.DateTime now = DateTime.Now;
                         System.TimeSpan diff1 = now.Subtract(createdAtDate);
@@ -251,10 +265,10 @@ namespace DraftAdmin.ViewModels
 
                         using (var client = new WebClient())
                         {
-                            string profileImageUrl = statusNode.SelectSingleNode("descendant::profile_image_url").FirstChild.Value.ToString();
+                            string profileImageUrl = tweetResponse.user.profileImageUrl;
                             string fileName = profileImageUrl.Substring(profileImageUrl.LastIndexOf("/") + 1);
                             string localFolder = ConfigurationManager.AppSettings["LocalImageDirectory"].ToString() + "\\Twitter";
-                            string localFile = localFolder + "\\" + id.FirstChild.Value.ToString() + "_normal.jpg";
+                            string localFile = localFolder + "\\" + tweetResponse.Id.ToString() + "_normal.jpg";
 
                             if (Directory.Exists(localFolder) == false)
                             {
@@ -271,14 +285,12 @@ namespace DraftAdmin.ViewModels
                                 client.DownloadFile(profileImageUrl.Replace("_normal", "_bigger"), localFile.Replace("_normal", "_bigger"));
                             }
 
-                            tweet.Text = statusNode.SelectSingleNode("descendant::text").FirstChild.Value.ToString();
-                            tweet.User = statusNode.SelectSingleNode("descendant::user/name").FirstChild.Value.ToString();
-                            tweet.ScreenName = statusNode.SelectSingleNode("descendant::user/screen_name").FirstChild.Value.ToString();
+                            tweet.Text = tweetResponse.tweetText;
+                            tweet.User = tweetResponse.user.Name;
+                            tweet.ScreenName = tweetResponse.user.screenName;
 
                             tweet.UserImage = localFile;
                         }
-
-                        //tweet.TweetType = tweetType;
                         
                         tweets.Add(tweet);
                     }

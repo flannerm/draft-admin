@@ -22,6 +22,7 @@ namespace DraftAdmin.Models
         private int _kiperRank;
         private int _mcshayRank;
         private string _position;
+        private string _positionFull;
         private string _state;
         private string _headshot;
         private string _height;
@@ -63,6 +64,12 @@ namespace DraftAdmin.Models
         {
             get { return _position; }
             set { _position = value;  }
+        }
+
+        public string PositionFull
+        {
+            get { return _positionFull; }
+            set { _positionFull = value; }
         }
 
         public string Hometown

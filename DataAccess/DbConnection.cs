@@ -366,6 +366,7 @@ namespace DraftAdmin.DataAccess
             }
 
             player.Position = row["position"].ToString();
+            player.PositionFull = row["positionfull"].ToString();
 
             if (tidbits != null)
             {
@@ -739,7 +740,7 @@ namespace DraftAdmin.DataAccess
                         sql = "select * from teams where league = 'NCAAF' or league = 'NCF23' order by league asc, name asc";
                         break;
                     case "NBA":
-                        sql = "select * from teams where league = 'NCAAB' or league = 'OLYMB' order by league asc, name asc";
+                        sql = "select * from teams where league = 'NCAAB' or league = 'OLYMB' or league = 'WNBA' or league = 'NBDL' order by league asc, name asc";
                         break;
                 }               
 
@@ -1296,6 +1297,8 @@ namespace DraftAdmin.DataAccess
                             category.SwatchFile = new Uri(row["swatch"].ToString());
                         }
                     }
+
+                    category.Template = row["template"].ToString();
 
                     categories.Add(category);
                 }
@@ -2045,6 +2048,27 @@ namespace DraftAdmin.DataAccess
                 {
                     row["kiperrank"] = player.KiperRank;
                 }
+
+                oldRank = 0;
+
+                if (row["mcshayrank"] != DBNull.Value)
+                {
+                    oldRank = Convert.ToInt16(row["mcshayrank"]);
+                }
+
+                if (oldRank != player.McShayRank)
+                {
+                    updateMcShayRanks(player, oldRank);
+                }
+
+                if (player.McShayRank == 0)
+                {
+                    row["mcshayrank"] = DBNull.Value;
+                }
+                else
+                {
+                    row["mcshayrank"] = player.McShayRank;
+                }
                 
                 if (player.School != null)
                 {
@@ -2056,6 +2080,7 @@ namespace DraftAdmin.DataAccess
                 }
                 
                 row["position"] = player.Position;
+                row["positionfull"] = player.PositionFull;
                 row["height"] = player.Height;
                 row["weight"] = player.Weight;
                 row["class"] = player.Class;
@@ -2724,6 +2749,119 @@ namespace DraftAdmin.DataAccess
             }
         }
 
+        private static void updateMcShayRanks(Player player, int rank)
+        {
+            OracleConnection cn = null;
+            OracleCommand cmdMax = null;
+            OracleCommand cmdRank = null;
+            OracleCommand cmdCount = null;
+            OracleDataReader rdrCount = null;
+
+            try
+            {
+
+                cn = createConnectionSDR();
+
+                string sql = "select max(mcshayrank) FROM draftplayers";
+                cmdMax = new OracleCommand(sql, cn);
+
+                OracleDataReader rdr = cmdMax.ExecuteReader();
+                int maxRank = 0;
+
+                if (rdr.HasRows)
+                {
+                    rdr.Read();
+
+                    if (rdr[0] != DBNull.Value)
+                    {
+                        maxRank = Convert.ToInt16(rdr[0]);
+                    }
+                    else
+                    {
+                        maxRank = 1;
+                    }
+                }
+
+                cmdMax.Dispose();
+                rdr.Close();
+                rdr.Dispose();
+
+                sql = "select count(*) from draftplayers where (mcshayrank > 0 and mcshayrank is not null) or playerid = " + player.PlayerId;
+                cmdCount = new OracleCommand(sql, cn);
+                rdrCount = cmdCount.ExecuteReader();
+                int count = 0;
+
+                if (rdrCount.HasRows)
+                {
+                    rdrCount.Read();
+                    count = Convert.ToInt16(rdrCount[0]);
+                }
+
+                cmdCount.Dispose();
+                rdrCount.Close();
+                rdrCount.Dispose();
+
+                if (player.McShayRank > 0)
+                {
+                    if (player.McShayRank > count)
+                    {
+                        player.McShayRank = count;
+                    }
+                    else
+                    {
+                        if (player.McShayRank < count)
+                        {
+                            if (player.McShayRank >= (maxRank + 1))
+                            {
+                                player.McShayRank = maxRank;
+                            }
+                        }
+                    }
+
+                    sql = "";
+
+                    if (player.McShayRank <= maxRank)
+                    {
+                        if (rank > player.McShayRank)
+                        {
+                            sql = "update draftplayers set mcshayrank = (mcshayrank + 1) where mcshayrank <= " + rank.ToString() + " and mcshayrank >= " + player.McShayRank.ToString() + " and playerid <> " + player.PlayerId;
+                        }
+                        else if (rank < player.McShayRank)
+                        {
+                            if (rank > 0)
+                            {
+                                sql = "update draftplayers set mcshayrank = (mcshayrank - 1) where mcshayrank > " + rank.ToString() + " and mcshayrank <= " + player.McShayRank.ToString() + " and playerid <> " + player.PlayerId;
+                            }
+                            else
+                            {
+                                sql = "update draftplayers set mcshayrank = (mcshayrank + 1) where mcshayrank >= " + player.McShayRank.ToString() + " and playerid <> " + player.PlayerId;
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    if (rank > 0) //old rank was not 0, new rank is 0
+                    {
+                        sql = "update draftplayers set mcshayrank = (mcshayrank - 1) where mcshayrank > " + rank;
+                    }
+                }
+
+                if (sql != "")
+                {
+                    cmdRank = new OracleCommand(sql, cn);
+                    cmdRank.ExecuteNonQuery();
+                }
+            }
+            finally
+            {
+                if (cmdMax != null) cmdMax.Dispose();
+                if (cmdCount != null) cmdCount.Dispose();
+                if (cmdRank != null) cmdRank.Dispose();
+                if (cn != null) cn.Close(); cn.Dispose();
+            }
+        }
+
         public static bool DeleteTidbitMySql(int tidbitTypeId, Int32 refId, int tidbitOrder)
         {
             bool result = false;
@@ -3163,7 +3301,7 @@ namespace DraftAdmin.DataAccess
 
                             Int16 age;
 
-                            if (dsPlayers.Tables["players"].Columns["age"] != null)
+                            if (dsPlayers.Tables["player"].Columns["age"] != null)
                             {
                                 if (Int16.TryParse(xmlRow["age"].ToString(), out age))
                                 {
@@ -3173,7 +3311,7 @@ namespace DraftAdmin.DataAccess
 
                             row["position"] = xmlRow["position"].ToString();
 
-                            if (dsPlayers.Tables["players"].Columns["positionfull"] != null)
+                            if (dsPlayers.Tables["player"].Columns["positionfull"] != null)
                             {
                                 row["positionfull"] = xmlRow["positionfull"].ToString();
                             }

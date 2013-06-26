@@ -122,6 +122,8 @@
         <StackPanel Grid.Row="9" Grid.Column="1" Grid.ColumnSpan="2" Orientation="Horizontal" VerticalAlignment="Center" Margin="5">
             <Button Name="addTidbitButton" Content="Add Tidbit" Width="90" Command="{Binding AddTidbitCommand}" Background="Black"></Button>
             <Button Name="deleteTidbitButton" Content="Delete Tidbit" Width="90" Height="25" Command="{Binding DeleteTidbitCommand}" Background="Black"></Button>
+            <Button Name="previewTidbitButton" Content="Preview Tidbit" Width="90" Height="25" Command="{Binding PreviewTidbitCommand}" Background="Goldenrod" 
+                    Foreground="Black" Margin="70,0,0,0" Visibility="{Binding PreviewTidbitButtonVisibility}"></Button>
         </StackPanel>
 
         <StackPanel Grid.Row="10" Grid.ColumnSpan="3" HorizontalAlignment="Center" VerticalAlignment="Center" Orientation="Horizontal">

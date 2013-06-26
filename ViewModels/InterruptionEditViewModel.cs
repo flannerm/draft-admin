@@ -93,13 +93,21 @@ namespace DraftAdmin.ViewModels
                 commandToSend.Command = (DraftAdmin.PlayoutCommands.CommandType)Enum.Parse(typeof(DraftAdmin.PlayoutCommands.CommandType), "ShowPage");
                 commandToSend.CommandID = Guid.NewGuid().ToString();
                 commandToSend.Parameters = new List<CommandParameter>();
-                commandToSend.Parameters.Add(new CommandParameter("TemplateName", ConfigurationManager.AppSettings["InterruptionTemplate"].ToString()));
+                commandToSend.Parameters.Add(new CommandParameter("TemplateName", Category.Template));
 
                 XmlDataRow xmlRow = new XmlDataRow();
 
-                xmlRow.Add("CHIP_1", this.Category.LogoTga.LocalPath);
-                xmlRow.Add("TIDBIT_1", this.SelectedTidbitText);
-                xmlRow.Add("SWATCH_1", this.Category.SwatchFile.LocalPath);
+                if (Category.LogoTga != null)
+                {
+                    xmlRow.Add("CHIP_1", Category.LogoTga.LocalPath);
+                }
+
+                if (Category.SwatchFile != null)
+                {
+                    xmlRow.Add("SWATCH_1", Category.SwatchFile.LocalPath);
+                }
+                                
+                xmlRow.Add("TIDBIT_1", SelectedTidbitText.Trim());
 
                 commandToSend.TemplateData = xmlRow.GetXMLString();
 

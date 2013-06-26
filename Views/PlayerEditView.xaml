@@ -32,7 +32,7 @@
             <TextBlock Text="First Name:" Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="5"/>           
             <TextBlock Text="School:" Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="5"/>
             <TextBlock Text="Draft Team:" Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="5"/>            
-            <TextBlock Text="Kiper Rank:" Grid.Row="3" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="5"/>            
+            <TextBlock Text="{Binding Rank1Title}" Grid.Row="3" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="5"/>            
             <!--<TextBlock Text="Headshot:" Grid.Row="4" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="5"/>-->
             <TextBlock Text="Height:" Grid.Row="5" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="5"/>
             <TextBlock Text="Trade:" Grid.Row="6" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="5"/>
@@ -51,14 +51,18 @@
 
         <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal">
             <ComboBox Name="school" HorizontalAlignment="Left" VerticalAlignment="Center"
-                  Width="200" Margin="5" ItemsSource="{Binding Schools, Source={x:Static global:GlobalCollections.Instance}}" DisplayMemberPath="Name" SelectedValuePath="ID"
+                  Width="180" Margin="5" ItemsSource="{Binding Schools, Source={x:Static global:GlobalCollections.Instance}}" DisplayMemberPath="Name" SelectedValuePath="ID"
                   SelectedItem="{Binding School, UpdateSourceTrigger=PropertyChanged}">                
             </ComboBox>
 
             <TextBlock Text="Position:" Grid.Row="4" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="5"/>
             
             <TextBox Name="position" Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="3" HorizontalAlignment="Stretch" VerticalAlignment="Center"
-                    Width="108" Height="30" Margin="5" Text="{Binding Position, UpdateSourceTrigger=PropertyChanged}"/> 
+                    Width="38" Height="30" Margin="5" Text="{Binding Position, UpdateSourceTrigger=PropertyChanged}"/>
+            
+            <TextBox Name="positionFull" Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="3" HorizontalAlignment="Stretch" VerticalAlignment="Center"
+                    Width="78" Height="30" Margin="5" Text="{Binding PositionFull, UpdateSourceTrigger=PropertyChanged}"/>
+
         </StackPanel>
 
         <StackPanel  Grid.Row="2" Grid.Column="1" Orientation="Horizontal">
@@ -78,7 +82,7 @@
                     Height="30" Margin="5" Width="50"
                     Text="{Binding KiperRank, UpdateSourceTrigger=PropertyChanged}"></TextBox>
 
-            <TextBlock Text="McShay Rank:" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="5"/>
+            <TextBlock Text="{Binding Rank2Title}" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="5"/>
                 
             <TextBox Name="rankSpecial" HorizontalAlignment="Left" VerticalAlignment="Center"
                     Height="30" Margin="5" Width="50" 

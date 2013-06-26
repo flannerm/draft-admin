@@ -647,6 +647,7 @@ namespace DraftAdmin.ViewModels
 
             TeamTabVM = new TeamTabViewModel();
             TeamTabVM.SetStatusBarMsg += new SetStatusBarMsgEventHandler(setStatusBarMsg);
+            TeamTabVM.SendCommandEvent += new SendCommandEventHandler(sendCommandToPlayout);
 
             CategoryTabVM = new CategoryTabViewModel();
             CategoryTabVM.SetStatusBarMsg += new SetStatusBarMsgEventHandler(setStatusBarMsg);

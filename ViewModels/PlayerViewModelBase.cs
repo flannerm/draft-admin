@@ -21,6 +21,7 @@ namespace DraftAdmin.ViewModels
         protected string _lastName;
         protected string _tvName;
         protected string _position;
+        protected string _positionFull;
         protected string _hometown;
         protected string _state;
         protected string _headshot;
@@ -69,6 +70,12 @@ namespace DraftAdmin.ViewModels
         {
             get { return _position; }
             set { _position = value; OnPropertyChanged("Position"); IsDirty = true; }
+        }
+
+        public string PositionFull
+        {
+            get { return _positionFull; }
+            set { _positionFull = value; OnPropertyChanged("PositionFull"); IsDirty = true; }
         }
 
         public string Hometown
@@ -176,6 +183,7 @@ namespace DraftAdmin.ViewModels
                 _hometown = player.Hometown;
                 _state = player.State;
                 _position = player.Position;
+                _positionFull = player.PositionFull;
                 _height = player.Height;
                 _weight = player.Weight;
                 _class = player.Class;

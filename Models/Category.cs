@@ -24,6 +24,7 @@ namespace DraftAdmin.Models
         private BitmapImage _logoBitmap;
         private Uri _swatchFile;
         private List<Tidbit> _tidbits;
+        private string _template;
         private bool _isDirty;
 
         #endregion
@@ -152,6 +153,12 @@ namespace DraftAdmin.Models
         {
             get { return _tidbits; }
             set { _tidbits = value; }
+        }
+
+        public string Template
+        {
+            get { return _template; }
+            set { _template = value; }
         }
 
         public bool IsDirty
